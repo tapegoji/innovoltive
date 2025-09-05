@@ -1,0 +1,19 @@
+[Unit]
+Description=InnoVoltive HTTPS Server
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=root
+ExecStart=/home/asepahvand/.nvm/versions/node/v20.19.4/bin/node /home/asepahvand/repos/innovoltive/server.js
+WorkingDirectory=/home/asepahvand/repos/innovoltive
+Environment=NODE_ENV=production
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=innovoltive
+
+[Install]
+WantedBy=multi-user.target
