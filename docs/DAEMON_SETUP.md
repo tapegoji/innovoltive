@@ -8,25 +8,26 @@ This document explains how to set up the InnoVoltive HTTPS server as a systemd d
 - Node.js v18.17+ installed (we use v20.19.4 via NVM)
 - SSL certificates from Let's Encrypt for `innovoltive.com`
 - Root/sudo access
-- Properly configured pnpm with build dependencies
 
 ### Important: Node.js Version Requirements
 
 ⚠️ **Critical**: Next.js 15.5.2 requires Node.js 18.17 or higher. If you encounter syntax errors when running with `sudo`, you have a Node.js version conflict (see Troubleshooting section).
 
-### pnpm Build Dependencies
+### pnpm Build Scripts (If Needed)
 
-The project includes a `pnpm-workspace.yaml` file that handles ignored build dependencies:
+Some systems with pnpm v10+ may show warnings about ignored build scripts. If you encounter build script warnings, you have two options:
 
-```yaml
-ignoredBuiltDependencies:
-  - '@clerk/shared'
-  - '@tailwindcss/oxide'
-  - sharp
-  - unrs-resolver
+**Option 1 - Install with scripts enabled:**
+```bash
+pnpm install --ignore-scripts=false
 ```
 
-This prevents pnpm security warnings while allowing necessary build scripts to run.
+**Option 2 - Configure pnpm globally:**
+```bash
+pnpm config set ignore-scripts false
+```
+
+This is **only needed if you see warnings** about ignored build dependencies like `@clerk/shared`, `@tailwindcss/oxide`, `sharp`, etc.
 
 ## Service Configuration
 
