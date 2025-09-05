@@ -8,8 +8,8 @@ Type=simple
 Restart=always
 RestartSec=1
 User=root
-ExecStart=/home/asepahvand/.nvm/versions/node/v20.19.4/bin/node /home/asepahvand/repos/innovoltive/server.js
-WorkingDirectory=/home/asepahvand/repos/innovoltive
+ExecStart=/home/asepahvand/.nvm/versions/node/v20.19.4/bin/node /home/asepahvand/repos/website/innovoltive/server.js
+WorkingDirectory=/home/asepahvand/repos/website/innovoltive
 Environment=NODE_ENV=production
 StandardOutput=syslog
 StandardError=syslog
