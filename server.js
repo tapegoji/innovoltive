@@ -1,7 +1,7 @@
-const { createServer } = require('https');
-const { parse } = require('url');
-const next = require('next');
-const fs = require('fs');
+import { createServer } from 'https';
+import { parse } from 'url';
+import next from 'next';
+import * as fs from 'fs';
 
 const dev = false; // Set to false for production build
 const hostname = 'innovoltive.com';
