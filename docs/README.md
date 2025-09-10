@@ -21,6 +21,9 @@ To set up the daemon service:
 # Start service
 sudo systemctl start innovoltive.service
 
+
+# Retart service
+sudo systemctl restart innovoltive.service
 # Check status  
 sudo systemctl status innovoltive.service
 
