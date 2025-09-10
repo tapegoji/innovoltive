@@ -19,7 +19,7 @@ export function Header() {
         <SignedOut>
           <ThemeToggle />
           <SignInButton>
-            <CircleUserRound className='w-8 h-8' />
+            <CircleUserRound className='w-8 h-8' strokeWidth={1.5} />
           </SignInButton>
           {/* <SignUpButton>
             <button className="bg-[#6c47ff] text-white rounded-full font-medium text-sm sm:text-base h-8 sm:h-8 px-4 sm:px-5 cursor-pointer">
