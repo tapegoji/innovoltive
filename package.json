@@ -2,6 +2,7 @@
   "name": "innovoltive_2",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev --turbopack",
     "dev:https": "sudo node server.js",
