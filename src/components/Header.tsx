@@ -13,7 +13,7 @@ import { ThemeToggle } from "@/components/theme-toggle"
 
 export function Header() {
   return (
-    <header className="flex justify-between items-center px-2 gap-4 h-10 border-b border-gray-400">
+    <header className="flex justify-between items-center px-2 gap-4 h-10 border-b">
       <Logo />
       <div className="flex items-center gap-4">
         <ThemeToggle />
