@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { ClerkProvider } from '@clerk/nextjs'
+import { shadcn } from '@clerk/themes'
 import { Geist, Geist_Mono } from 'next/font/google'
 import { ThemeProvider } from '@/components/theme-toggle'
 import { Header } from '@/components/Header'
@@ -28,7 +29,11 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <ClerkProvider>
+        <ClerkProvider
+          appearance={{
+            baseTheme: shadcn,
+          }}
+        >
           <ThemeProvider
             attribute="class"
             defaultTheme="system"

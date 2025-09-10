@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@clerk/nextjs": "^6.31.9",
+    "@clerk/themes": "^2.4.18",
     "@mdi/js": "^7.4.47",
     "@mdi/react": "^1.6.1",
     "@radix-ui/react-dialog": "^1.1.15",
