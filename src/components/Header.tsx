@@ -7,7 +7,7 @@ import {
   SignedOut,
   UserButton,
 } from '@clerk/nextjs'
-import { LayoutDashboard } from 'lucide-react'
+import { CircleUserRound, LayoutDashboard } from 'lucide-react'
 import { Logo } from "@/components/logo"
 import { ThemeToggle } from "@/components/theme-toggle"
 
@@ -18,7 +18,9 @@ export function Header() {
       <div className="flex items-center gap-4">
         <SignedOut>
           <ThemeToggle />
-          <SignInButton />
+          <SignInButton>
+            <CircleUserRound className='w-8 h-8' />
+          </SignInButton>
           {/* <SignUpButton>
             <button className="bg-[#6c47ff] text-white rounded-full font-medium text-sm sm:text-base h-8 sm:h-8 px-4 sm:px-5 cursor-pointer">
               Sign Up
