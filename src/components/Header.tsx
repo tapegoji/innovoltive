@@ -13,11 +13,11 @@ import { ThemeToggle } from "@/components/theme-toggle"
 
 export function Header() {
   return (
-    <header className="flex justify-between items-center p-4 gap-4 h-16">
+    <header className="flex justify-between items-center px-2 gap-4 h-10 border-b border-gray-400">
       <Logo />
       <div className="flex items-center gap-4">
+        <ThemeToggle />
         <SignedOut>
-          <ThemeToggle />
           <SignInButton>
             <CircleUserRound className='w-8 h-8' strokeWidth={1.5} />
           </SignInButton>
