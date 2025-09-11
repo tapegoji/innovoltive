@@ -48,10 +48,10 @@ export function ControlPanel() {
       className="z-[100]"
       dragHandleClassName="drag-handle"
     >
-      <div className="h-full flex flex-col bg-background border rounded-lg overflow-hidden">
-        <Card className="flex-1 p-1 mb-0 border-0 shadow-none">
-          <CardHeader className="p-1 max-h-8 border-b">
-            <div className="flex text-sm justify-between items-center">
+      <div className="h-full flex flex-col bg-sidebar border rounded-lg overflow-hidden">
+        <Card className="flex-1 p-1 mb-0 border-0 shadow-none bg-sidebar">
+          <CardHeader className="p-1 max-h-8 border-b border-sidebar-border">
+            <div className="flex text-sm justify-between items-center text-sidebar-foreground">
                 <div className="flex-1">
                 {isMobile ? 'CP' : 'Control Panel'}
                 </div>
@@ -61,24 +61,24 @@ export function ControlPanel() {
               <div className="flex-1 flex justify-end space-x-1">
                 <IconX 
                   size={16} 
-                  className="text-muted-foreground hover:text-destructive cursor-pointer transition-colors"
+                  className="text-sidebar-foreground/60 hover:text-destructive cursor-pointer transition-colors"
                   onClick={() => setIsVisible(false)}
                 />
               </div>
             </div>
           </CardHeader>
           <CardContent className="p-1 h-full">
-            <div className="space-y-2 pt-0 text-sm">
+            <div className="space-y-2 pt-0 text-sm text-sidebar-foreground">
               <div>Geometry</div>
               <div>Mesh</div>
               <div>Simulation</div>
             </div>
           </CardContent>
         </Card>
-        <div className="px-2 py-1 border-t bg-muted/50">
+        <div className="px-2 py-1 border-t border-sidebar-border bg-sidebar-accent/50">
           <Link
             href="/dashboard"
-            className="text-xs text-primary hover:text-primary/80 transition-colors block text-center"
+            className="text-xs text-sidebar-primary hover:text-sidebar-primary/80 transition-colors block text-center"
           >
             ← Return to Dashboard
           </Link>
