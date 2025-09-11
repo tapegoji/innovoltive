@@ -16,7 +16,7 @@ function Box() {
 
 export default function CanvasPage() {
   return (
-    <div className="w-full h-screen" style={{ backgroundColor: 'var(--canvas)' }}>
+    <div className="w-full h-screen">
       <ControlPanel />
       <Canvas
         orthographic
