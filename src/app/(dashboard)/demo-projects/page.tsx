@@ -28,7 +28,7 @@ export default function DemoProjectsPage() {
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground mb-6">
-              We're working hard to bring you amazing public project examples, 
+              We&apos;re working hard to bring you amazing public project examples, 
               templates, and tutorials. Check back soon!
             </p>
             <div className="flex items-center justify-center space-x-2 text-sm text-primary">

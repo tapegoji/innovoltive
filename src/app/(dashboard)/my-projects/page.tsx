@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { IconFolder, IconExternalLink } from '@tabler/icons-react'
+import { currentUser } from '@clerk/nextjs/server'
 
 const projects = [
   {
@@ -15,11 +16,28 @@ const projects = [
   }
 ]
 
-export default function MyProjectsPage() {
+export default async function MyProjectsPage() {
+  const user = await currentUser()
+  
+  if (!user) {
+    return (
+      <div className="container mx-auto p-6">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold tracking-tight">My Projects</h1>
+          <p className="text-muted-foreground mt-2">
+            Please sign in to view your projects
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  const userName = user?.firstName ? `${user.firstName}'s` : 'My'
+
   return (
     <div className="container mx-auto p-6">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight">My Projects</h1>
+        <h1 className="text-3xl font-bold tracking-tight">{userName} Projects</h1>
         <p className="text-muted-foreground mt-2">
           Manage and access your CAD projects and simulations
         </p>
