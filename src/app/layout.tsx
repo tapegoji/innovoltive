@@ -3,7 +3,6 @@ import { ClerkProvider } from '@clerk/nextjs'
 import { shadcn } from '@clerk/themes'
 import { Geist, Geist_Mono } from 'next/font/google'
 import { ThemeProvider } from '@/components/theme-toggle'
-import { Header } from '@/components/Header'
 import './globals.css'
 
 const geistSans = Geist({
@@ -40,7 +39,6 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <Header />
             {children}
           </ThemeProvider>
         </ClerkProvider>
