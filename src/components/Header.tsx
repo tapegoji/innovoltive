@@ -17,19 +17,36 @@ import {
   TooltipTrigger,
   TooltipProvider
 } from "@/components/ui/tooltip"
+import { cn } from "@/lib/utils"
+import React from 'react'
 
-export function Header() {
+interface HeaderProps {
+  compact?: boolean
+  className?: string
+  children?: React.ReactNode
+}
+
+export function Header({ compact = false, className, children }: HeaderProps) {
   return (
     <TooltipProvider>
-      <header className="bg-sidebar border-sidebar-border flex justify-between items-center px-2 w-full">
-        <Logo />
-        <div className="flex items-center gap-4">
+      <header className={cn(
+        "bg-sidebar border-sidebar-border flex items-center w-full",
+        compact ? "h-8 px-2" : "px-2",
+        className
+      )}>
+        <Logo className={compact ? "text-lg" : ""} />
+        {children && (
+          <div className="flex-1 flex items-center justify-center">
+            {children}
+          </div>
+        )}
+        <div className={cn("flex items-center gap-4", !children && "ml-auto")}>
           <ThemeToggle />
           <SignedOut>
             <Tooltip>
               <TooltipTrigger asChild>
                 <SignInButton>
-                  <CircleUserRound className="cursor-pointer" />
+                  <CircleUserRound className={cn("cursor-pointer", compact && "w-4 h-4")} />
                 </SignInButton>
               </TooltipTrigger>
               <TooltipContent>
@@ -46,7 +63,7 @@ export function Header() {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Link href="/dashboard">
-                  <LayoutDashboard className="mr-2" />
+                  <LayoutDashboard className={cn("mr-2", compact && "w-4 h-4")} />
                 </Link>
               </TooltipTrigger>
               <TooltipContent>

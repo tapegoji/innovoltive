@@ -11,7 +11,7 @@ export function Logo({ withLink = true, className = "" }: LogoProps) {
   const logoContent = (
     <>
       <Icon path={mdiShapePlus} size={1} className="text-primary" />
-      <h1 className="text-2xl font-bold">InFEM</h1>
+      <h1 className={`text-2xl font-bold ${className}`}>InFEM</h1>
     </>
   )
 
