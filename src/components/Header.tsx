@@ -20,7 +20,7 @@ import {
 export function Header() {
   return (
     <TooltipProvider>
-      <header className="flex justify-between items-center gap-4 w-full">
+      <header className="flex justify-between items-center px-2 w-full">
         <Logo />
         <div className="flex items-center gap-4">
           <ThemeToggle />

@@ -25,7 +25,7 @@ export function Logo({ withLink = true, className = "" }: LogoProps) {
 
   return (
     <div className="flex items-center space-x-2">
-      <Link href="/" className={`py-2 flex items-center space-x-2 hover:opacity-80 transition-opacity ${className}`}>
+      <Link href="/" className={`flex items-center space-x-2 hover:opacity-80 transition-opacity ${className}`}>
         {logoContent}
       </Link>
     </div>
