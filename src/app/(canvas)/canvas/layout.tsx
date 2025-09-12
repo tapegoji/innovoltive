@@ -10,7 +10,7 @@ export default function CanvasLayout({
   return (
     <div className="w-full h-screen canvas">
       <Header compact className='border-b'>
-        <Box className="w-4 h-4" />
+        <Box className="w-6 h-6" />
       </Header>
       {children}
     </div>

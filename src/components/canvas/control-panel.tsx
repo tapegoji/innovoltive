@@ -24,7 +24,7 @@ export function ControlPanel() {
     return (
       <button
         onClick={() => setIsVisible(true)}
-        className="fixed top-10 left-2 z-[100] w-10 h-10 bg-sidebar text-sidebar-foreground rounded-lg shadow-lg hover:bg-sidebar-accent transition-colors flex items-center justify-center border border-sidebar-border"
+        className="fixed top-9 left-1 z-[100] w-8 h-8 bg-sidebar text-sidebar-foreground rounded shadow-lg hover:bg-sidebar-accent transition-colors flex items-center justify-center border border-sidebar-border"
         title="Open Control Panel"
       >
         <IconMenu2 size={20} />
@@ -35,8 +35,8 @@ export function ControlPanel() {
   return (
     <Rnd
       default={{
-        x: 8,
-        y: 8,
+        x: 4,
+        y: 4,
         width: isMobile ? 160 : 250,
         height: isMobile ? 250 : 400
       }}
