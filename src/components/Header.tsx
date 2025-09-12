@@ -8,6 +8,7 @@ import {
   UserButton,
 } from '@clerk/nextjs'
 import { CircleUserRound, LayoutDashboard } from 'lucide-react'
+import Link from 'next/link'
 import { Logo } from "@/components/logo"
 import { ThemeToggle } from "@/components/theme-toggle"
 import {
@@ -20,7 +21,7 @@ import {
 export function Header() {
   return (
     <TooltipProvider>
-      <header className="flex justify-between items-center px-2 w-full">
+      <header className="bg-sidebar border-sidebar-border flex justify-between items-center px-2 w-full">
         <Logo />
         <div className="flex items-center gap-4">
           <ThemeToggle />
@@ -42,6 +43,16 @@ export function Header() {
             </SignUpButton> */}
           </SignedOut>
           <SignedIn>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Link href="/dashboard">
+                  <LayoutDashboard className="mr-2" />
+                </Link>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Go to Dashboard</p>
+              </TooltipContent>
+            </Tooltip>
             <UserButton>
               <UserButton.MenuItems>
                 <UserButton.Link
