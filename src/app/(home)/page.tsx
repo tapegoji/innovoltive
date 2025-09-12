@@ -11,8 +11,40 @@ export default function Home() {
           </h1>
           <p className="text-xl text-muted-foreground mb-8">
             Welcome to InFEM - where innovation meets creativity
-          </p>
-          
+          </p>        
+        </div>        
+        <div className="mt-16 max-w-4xl mx-auto">
+          <div className="text-lg text-muted-foreground space-y-6">
+            <ul className="space-y-3 text-left max-w-4xl mx-auto">
+              <li className="flex items-start">
+                <span className="mr-2">•</span>
+                <span><span className="font-bold">Design and Simulate Magnetics in 1D, 2D, and 3D</span> — from core losses to complex field interactions</span>
+              </li>
+              <li className="flex items-start">
+                <span className="mr-2">•</span>
+                <span><span className="font-bold">PCB Trace Simulation</span> — analyze current flow, predict temperature rise, and optimize layouts</span>
+              </li>
+              <li className="flex items-start">
+                <span className="mr-2">•</span>
+                <span><span className="font-bold">Thermal Prediction</span> — forecast heating effects across your design before prototyping</span>
+              </li>
+              <li className="flex items-start">
+                <span className="mr-2">•</span>
+                <span><span className="font-bold">Extract Parasitics</span> — get accurate inductance, capacitance, and resistance values directly from your geometry</span>
+              </li>
+              <li className="flex items-start">
+                <span className="mr-2">•</span>
+                <span><span className="font-bold">Cloud-Based</span> — no heavy installs, just upload your design and start simulating</span>
+              </li>
+              <li className="flex items-start">
+                <span className="mr-2">•</span>
+                <span><span className="font-bold">For Engineers, by Engineers</span> — tools built to accelerate innovation and cut down trial-and-error</span>
+              </li>
+            </ul>
+          </div>
+        </div>        
+        {/* Call to Action Section */}
+        <div className="mt-20 max-w-4xl mx-auto text-center">
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/sign-in">
               <Button size="lg">Get Started</Button>
@@ -22,29 +54,16 @@ export default function Home() {
                 Sign Up
               </Button>
             </Link>
-            <Link href="/pricing">
+            {/* <Link href="/pricing">
               <Button variant="outline" size="lg">
                 View Pricing
               </Button>
-            </Link>
+            </Link> */}
           </div>
         </div>
-        
-        {/* About Us Section */}
-        <div className="mt-16 max-w-4xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-8">About Us</h2>
-          <div className="text-lg text-muted-foreground space-y-6">
-            <p>
-              Welcome to InnoVoltive, where innovation knows no limits. We are a group of seasoned power electronics experts, each with a wealth of knowledge and extensive hands-on experience in the field. Our collective expertise is rooted in years of dedicated research and development at the forefront of power electronics innovation.
-            </p>
-            
-            <p>
-              At InnoVoltive, our mission is to bridge the gap between cutting-edge research and practical industry applications in the power electronics field. We specialize in designing efficient, high-frequency, and high-power density power converters, including DC-DC and DC-AC converters. Our goal is to create a transformative impact by bringing unparalleled performance and high efficiencies to existing markets while pioneering innovative technologies that bridge the research-to-industry divide.
-            </p>
-          </div>
-        </div>
-        
-        <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+
+        {/* Features Grid Section */}
+        <div className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           <div className="text-center p-6 rounded-lg border">
             <h3 className="text-xl font-semibold mb-3">Innovation</h3>
             <p className="text-muted-foreground">

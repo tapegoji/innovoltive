@@ -78,7 +78,7 @@ export function ControlPanel() {
         <div className="px-2 py-1 border-t border-sidebar-border bg-sidebar-accent/50">
           <Link
             href="/dashboard"
-            className="text-xs text-sidebar-primary hover:text-sidebar-primary/80 transition-colors block text-center"
+            className="text-xs text-center"
           >
             ← Return to Dashboard
           </Link>

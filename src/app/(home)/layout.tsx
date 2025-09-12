@@ -7,7 +7,7 @@ export default function HomeLayout({
 }>) {
   return (
     <>
-      <Header />
+      <Header compact/>
       {children}
     </>
   )
