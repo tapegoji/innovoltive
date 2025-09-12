@@ -34,7 +34,7 @@ export function Header({ compact = false, className, children }: HeaderProps) {
         compact ? "h-8 px-2" : "px-2",
         className
       )}>
-        <Logo className={compact ? "text-lg" : ""} />
+        <Logo textSize={compact ? "text-lg" : "text-2xl"} />
         {children && (
           <div className="flex-1 flex items-center justify-center">
             {children}

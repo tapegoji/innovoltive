@@ -5,13 +5,14 @@ import Link from 'next/link'
 interface LogoProps {
   withLink?: boolean
   className?: string
+  textSize?: string
 }
 
-export function Logo({ withLink = true, className = "" }: LogoProps) {
+export function Logo({ withLink = true, className = "", textSize = "text-2xl" }: LogoProps) {
   const logoContent = (
     <>
       <Icon path={mdiShapePlus} size={1} className="text-primary" />
-      <h1 className={`text-2xl font-bold ${className}`}>InFEM</h1>
+      <h1 className={`font-bold ${textSize}`}>InFEM</h1>
     </>
   )
 
@@ -24,8 +25,8 @@ export function Logo({ withLink = true, className = "" }: LogoProps) {
   }
 
   return (
-    <div className="flex items-center space-x-2">
-      <Link href="/" className={`flex items-center space-x-2 hover:opacity-80 transition-opacity ${className}`}>
+    <div className={`flex items-center space-x-2 ${className}`}>
+      <Link href="/" className="flex items-center space-x-2 hover:opacity-80 transition-opacity">
         {logoContent}
       </Link>
     </div>
