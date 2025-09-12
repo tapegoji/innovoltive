@@ -50,10 +50,7 @@ export function AppSidebar() {
                 return (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild isActive={isActive}>
-                      <Link href={item.url} className={cn(
-                        "flex items-center gap-2",
-                        isActive && "bg-sidebar-accent text-sidebar-accent-foreground"
-                      )}>
+                      <Link href={item.url}>
                         <item.icon />
                         <span>{item.title}</span>
                       </Link>
