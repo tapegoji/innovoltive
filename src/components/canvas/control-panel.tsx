@@ -24,7 +24,7 @@ export function ControlPanel() {
     return (
       <button
         onClick={() => setIsVisible(true)}
-        className="fixed top-2 left-2 z-[100] w-10 h-10 bg-sidebar text-sidebar-foreground rounded-lg shadow-lg hover:bg-sidebar-accent transition-colors flex items-center justify-center border border-sidebar-border"
+        className="fixed top-10 left-2 z-[100] w-10 h-10 bg-sidebar text-sidebar-foreground rounded-lg shadow-lg hover:bg-sidebar-accent transition-colors flex items-center justify-center border border-sidebar-border"
         title="Open Control Panel"
       >
         <IconMenu2 size={20} />

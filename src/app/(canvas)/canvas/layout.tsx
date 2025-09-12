@@ -1,3 +1,4 @@
+import { Header } from '@/components/Header'
 import React, { ReactNode } from 'react'
 
 export default function CanvasLayout({
@@ -7,6 +8,7 @@ export default function CanvasLayout({
 }) {
   return (
     <div className="w-full h-screen canvas">
+      <Header />
       {children}
     </div>
   )
