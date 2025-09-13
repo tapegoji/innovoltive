@@ -28,10 +28,30 @@ export default function MyProjectsPage() {
   React.useEffect(() => {
     async function fetchProjects() {
       try {
+        // First, get project IDs from user_projects table
+        const { data: userProjects, error: userProjectsError } = await supabase
+          .from('user_projects')
+          .select('project_id')
+          .eq('user_id', user?.id)
+
+        if (userProjectsError) {
+          console.error('Error fetching user projects:', userProjectsError)
+          return
+        }
+
+        if (!userProjects || userProjects.length === 0) {
+          setProjects([])
+          return
+        }
+
+        // Extract project IDs
+        const projectIds = userProjects.map(up => up.project_id)
+
+        // Then, fetch project details from projects table using the IDs
         const { data, error } = await supabase
           .from('projects')
           .select('*')
-          .eq('user_id', user?.id)
+          .in('id', projectIds)
           .order('date_modified', { ascending: false })
 
         if (error) {

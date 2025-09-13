@@ -27,6 +27,23 @@ async function insertProjects() {
         console.error('Error inserting project:', project.name, error)
       } else {
         console.log('Inserted project:', project.name)
+
+        // Insert into user_projects table
+        const userProjectData = {
+          user_id: project.user_id,
+          project_id: project.id,
+          role: 'owner'
+        }
+
+        const { data: userProjectResult, error: userProjectError } = await supabase
+          .from('user_projects')
+          .insert([userProjectData])
+
+        if (userProjectError) {
+          console.error('Error inserting user_project for:', project.name, userProjectError)
+        } else {
+          console.log('Inserted user_project for:', project.name)
+        }
       }
     }
 
