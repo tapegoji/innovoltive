@@ -6,7 +6,6 @@ export interface Project {
   size?: string
   date_modified: string
   status: "active" | "completed" | "paused" | "archived"
-  user_id: string
   created_at: string
   updated_at: string
 }

@@ -4,8 +4,6 @@ import React from 'react'
 import { Plus } from 'lucide-react'
 import { useUser } from '@clerk/nextjs'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { supabase } from '@/lib/supabase'
 
@@ -48,30 +46,53 @@ export function AddProjectDialog({ onProjectAdded }: AddProjectDialogProps) {
 
     setLoading(true)
     try {
+      // Generate a unique ID for the project
+      const projectId = crypto.randomUUID()
+
       const projectData = {
+        id: projectId,
         name: formData.name.trim(),
-        description: formData.description.trim() || null,
+        description: formData.description.trim(),
         type: formData.type,
         status: formData.status,
-        user_id: user.id,
         date_modified: new Date().toISOString(),
-        size: '0 KB' // Default size for new projects
+        size: '0 MB' // Default size for new projects
       }
 
       console.log('Creating project:', projectData)
 
-      const { data, error } = await supabase
-        .from('user_projects')
+      // First, insert the project
+      const { data: projectResult, error: projectError } = await supabase
+        .from('projects')
         .insert([projectData])
         .select()
 
-      if (error) {
-        console.error('Error creating project:', error)
-        alert(`Failed to create project: ${error.message}`)
+      if (projectError) {
+        console.error('Error creating project:', projectError)
+        alert(`Failed to create project: ${projectError.message}`)
         return
       }
 
-      console.log('Project created successfully:', data)
+      console.log('Project created successfully:', projectResult)
+
+      // Then, create the user-project relationship
+      const userProjectData = {
+        user_id: user.id,
+        project_id: projectId,
+        role: 'owner'
+      }
+
+      const { data: userProjectResult, error: userProjectError } = await supabase
+        .from('user_projects')
+        .insert([userProjectData])
+
+      if (userProjectError) {
+        console.error('Error creating user-project relationship:', userProjectError)
+        // Don't fail the whole operation, but log the error
+        console.warn('Project created but user association failed')
+      } else {
+        console.log('User-project relationship created:', userProjectResult)
+      }
       
       // Reset form
       setFormData({
@@ -145,36 +166,29 @@ export function AddProjectDialog({ onProjectAdded }: AddProjectDialogProps) {
 
               <div className="space-y-3">
                 <label className="text-sm font-medium">Project Type *</label>
-                <div className="grid grid-cols-1 gap-3">
+                <div className="space-y-2">
                   {projectTypes.map((type) => (
-                    <Card 
-                      key={type.value}
-                      className={`cursor-pointer transition-colors ${
-                        formData.type === type.value 
-                          ? 'ring-2 ring-primary bg-primary/5' 
-                          : 'hover:bg-muted/50'
-                      }`}
-                      onClick={() => setFormData(prev => ({ ...prev, type: type.value as any }))}
-                    >
-                      <CardHeader className="pb-2">
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="radio"
-                            name="type"
-                            value={type.value}
-                            checked={formData.type === type.value}
-                            onChange={() => {}}
-                            className="text-primary"
-                          />
-                          <CardTitle className="text-sm">{type.label}</CardTitle>
-                        </div>
-                      </CardHeader>
-                      <CardContent className="pt-0">
-                        <CardDescription className="text-xs">
-                          {type.description}
-                        </CardDescription>
-                      </CardContent>
-                    </Card>
+                    <div key={type.value} className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id={type.value}
+                        name="type"
+                        value={type.value}
+                        checked={formData.type === type.value}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setFormData(prev => ({ ...prev, type: type.value as any }))
+                          }
+                        }}
+                        className="h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary"
+                      />
+                      <label htmlFor={type.value} className="text-sm font-medium cursor-pointer">
+                        {type.label}
+                      </label>
+                      <span className="text-xs text-muted-foreground">
+                        {type.description}
+                      </span>
+                    </div>
                   ))}
                 </div>
               </div>

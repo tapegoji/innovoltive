@@ -1,0 +1,27 @@
+-- -- Create the projects table from scratch with no dependencies
+-- CREATE TABLE projects (
+--   id TEXT PRIMARY KEY,
+--   name TEXT,
+--   type TEXT,
+--   description TEXT,
+--   date_modified TIMESTAMP,
+--   size TEXT,
+--   status TEXT,
+--   created_at TIMESTAMP DEFAULT NOW(),
+--   updated_at TIMESTAMP DEFAULT NOW()
+-- );
+
+-- -- Create the user_projects junction table
+-- CREATE TABLE user_projects (
+--   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+--   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+--   project_id TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+--   role TEXT NOT NULL DEFAULT 'owner',
+--   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+--   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+--   UNIQUE(user_id, project_id)
+-- );
+
+-- -- Create indexes for better performance
+-- CREATE INDEX idx_user_projects_user_id ON user_projects(user_id);
+-- CREATE INDEX idx_user_projects_project_id ON user_projects(project_id);
