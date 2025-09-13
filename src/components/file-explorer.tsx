@@ -24,6 +24,7 @@ interface FileExplorerProps {
   viewMode?: "grid" | "list"
   onViewModeChange?: (mode: "grid" | "list") => void
   renderItemLink?: (item: FileItem, children: React.ReactNode) => React.ReactNode
+  toolbarActions?: React.ReactNode
 }
 
 const getIcon = (type: string) => {
@@ -48,7 +49,7 @@ const getStatusBadge = (status: string) => (
   </span>
 )
 
-export function FileExplorer({ items, currentPath = ["My Projects"], viewMode = "list", onViewModeChange, renderItemLink }: FileExplorerProps) {
+export function FileExplorer({ items, currentPath = ["My Projects"], viewMode = "list", onViewModeChange, renderItemLink, toolbarActions }: FileExplorerProps) {
   const [sortBy, setSortBy] = React.useState<"name" | "type" | "status" | "date" | "size">("name")
   const [sortOrder, setSortOrder] = React.useState<"asc" | "desc">("asc")
 
@@ -103,6 +104,7 @@ export function FileExplorer({ items, currentPath = ["My Projects"], viewMode = 
         </Breadcrumb>
 
         <div className="flex items-center gap-2">
+          {toolbarActions}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm">
