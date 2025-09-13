@@ -18,27 +18,27 @@ export default function Home() {
             <ul className="space-y-3 text-left max-w-4xl mx-auto">
               <li className="flex items-start">
                 <span className="mr-2">•</span>
-                <span><span className="font-bold">Design and Simulate Magnetics in 1D, 2D, and 3D</span> — from core losses to complex field interactions</span>
+                <span><span className="font-bold text-foreground">Design and Simulate Magnetics in 1D, 2D, and 3D</span> — from core losses to complex field interactions</span>
               </li>
               <li className="flex items-start">
                 <span className="mr-2">•</span>
-                <span><span className="font-bold">PCB Trace Simulation</span> — analyze current flow, predict temperature rise, and optimize layouts</span>
+                <span><span className="font-bold text-foreground">PCB Trace Simulation</span> — analyze current flow, predict temperature rise, and optimize layouts</span>
               </li>
               <li className="flex items-start">
                 <span className="mr-2">•</span>
-                <span><span className="font-bold">Thermal Prediction</span> — forecast heating effects across your design before prototyping</span>
+                <span><span className="font-bold text-foreground">Thermal Prediction</span> — forecast heating effects across your design before prototyping</span>
               </li>
               <li className="flex items-start">
                 <span className="mr-2">•</span>
-                <span><span className="font-bold">Extract Parasitics</span> — get accurate inductance, capacitance, and resistance values directly from your geometry</span>
+                <span><span className="font-bold text-foreground">Extract Parasitics</span> — get accurate inductance, capacitance, and resistance values directly from your geometry</span>
               </li>
               <li className="flex items-start">
                 <span className="mr-2">•</span>
-                <span><span className="font-bold">Cloud-Based</span> — no heavy installs, just upload your design and start simulating</span>
+                <span><span className="font-bold text-foreground">Cloud-Based</span> — no heavy installs, just upload your design and start simulating</span>
               </li>
               <li className="flex items-start">
                 <span className="mr-2">•</span>
-                <span><span className="font-bold">For Engineers, by Engineers</span> — tools built to accelerate innovation and cut down trial-and-error</span>
+                <span><span className="font-bold text-foreground">For Engineers, by Engineers</span> — tools built to accelerate innovation and cut down trial-and-error</span>
               </li>
             </ul>
           </div>
@@ -47,15 +47,15 @@ export default function Home() {
         <div className="mt-20 max-w-4xl mx-auto text-center">
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/sign-in">
-              <Button size="lg">Get Started</Button>
+              <Button className="text-secondary">Get Started</Button>
             </Link>
             <Link href="/sign-up">
-              <Button variant="outline" size="lg">
+              <Button variant="outline" className="text-foreground">
                 Sign Up
               </Button>
             </Link>
             {/* <Link href="/pricing">
-              <Button variant="outline" size="lg">
+              <Button variant="outline" className="text-foreground">
                 View Pricing
               </Button>
             </Link> */}
