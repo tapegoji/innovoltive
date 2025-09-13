@@ -8,7 +8,6 @@ import { useUser } from '@clerk/nextjs'
 import { supabase } from '@/lib/supabase'
 import { Project } from '@/types/database'
 import { AddProjectDialog } from '@/components/add-project-dialog'
-import { SimpleAddProjectDialog } from '@/components/simple-add-project-dialog'
 
 function formatDateModified(dateString: string): string {
   const date = new Date(dateString)
