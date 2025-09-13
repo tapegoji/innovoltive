@@ -55,6 +55,7 @@ export function AddProjectDialog({ onProjectAdded }: AddProjectDialogProps) {
         description: formData.description.trim(),
         type: formData.type,
         status: formData.status,
+        user_id: user.id,
         date_modified: new Date().toISOString(),
         size: '0 MB' // Default size for new projects
       }

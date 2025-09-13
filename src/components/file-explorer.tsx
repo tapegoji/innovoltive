@@ -16,6 +16,7 @@ export interface FileItem {
   dateModified: string
   description?: string
   status: "active" | "completed" | "paused" | "archived"
+  user?: string
 }
 
 interface FileExplorerProps {
@@ -151,17 +152,18 @@ export function FileExplorer({ items, currentPath = ["My Projects"], viewMode = 
           </div>
         ) : (
           <div className="space-y-1">
-            <div className="grid grid-cols-12 gap-4 px-3 py-2 text-sm font-medium text-muted-foreground border-b">
+            <div className="grid grid-cols-13 gap-4 px-3 py-2 text-sm font-medium text-muted-foreground border-b">
               <div className="col-span-3">Name</div>
               <div className="col-span-1">Type</div>
               <div className="col-span-2">Status</div>
               <div className="col-span-1">Size</div>
               <div className="col-span-2">Date Modified</div>
-              <div className="col-span-3">Description</div>
+              <div className="col-span-2">User</div>
+              <div className="col-span-2">Description</div>
             </div>
             {sortedItems.map(item => (
               <ItemWrapper key={item.id} item={item}>
-                <div className="grid grid-cols-12 gap-4 px-3 py-2 text-sm cursor-pointer hover:bg-accent/50 rounded transition-colors">
+                <div className="grid grid-cols-13 gap-4 px-3 py-2 text-sm cursor-pointer hover:bg-accent/50 rounded transition-colors">
                   <div className="col-span-3 flex items-center space-x-2 min-w-0">
                     {getIcon(item.type)}
                     <span className="truncate font-medium" title={item.name}>{item.name}</span>
@@ -170,7 +172,10 @@ export function FileExplorer({ items, currentPath = ["My Projects"], viewMode = 
                   <div className="col-span-2">{getStatusBadge(item.status)}</div>
                   <div className="col-span-1 text-muted-foreground">{item.size || "-"}</div>
                   <div className="col-span-2 text-muted-foreground">{item.dateModified}</div>
-                  <div className="col-span-3 text-muted-foreground">
+                  <div className="col-span-2 text-muted-foreground">
+                    <span className="truncate" title={item.user}>{item.user || "-"}</span>
+                  </div>
+                  <div className="col-span-2 text-muted-foreground">
                     <span className="truncate" title={item.description}>{item.description || "-"}</span>
                   </div>
                 </div>

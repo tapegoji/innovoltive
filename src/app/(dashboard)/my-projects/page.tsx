@@ -31,6 +31,7 @@ export default function MyProjectsPage() {
         const { data, error } = await supabase
           .from('projects')
           .select('*')
+          .eq('user_id', user?.id)
           .order('date_modified', { ascending: false })
 
         if (error) {
@@ -45,7 +46,8 @@ export default function MyProjectsPage() {
           description: project.description,
           dateModified: formatDate(project.date_modified),
           size: project.size,
-          status: project.status
+          status: project.status,
+          user: user?.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : user?.username || 'Unknown User'
         }))
 
         setProjects(formattedProjects)
@@ -56,8 +58,10 @@ export default function MyProjectsPage() {
       }
     }
 
-    fetchProjects()
-  }, [])
+    if (user?.id) {
+      fetchProjects()
+    }
+  }, [user])
 
   if (!user) {
     return (
@@ -103,6 +107,9 @@ export default function MyProjectsPage() {
         {projects.length === 0 && (
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="text-center">
+              <IconFolder className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+              <h3 className="text-lg font-medium text-muted-foreground mb-2">No projects yet</h3>
+              <p className="text-muted-foreground">Create your first project to get started with CAD modeling and simulation.</p>
             </div>
           </div>
         )}
