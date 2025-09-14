@@ -54,6 +54,7 @@ import { toast } from "sonner"
 import { z } from "zod"
 
 import { useIsMobile } from "@/hooks/use-mobile"
+import { ProjectForm } from "@/components/project-form"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -70,6 +71,14 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart"
 import { Checkbox } from "@/components/ui/checkbox"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import {
   Drawer,
   DrawerClose,
@@ -382,6 +391,7 @@ export function DataTable({
     pageSize: 10,
   })
   const [activeTab, setActiveTab] = React.useState("tabular")
+  const [isAddDialogOpen, setIsAddDialogOpen] = React.useState(false)
   const sortableId = React.useId()
   const sensors = useSensors(
     useSensor(MouseSensor, {}),
@@ -503,10 +513,33 @@ export function DataTable({
                 })}
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button variant="outline" size="sm">
-            <IconPlus />
-            <span className="hidden lg:inline">Add Project</span>
-          </Button>
+          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline" size="sm">
+                <IconPlus />
+                <span className="hidden lg:inline">Add Project</span>
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Add New Project</DialogTitle>
+                <DialogDescription>
+                  Create a new project. Fill in the details below.
+                </DialogDescription>
+              </DialogHeader>
+              <ProjectForm 
+                onSubmit={(project) => {
+                  const newProject = {
+                    ...project,
+                    id: Math.max(...data.map(p => p.id), 0) + 1
+                  }
+                  setData(prev => [...prev, newProject])
+                  setIsAddDialogOpen(false) // Close dialog after adding
+                }}
+                onCancel={() => setIsAddDialogOpen(false)}
+              />
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
       <TabsContent
