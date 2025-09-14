@@ -135,6 +135,78 @@ const getTypeLabel = (type: string) => {
   return typeLabels.join(' + ')
 }
 
+const getTypeBadge = (type: string) => {
+  if (!type) return (
+    <Badge variant="outline" className="text-xs font-medium">
+      Unknown
+    </Badge>
+  )
+  
+  const types = type.split(',').map(t => t.trim().toLowerCase())
+  
+  // For multiple types, show them as separate badges
+  if (types.length > 1) {
+    return (
+      <div className="flex items-center gap-1 flex-wrap">
+        {types.map((t, index) => {
+          const badgeClasses = {
+            'em': 'text-blue-600 border-blue-200',
+            'ht': 'text-red-600 border-red-200',
+            'cfd': 'text-green-600 border-green-200',
+            'folder': 'text-gray-600 border-gray-200',
+            'file': 'text-gray-600 border-gray-200'
+          }[t] || 'text-gray-600 border-gray-200'
+          
+          const labels = {
+            'em': 'EM',
+            'ht': 'HT', 
+            'cfd': 'CFD',
+            'folder': 'Folder',
+            'file': 'File'
+          }[t] || t.toUpperCase()
+          
+          return (
+            <Badge 
+              key={index}
+              variant="outline" 
+              className={`text-xs font-medium ${badgeClasses}`}
+            >
+              {labels}
+            </Badge>
+          )
+        })}
+      </div>
+    )
+  }
+  
+  // For single types, show one badge
+  const firstType = types[0]
+  const badgeClasses = {
+    'em': 'text-blue-600 border-blue-200',
+    'ht': 'text-red-600 border-red-200', 
+    'cfd': 'text-green-600 border-green-200',
+    'folder': 'text-gray-600 border-gray-200',
+    'file': 'text-gray-600 border-gray-200'
+  }[firstType] || 'text-gray-600 border-gray-200'
+  
+  const labels = {
+    'em': 'EM',
+    'ht': 'HT',
+    'cfd': 'CFD', 
+    'folder': 'Folder',
+    'file': 'File'
+  }[firstType] || firstType.toUpperCase()
+  
+  return (
+    <Badge 
+      variant="outline" 
+      className={`text-xs font-medium ${badgeClasses}`}
+    >
+      {labels}
+    </Badge>
+  )
+}
+
 const getStatusBadge = (status: string) => (
   <Badge 
     variant="outline" 
@@ -460,11 +532,7 @@ export function ProjectsDataTable({
     {
       accessorKey: "type",
       header: "Type",
-      cell: ({ row }) => (
-        <div className="text-muted-foreground">
-          {getTypeLabel(row.original.type)}
-        </div>
-      ),
+      cell: ({ row }) => getTypeBadge(row.original.type),
     },
     {
       accessorKey: "status",
