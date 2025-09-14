@@ -19,7 +19,7 @@ async function insertProjects() {
     console.log('Inserting projects into database...')
 
     for (const project of projects) {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('projects')
         .insert([project])
 
@@ -35,7 +35,7 @@ async function insertProjects() {
           role: 'owner'
         }
 
-        const { data: userProjectResult, error: userProjectError } = await supabase
+        const { error: userProjectError } = await supabase
           .from('user_projects')
           .insert([userProjectData])
 

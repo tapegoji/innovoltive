@@ -156,7 +156,7 @@ export function FileExplorer({ items, currentPath = ["My Projects"], viewMode = 
     }
   }
 
-  const ItemWrapper = ({ item, children }: { item: FileItem; children: React.ReactNode }) => 
+  const ItemWrapper = ({ children }: { children: React.ReactNode }) => 
     children
 
   return (
@@ -229,7 +229,7 @@ export function FileExplorer({ items, currentPath = ["My Projects"], viewMode = 
         ) : viewMode === "grid" ? (
           <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
             {sortedItems.map(item => (
-              <ItemWrapper key={item.id} item={item}>
+              <ItemWrapper key={item.id}>
                 <Card className={cn(
                   "p-3 hover:bg-accent/50 transition-colors border-0 shadow-none hover:shadow-sm relative",
                   selectedItems.has(item.id) ? "bg-accent shadow-sm" : ""
@@ -282,7 +282,7 @@ export function FileExplorer({ items, currentPath = ["My Projects"], viewMode = 
                   <div className="break-words">Description</div>
                 </div>
                 {sortedItems.map(item => (
-                  <ItemWrapper key={item.id} item={item}>
+                  <ItemWrapper key={item.id}>
                     <div className={cn(
                       "grid gap-4 px-3 py-2 text-sm hover:bg-accent/50 rounded transition-colors",
                       selectedItems.has(item.id) ? "bg-accent" : ""

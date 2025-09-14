@@ -2,7 +2,7 @@ import { auth, currentUser } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
 import { fetchUserProjects, formatProjectsForDisplay } from '@/lib/data'
 import { MyProjectsClient } from '@/components/my-projects-client'
-import { FileItem } from '@/components/file-explorer'
+import { ProjectData } from '@/components/projects-data-table'
 
 export default async function MyProjectsPage() {
   // Get authenticated user from server
@@ -24,7 +24,7 @@ export default async function MyProjectsPage() {
   )
 
   return <MyProjectsClient 
-    projects={formattedProjects as FileItem[]} 
+    projects={formattedProjects as ProjectData[]} 
     userName={userName}
     userId={userId}
   />

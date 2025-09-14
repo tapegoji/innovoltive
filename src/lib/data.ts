@@ -46,7 +46,7 @@ function formatDate(dateString: string): string {
 
 // UTILITY FUNCTIONS (not server actions)
 
-// Format projects for the FileExplorer component
+// Format projects for the ProjectsDataTable component
 export function formatProjectsForDisplay(projects: ProjectDisplay[], userName: string): FormattedProject[] {
   return projects.map(project => ({
     id: project.id,

@@ -3,11 +3,11 @@
 import React from 'react'
 import Link from 'next/link'
 import { IconFolder } from '@tabler/icons-react'
-import { FileExplorer, FileItem } from '@/components/file-explorer'
+import { ProjectsDataTable, ProjectData } from '@/components/projects-data-table'
 import { AddProjectDialog } from '@/components/add-project-dialog'
 
 interface MyProjectsClientProps {
-  projects: FileItem[]
+  projects: ProjectData[]
   userName: string
   userId: string
   onProjectAdded?: () => void
@@ -29,8 +29,8 @@ export function MyProjectsClient({ projects, userName, userId, onProjectAdded }:
         <AddProjectDialog onProjectAdded={onProjectAdded || (() => window.location.reload())} />
       </div>
       <div className="relative flex-1">
-        <FileExplorer
-          items={projects}
+        <ProjectsDataTable
+          data={projects}
           currentPath={[`${userName} Projects`]}
           viewMode={viewMode}
           onViewModeChange={setViewMode}
@@ -39,6 +39,7 @@ export function MyProjectsClient({ projects, userName, userId, onProjectAdded }:
           renderItemLink={(item, children) => (
             <Link href={`/canvas?project=${item.id}`}>{children}</Link>
           )}
+          toolbarActions={null}
           emptyState={
             <div className="flex items-center justify-center h-full">
               <div className="text-center">

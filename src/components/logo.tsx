@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 
 interface LogoProps {
   withLink?: boolean
@@ -9,7 +10,7 @@ interface LogoProps {
 export function Logo({ withLink = true, className = "", textSize = "text-2xl" }: LogoProps) {
   const logoContent = (
     <>
-      <img src="/infem_logo.svg" alt="InFEM Logo" className="h-6 w-6" />
+      <Image src="/infem_logo.svg" alt="InFEM Logo" className="h-6 w-6" width={24} height={24} />
       <h1 className={`font-bold ${textSize}`}>InFEM</h1>
     </>
   )

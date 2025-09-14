@@ -14,7 +14,6 @@ import { IconBook, IconFolder } from "@tabler/icons-react"
 import { MdPublic } from "react-icons/md";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
 
 // Menu items.
 const items = [
