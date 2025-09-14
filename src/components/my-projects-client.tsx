@@ -37,7 +37,7 @@ export function MyProjectsClient({ projects, userName, userId, onProjectAdded }:
           userId={userId}
           onItemsDeleted={handleItemsDeleted}
           renderItemLink={(item, children) => (
-            <Link href={`/canvas?project=${item.id}`}>{children}</Link>
+            <Link href={`/canvas/${item.id}`}>{children}</Link>
           )}
           toolbarActions={null}
           emptyState={
