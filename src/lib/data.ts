@@ -1,10 +1,10 @@
 import { getSupabaseClient } from './supabase'
 
-// Types for our data
-export interface Project {
+// Types for our data - using a subset of the database Project type for display
+export interface ProjectDisplay {
   id: string
   name: string
-  type: "em" | "ht" | "cfd" | "mp" | "folder" | "file"
+  type: "em" | "ht" | "cfd" | "mp"
   description: string | null
   date_modified: string
   size: string | null
@@ -14,12 +14,20 @@ export interface Project {
 export interface FormattedProject {
   id: string
   name: string
-  type: "em" | "ht" | "cfd" | "mp" | "folder" | "file"
+  type: "em" | "ht" | "cfd" | "mp"
   description: string
   dateModified: string
   size: string
   status: "active" | "completed" | "paused" | "archived"
   user: string
+}
+
+export interface CreateProjectData {
+  name: string
+  description: string
+  type: 'em' | 'ht' | 'cfd' | 'mp'
+  status: 'active' | 'completed' | 'paused' | 'archived'
+  userId: string
 }
 
 // Helper function to format dates
@@ -34,8 +42,26 @@ function formatDate(dateString: string): string {
   })
 }
 
+// UTILITY FUNCTIONS (not server actions)
+
+// Format projects for the FileExplorer component
+export function formatProjectsForDisplay(projects: ProjectDisplay[], userName: string): FormattedProject[] {
+  return projects.map(project => ({
+    id: project.id,
+    name: project.name,
+    type: project.type,
+    description: project.description || '',
+    dateModified: formatDate(project.date_modified),
+    size: project.size || '',
+    status: project.status,
+    user: userName
+  }))
+}
+
+// DATA FETCHING FUNCTIONS
+
 // Fetch user projects using optimized approach to avoid waterfalls
-export async function fetchUserProjects(userId: string): Promise<Project[]> {
+export async function fetchUserProjects(userId: string): Promise<ProjectDisplay[]> {
   try {
     const supabase = getSupabaseClient()
     
@@ -74,18 +100,4 @@ export async function fetchUserProjects(userId: string): Promise<Project[]> {
     console.error('Error in fetchUserProjects:', error)
     throw error
   }
-}
-
-// Format projects for the FileExplorer component
-export function formatProjectsForDisplay(projects: Project[], userName: string): FormattedProject[] {
-  return projects.map(project => ({
-    id: project.id,
-    name: project.name,
-    type: project.type,
-    description: project.description || '',
-    dateModified: formatDate(project.date_modified),
-    size: project.size || '',
-    status: project.status,
-    user: userName
-  }))
 }

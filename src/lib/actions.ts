@@ -1,14 +1,9 @@
 'use server'
 
 import { getSupabaseClient } from './supabase'
+import { CreateProjectData } from './data'
 
-export interface CreateProjectData {
-  name: string
-  description: string
-  type: 'em' | 'ht' | 'cfd' | 'mp'
-  status: 'active' | 'completed' | 'paused' | 'archived'
-  userId: string
-}
+// SERVER ACTIONS
 
 export async function createProject(data: CreateProjectData) {
   try {
@@ -59,41 +54,6 @@ export async function createProject(data: CreateProjectData) {
     return { success: true, data: projectResult }
   } catch (error) {
     console.error('Error in createProject:', error)
-    return { success: false, error: 'An unexpected error occurred' }
-  }
-}
-
-export async function getUserProjects(userId: string) {
-  try {
-    const supabase = getSupabaseClient()
-    
-    const { data, error } = await supabase
-      .from('user_projects')
-      .select(`
-        project_id,
-        role,
-        projects (
-          id,
-          name,
-          description,
-          type,
-          status,
-          date_modified,
-          size,
-          created_at,
-          updated_at
-        )
-      `)
-      .eq('user_id', userId)
-
-    if (error) {
-      console.error('Error fetching user projects:', error)
-      return { success: false, error: error.message }
-    }
-
-    return { success: true, data }
-  } catch (error) {
-    console.error('Error in getUserProjects:', error)
     return { success: false, error: 'An unexpected error occurred' }
   }
 }
