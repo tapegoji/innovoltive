@@ -38,6 +38,7 @@ import {
   IconFile,
   IconDevices,
   IconMinus,
+  IconAtom,
 } from "@tabler/icons-react"
 import { ShareProjectDialog } from "@/components/share-project-dialog"
 import {
@@ -134,7 +135,11 @@ const getIcon = (type: string, size: "small" | "large" = "small") => {
   const iconSize = size === "large" ? "h-12 w-12" : "h-4 w-4"
   const colorClass = hasProjectType || type === "folder" ? "text-blue-500" : "text-gray-600"
   
-  return hasProjectType || type === "folder" ? 
+  if (hasProjectType) {
+    return <IconAtom className={`${iconSize} ${colorClass} flex-shrink-0`} />
+  }
+  
+  return type === "folder" ? 
     <IconFolder className={`${iconSize} ${colorClass} flex-shrink-0`} /> : 
     <IconFile className={`${iconSize} ${colorClass} flex-shrink-0`} />
 }
@@ -456,11 +461,10 @@ export function ProjectsDataTable({
       cell: ({ row }) => {
         const project = row.original
         return (
-          <div className="flex items-center space-x-2 min-w-0">
-            {getIcon(project.type)}
+          <div className="flex items-center min-w-0">
             {renderItemLink ? (
               renderItemLink(project, 
-                <span className="font-medium hover:underline cursor-pointer truncate" title={project.name}>
+                <span className="cursor-pointer font-bold" title={project.name}>
                   {project.name}
                 </span>
               )
@@ -700,11 +704,10 @@ export function ProjectsDataTable({
             />
           )}
           <div className="flex flex-col items-center text-center space-y-2">
-            {getIcon(item.type, "large")}
             <div className="min-w-0 flex-1">
               {renderItemLink ? (
                 renderItemLink(item, 
-                  <p className="text-sm font-medium truncate hover:underline cursor-pointer" title={item.name}>{item.name}</p>
+                  <p className="text-sm font-medium truncate hover:underline cursor-pointer text-blue-600 hover:text-blue-800" title={item.name}>{item.name}</p>
                 )
               ) : (
                 <p className="text-sm font-medium truncate" title={item.name}>{item.name}</p>
