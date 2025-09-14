@@ -57,6 +57,13 @@ import { useIsMobile } from "@/hooks/use-mobile"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
@@ -283,6 +290,80 @@ function DraggableRow({ row }: { row: Row<z.infer<typeof schema>> }) {
   )
 }
 
+function ProjectCard({ project }: { project: z.infer<typeof schema> }) {
+  const isMobile = useIsMobile()
+  
+  return (
+    <Card className="group relative overflow-hidden transition-all hover:shadow-md">
+      <CardHeader className="pb-3">
+        <div className="flex items-start justify-between">
+          <div className="space-y-1">
+            <CardTitle className="text-base leading-tight">
+              {project.header}
+            </CardTitle>
+            <CardDescription className="text-sm">
+              {project.reviewer}
+            </CardDescription>
+          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="size-8 opacity-0 transition-opacity group-hover:opacity-100"
+              >
+                <IconDotsVertical className="size-4" />
+                <span className="sr-only">Open menu</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-32">
+              <DropdownMenuItem>Edit</DropdownMenuItem>
+              <DropdownMenuItem>Make a copy</DropdownMenuItem>
+              <DropdownMenuItem>Favorite</DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem variant="destructive">Delete</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="flex flex-wrap gap-2">
+          <Badge variant="outline" className="text-xs">
+            {project.type}
+          </Badge>
+          <Badge 
+            variant={project.status === "Done" ? "default" : "secondary"}
+            className="text-xs"
+          >
+            {project.status === "Done" && (
+              <IconCircleCheckFilled className="mr-1 size-3 fill-green-500 dark:fill-green-400" />
+            )}
+            {project.status === "In Progress" && (
+              <IconLoader className="mr-1 size-3" />
+            )}
+            {project.status}
+          </Badge>
+        </div>
+        
+        <div className="grid grid-cols-2 gap-4 text-sm">
+          <div>
+            <p className="text-muted-foreground text-xs font-medium uppercase tracking-wide">
+              Size
+            </p>
+            <p className="font-medium">{project.target}</p>
+          </div>
+          <div>
+            <p className="text-muted-foreground text-xs font-medium uppercase tracking-wide">
+              Modified
+            </p>
+            <p className="font-medium">{project.limit}</p>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
 export function DataTable({
   data: initialData,
 }: {
@@ -300,6 +381,7 @@ export function DataTable({
     pageIndex: 0,
     pageSize: 10,
   })
+  const [activeTab, setActiveTab] = React.useState("tabular")
   const sortableId = React.useId()
   const sensors = useSensors(
     useSensor(MouseSensor, {}),
@@ -350,14 +432,15 @@ export function DataTable({
 
   return (
     <Tabs
-      defaultValue="outline"
+      value={activeTab}
+      onValueChange={setActiveTab}
       className="w-full flex-col justify-start gap-6"
     >
       <div className="flex items-center justify-between px-4 lg:px-6">
         <Label htmlFor="view-selector" className="sr-only">
           View
         </Label>
-        <Select defaultValue="outline">
+        <Select value={activeTab} onValueChange={setActiveTab}>
           <SelectTrigger
             className="flex w-fit @4xl/main:hidden"
             size="sm"
@@ -366,21 +449,15 @@ export function DataTable({
             <SelectValue placeholder="Select a view" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="outline">Outline</SelectItem>
-            <SelectItem value="past-performance">Past Performance</SelectItem>
-            <SelectItem value="key-personnel">Key Personnel</SelectItem>
-            <SelectItem value="focus-documents">Focus Documents</SelectItem>
+            <SelectItem value="tabular">Tabular View</SelectItem>
+            <SelectItem value="project-focus">Project Focus</SelectItem>
           </SelectContent>
         </Select>
         <TabsList className="**:data-[slot=badge]:bg-muted-foreground/30 hidden **:data-[slot=badge]:size-5 **:data-[slot=badge]:rounded-full **:data-[slot=badge]:px-1 @4xl/main:flex">
-          <TabsTrigger value="outline">Outline</TabsTrigger>
-          <TabsTrigger value="past-performance">
-            Past Performance <Badge variant="secondary">3</Badge>
+          <TabsTrigger value="tabular">Tabular View</TabsTrigger>
+          <TabsTrigger value="project-focus">
+            Project Focus <Badge variant="secondary">{data.length}</Badge>
           </TabsTrigger>
-          <TabsTrigger value="key-personnel">
-            Key Personnel <Badge variant="secondary">2</Badge>
-          </TabsTrigger>
-          <TabsTrigger value="focus-documents">Focus Documents</TabsTrigger>
         </TabsList>
         <div className="flex items-center gap-2">
           <DropdownMenu>
@@ -433,7 +510,7 @@ export function DataTable({
         </div>
       </div>
       <TabsContent
-        value="outline"
+        value="tabular"
         className="relative flex flex-col gap-4 overflow-auto px-4 lg:px-6"
       >
         <div className="overflow-hidden rounded-lg border">
@@ -566,19 +643,14 @@ export function DataTable({
         </div>
       </TabsContent>
       <TabsContent
-        value="past-performance"
-        className="flex flex-col px-4 lg:px-6"
+        value="project-focus"
+        className="flex flex-col gap-6 px-4 lg:px-6"
       >
-        <div className="aspect-video w-full flex-1 rounded-lg border border-dashed"></div>
-      </TabsContent>
-      <TabsContent value="key-personnel" className="flex flex-col px-4 lg:px-6">
-        <div className="aspect-video w-full flex-1 rounded-lg border border-dashed"></div>
-      </TabsContent>
-      <TabsContent
-        value="focus-documents"
-        className="flex flex-col px-4 lg:px-6"
-      >
-        <div className="aspect-video w-full flex-1 rounded-lg border border-dashed"></div>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {data.map((project) => (
+            <ProjectCard key={project.id} project={project} />
+          ))}
+        </div>
       </TabsContent>
     </Tabs>
   )
