@@ -46,7 +46,7 @@ export function Header({ compact = false, className, children }: HeaderProps) {
             <Tooltip>
               <TooltipTrigger asChild>
                 <SignInButton>
-                  <CircleUserRound className={cn("cursor-pointer", compact && "w-4 h-4")} />
+                  <CircleUserRound className={cn("cursor-pointer", compact && "w-6 h-6")} />
                 </SignInButton>
               </TooltipTrigger>
               <TooltipContent>
@@ -63,7 +63,7 @@ export function Header({ compact = false, className, children }: HeaderProps) {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Link href="/dashboard">
-                  <LayoutDashboard className={cn("mr-2", compact && "w-4 h-4")} />
+                  <LayoutDashboard className={cn("mr-2", compact && "w-6 h-6")} />
                 </Link>
               </TooltipTrigger>
               <TooltipContent>

@@ -1,5 +1,3 @@
-import Icon from '@mdi/react'
-import { mdiShapePlus } from '@mdi/js'
 import Link from 'next/link'
 
 interface LogoProps {
@@ -11,7 +9,7 @@ interface LogoProps {
 export function Logo({ withLink = true, className = "", textSize = "text-2xl" }: LogoProps) {
   const logoContent = (
     <>
-      <Icon path={mdiShapePlus} size={1} className="text-primary" />
+      <img src="/infem_logo.svg" alt="InFEM Logo" className="h-6 w-6" />
       <h1 className={`font-bold ${textSize}`}>InFEM</h1>
     </>
   )
