@@ -12,6 +12,16 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -60,8 +70,7 @@ export function ShareProjectDialog({
   const [shareOption, setShareOption] = React.useState<'email' | 'public'>('email')
   const [emailInput, setEmailInput] = React.useState('')
   const [sharedEmails, setSharedEmails] = React.useState<ShareEmail[]>([])
-  const [isPublic, setIsPublic] = React.useState(false)
-  const publicRole = 'viewer' // Public access is always viewer
+  const [showPublicConfirm, setShowPublicConfirm] = React.useState(false)
   const [isSharing, setIsSharing] = React.useState(false)
 
   // Reset state when dialog opens/closes
@@ -69,8 +78,8 @@ export function ShareProjectDialog({
     if (!open) {
       setEmailInput('')
       setSharedEmails([])
-      setIsPublic(false)
       setShareOption('email')
+      setShowPublicConfirm(false)
     } else if (project) {
       loadExistingShares()
     }
@@ -83,8 +92,18 @@ export function ShareProjectDialog({
       const { getProjectShares } = await import('@/lib/actions')
       const result = await getProjectShares(project.id, userId)
       if (result.success) {
-        setSharedEmails(result.emails || [])
-        setIsPublic(result.isPublic || false)
+        const emails = result.emails || []
+        
+        // If project is public, add the "public" entry to the emails list
+        if (result.isPublic) {
+          const publicEntry: ShareEmail = {
+            email: 'public',
+            role: 'viewer'
+          }
+          setSharedEmails([...emails, publicEntry])
+        } else {
+          setSharedEmails(emails)
+        }
       }
     } catch (error) {
       console.error('Error loading existing shares:', error)
@@ -120,9 +139,29 @@ export function ShareProjectDialog({
   }
 
   const handleSelectPublic = () => {
-    setShareOption('public')
-    setIsPublic(false)  // Don't auto-enable, let user choose
+    setShowPublicConfirm(true)
+  }
+
+  const handleConfirmPublic = () => {
+    // Add "public" as a special email entry
+    const publicEntry: ShareEmail = {
+      email: 'public',
+      role: 'viewer'
+    }
+    
+    // Check if public is already added
+    if (!sharedEmails.find(item => item.email === 'public')) {
+      setSharedEmails(prev => [...prev, publicEntry])
+      toast.success('Project will be made public when you click Share Project')
+    }
+    
+    setShareOption('email')
     setEmailInput('')
+    setShowPublicConfirm(false)
+  }
+
+  const handleCancelPublic = () => {
+    setShowPublicConfirm(false)
   }
 
   const handleRemoveEmail = (email: string) => {
@@ -145,17 +184,21 @@ export function ShareProjectDialog({
     try {
       const { shareProject } = await import('@/lib/actions')
       
-      // Create email roles map
+      // Separate regular emails from public
+      const regularEmails = sharedEmails.filter(item => item.email !== 'public')
+      const hasPublic = sharedEmails.some(item => item.email === 'public')
+      
+      // Create email roles map (excluding public)
       const emailRoles: Record<string, 'viewer' | 'editor'> = {}
-      sharedEmails.forEach(item => {
+      regularEmails.forEach(item => {
         emailRoles[item.email] = item.role
       })
       
       const result = await shareProject(project.id, {
-        emails: sharedEmails.map(item => item.email),
+        emails: regularEmails.map(item => item.email),
         emailRoles,
-        isPublic,
-        publicRole,
+        isPublic: hasPublic,
+        publicRole: 'viewer', // Public is always viewer
         ownerId: userId
       })
 
@@ -177,174 +220,202 @@ export function ShareProjectDialog({
   if (!project) return null
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] max-h-[80vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Users className="h-5 w-5" />
-            Share &quot;{project.name}&quot;
-          </DialogTitle>
-          <DialogDescription>
-            Share this project with other users or make it publicly accessible.
-          </DialogDescription>
-        </DialogHeader>
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="sm:max-w-[500px] max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Users className="h-5 w-5" />
+              Share &quot;{project.name}&quot;
+            </DialogTitle>
+            <DialogDescription>
+              Share this project with other users or make it publicly accessible.
+            </DialogDescription>
+          </DialogHeader>
 
-        <div className="space-y-6">
-          {/* Unified Share Input */}
-          <div className="space-y-3">
-            <Label>Share with</Label>
-            <Command className="rounded-lg border shadow-sm">
-              <CommandInput 
-                placeholder="Enter email address or select option..."
-                value={emailInput}
-                onValueChange={setEmailInput}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && emailInput && emailInput.includes('@')) {
-                    e.preventDefault()
-                    handleAddEmail()
-                  }
-                }}
-              />
-              <CommandList>
-                <CommandEmpty>
-                  {emailInput && emailInput.includes('@') ? (
-                    "Press Enter to add this email"
-                  ) : (
-                    "Enter an email address"
-                  )}
-                </CommandEmpty>
-                <CommandGroup>
-                  <CommandItem
-                    onSelect={handleSelectPublic}
-                  >
-                    <Globe className="mr-2 h-4 w-4" />
-                    <span>Make public</span>
-                  </CommandItem>
-                </CommandGroup>
-              </CommandList>
-            </Command>
-            
-            {shareOption === 'email' && emailInput && emailInput.includes('@') && (
-              <div className="flex items-center space-x-2">
-                <Select
-                  value="viewer"
-                  onValueChange={() => {}} // Will set role when adding
-                >
-                  <SelectTrigger className="w-32">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="viewer">Viewer</SelectItem>
-                    <SelectItem value="editor">Editor</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Button 
-                  onClick={handleAddEmail}
-                  disabled={!emailInput.trim()}
-                  size="sm"
-                >
-                  Add
-                </Button>
-              </div>
-            )}
-            
-            {shareOption === 'public' && (
-              <div className="space-y-2 p-3 border rounded-lg bg-muted/50">
+          <div className="space-y-6">
+            {/* Unified Share Input */}
+            <div className="space-y-3">
+              <Label>Share with</Label>
+              <Command className="rounded-lg border shadow-sm">
+                <CommandInput 
+                  placeholder="Enter email address or select option..."
+                  value={emailInput}
+                  onValueChange={setEmailInput}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && emailInput && emailInput.includes('@')) {
+                      e.preventDefault()
+                      handleAddEmail()
+                    }
+                  }}
+                />
+                <CommandList>
+                  <CommandEmpty>
+                    {emailInput && emailInput.includes('@') ? (
+                      "Press Enter to add this email"
+                    ) : (
+                      "Enter an email address"
+                    )}
+                  </CommandEmpty>
+                  <CommandGroup>
+                    <CommandItem
+                      onSelect={handleSelectPublic}
+                    >
+                      <Globe className="mr-2 h-4 w-4" />
+                      <span>Make public</span>
+                    </CommandItem>
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+              
+              {shareOption === 'email' && emailInput && emailInput.includes('@') && (
                 <div className="flex items-center space-x-2">
-                  <Globe className="h-4 w-4" />
-                  <span className="text-sm font-medium">Public access</span>
+                  <Select
+                    value="viewer"
+                    onValueChange={() => {}} // Will set role when adding
+                  >
+                    <SelectTrigger className="w-32">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="viewer">Viewer</SelectItem>
+                      <SelectItem value="editor">Editor</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Button 
+                    onClick={handleAddEmail}
+                    disabled={!emailInput.trim()}
+                    size="sm"
+                  >
+                    Add
+                  </Button>
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  Anyone with the link can view this project
-                </p>
+              )}
+              
+              <p className="text-xs text-muted-foreground">
+                Enter email addresses to share with. If the users exist, the project will be available in their profile.
+              </p>
+            </div>
+
+            {/* Shared emails list */}
+            {sharedEmails.length > 0 && (
+              <div className="space-y-3">
+                <Label>People with access</Label>
+                <div className="space-y-2 max-h-40 overflow-y-auto">
+                  {sharedEmails.map((emailItem) => (
+                    <div key={emailItem.email} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                          {emailItem.email === 'public' ? (
+                            <Globe className="h-4 w-4" />
+                          ) : (
+                            <span className="text-sm font-medium">
+                              {emailItem.email.charAt(0).toUpperCase()}
+                            </span>
+                          )}
+                        </div>
+                        <div>
+                          <span className="text-sm font-medium">
+                            {emailItem.email === 'public' ? 'Public access' : emailItem.email}
+                          </span>
+                          {emailItem.email === 'public' && (
+                            <p className="text-xs text-muted-foreground">
+                              Anyone with the link
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Select
+                          value={emailItem.role}
+                          onValueChange={(role: 'viewer' | 'editor') => handleRoleChange(emailItem.email, role)}
+                          disabled={emailItem.email === 'public'} // Public is always viewer
+                        >
+                          <SelectTrigger className="w-24 h-8">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="viewer">Viewer</SelectItem>
+                            <SelectItem value="editor">Editor</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={() => handleRemoveEmail(emailItem.email)}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
-            
-            <p className="text-xs text-muted-foreground">
-              {shareOption === 'public' 
-                ? "Make this project accessible to anyone with the link" 
-                : "Enter email addresses to share with. If the users exist, the project will be available in their profile."
-              }
-            </p>
+
+            {/* Share summary */}
+            {sharedEmails.length > 0 && (
+              <div className="space-y-2 p-3 bg-muted/50 rounded-lg">
+                <Label className="text-sm font-medium">Share summary:</Label>
+                <div className="flex flex-wrap gap-2">
+                  {sharedEmails.map((emailItem) => (
+                    <Badge 
+                      key={emailItem.email} 
+                      variant={emailItem.email === 'public' ? "outline" : "secondary"} 
+                      className="text-xs"
+                    >
+                      {emailItem.email === 'public' ? (
+                        <>
+                          <Globe className="h-3 w-3 mr-1" />
+                          Public (viewer)
+                        </>
+                      ) : (
+                        `${emailItem.email} (${emailItem.role})`
+                      )}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* Shared emails list */}
-          {sharedEmails.length > 0 && (
-            <div className="space-y-3">
-              <Label>People with access</Label>
-              <div className="space-y-2 max-h-40 overflow-y-auto">
-                {sharedEmails.map((emailItem) => (
-                  <div key={emailItem.email} className="flex items-center justify-between p-3 border rounded-lg">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
-                        <span className="text-sm font-medium">
-                          {emailItem.email.charAt(0).toUpperCase()}
-                        </span>
-                      </div>
-                      <span className="text-sm font-medium">{emailItem.email}</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Select
-                        value={emailItem.role}
-                        onValueChange={(role: 'viewer' | 'editor') => handleRoleChange(emailItem.email, role)}
-                      >
-                        <SelectTrigger className="w-24 h-8">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="viewer">Viewer</SelectItem>
-                          <SelectItem value="editor">Editor</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8"
-                        onClick={() => handleRemoveEmail(emailItem.email)}
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+          {/* Actions */}
+          <div className="flex justify-end space-x-2 pt-4">
+            <Button variant="outline" onClick={() => onOpenChange(false)}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleShare}
+              disabled={isSharing || sharedEmails.length === 0}
+            >
+              {isSharing ? 'Sharing...' : 'Share Project'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
-          {/* Share summary */}
-          {(sharedEmails.length > 0 || isPublic) && (
-            <div className="space-y-2 p-3 bg-muted/50 rounded-lg">
-              <Label className="text-sm font-medium">Share summary:</Label>
-              <div className="flex flex-wrap gap-2">
-                {sharedEmails.map((emailItem) => (
-                  <Badge key={emailItem.email} variant="secondary" className="text-xs">
-                    {emailItem.email} ({emailItem.role})
-                  </Badge>
-                ))}
-                {isPublic && (
-                  <Badge variant="outline" className="text-xs">
-                    <Globe className="h-3 w-3 mr-1" />
-                    Public (viewer)
-                  </Badge>
-                )}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Actions */}
-        <div className="flex justify-end space-x-2 pt-4">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
-          </Button>
-          <Button 
-            onClick={handleShare}
-            disabled={isSharing || (sharedEmails.length === 0 && !isPublic)}
-          >
-            {isSharing ? 'Sharing...' : 'Share Project'}
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
+      {/* Public Confirmation Dialog */}
+      <AlertDialog open={showPublicConfirm} onOpenChange={setShowPublicConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Make Project Public?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will make &quot;{project?.name}&quot; accessible to anyone with the link. 
+              Anyone will be able to view this project without needing to sign in.
+              Are you sure you want to proceed?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleCancelPublic}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmPublic}>
+              Yes, Make Public
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   )
 }
