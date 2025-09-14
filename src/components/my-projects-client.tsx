@@ -24,7 +24,7 @@ export function MyProjectsClient({ projects, userName, userId, onProjectAdded }:
     <div className="h-[calc(100vh-4rem)]">
       <div className="flex items-center justify-between p-6 border-b">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">{userName} Projects</h1>
+          <h1 className="text-xl font-semibold tracking-tight">{userName} Projects</h1>
         </div>
         <AddProjectDialog onProjectAdded={onProjectAdded || (() => window.location.reload())} />
       </div>
