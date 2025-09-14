@@ -2,7 +2,7 @@ import * as dotenv from 'dotenv'
 
 async function inspectTable() {
   dotenv.config({ path: '.env.local' })
-  const { supabase } = await import('./src/lib/supabase.js')
+  const { supabase } = await import('../lib/supabase.js')
 
   try {
     // Try to select all columns from projects table

@@ -13,7 +13,7 @@ const projects = [
 
 async function insertProjects() {
   dotenv.config({ path: '.env.local' })
-  const { supabase } = await import('./src/lib/supabase.js')
+  const { supabase } = await import('../lib/supabase.js')
 
   try {
     console.log('Inserting projects into database...')
