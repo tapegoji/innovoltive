@@ -12,6 +12,14 @@ export async function createProject(data: CreateProjectData) {
     // Generate a unique ID for the project
     const projectId = crypto.randomUUID()
 
+    const now = new Date()
+    const localDateString = now.getFullYear() + '-' + 
+                           String(now.getMonth() + 1).padStart(2, '0') + '-' + 
+                           String(now.getDate()).padStart(2, '0') + 'T' + 
+                           String(now.getHours()).padStart(2, '0') + ':' + 
+                           String(now.getMinutes()).padStart(2, '0') + ':' + 
+                           String(now.getSeconds()).padStart(2, '0')
+
     const projectData = {
       id: projectId,
       name: data.name.trim(),
@@ -19,7 +27,7 @@ export async function createProject(data: CreateProjectData) {
       type: data.type,
       status: data.status,
       user_id: data.userId,
-      date_modified: new Date().toISOString(),
+      date_modified: localDateString,
       size: '0 MB' // Default size for new projects
     }
 

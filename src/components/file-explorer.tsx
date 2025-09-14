@@ -51,7 +51,7 @@ const getStatusBadge = (status: string) => (
 )
 
 export function FileExplorer({ items, currentPath = ["My Projects"], viewMode = "list", onViewModeChange, renderItemLink, toolbarActions }: FileExplorerProps) {
-  const [sortBy, setSortBy] = React.useState<"name" | "type" | "status" | "date" | "size">("name")
+  const [sortBy, setSortBy] = React.useState<"name" | "type" | "status" | "date" | "size" | "user">("name")
   const [sortOrder, setSortOrder] = React.useState<"asc" | "desc">("asc")
 
   const sortedItems = React.useMemo(() => {
@@ -69,6 +69,7 @@ export function FileExplorer({ items, currentPath = ["My Projects"], viewMode = 
         case "size": comparison = (a.size || "").localeCompare(b.size || ""); break
         case "status": comparison = a.status.localeCompare(b.status); break
         case "type": comparison = a.type.localeCompare(b.type); break
+        case "user": comparison = (a.user || "").localeCompare(b.user || ""); break
       }
       return sortOrder === "asc" ? comparison : -comparison
     })
@@ -113,9 +114,9 @@ export function FileExplorer({ items, currentPath = ["My Projects"], viewMode = 
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-              {(["name", "type", "status", "date", "size"] as const).map(field => (
+              {(["name", "type", "status", "date", "size", "user"] as const).map(field => (
                 <DropdownMenuItem key={field} onClick={() => handleSort(field)}>
-                  {field.charAt(0).toUpperCase() + field.slice(1)} {sortBy === field && (sortOrder === "asc" ? "↑" : "↓")}
+                  {field === "user" ? "Created By" : field.charAt(0).toUpperCase() + field.slice(1)} {sortBy === field && (sortOrder === "asc" ? "↑" : "↓")}
                 </DropdownMenuItem>
               ))}
             </DropdownMenuContent>

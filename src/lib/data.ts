@@ -32,13 +32,15 @@ export interface CreateProjectData {
 
 // Helper function to format dates
 function formatDate(dateString: string): string {
-  const date = new Date(dateString)
-  return date.toLocaleDateString('en-US', {
+  // Parse the date string as local time (not UTC)
+  const date = new Date(dateString.includes('T') ? dateString : dateString + 'T00:00:00')
+  return date.toLocaleString('en-US', {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
     hour: 'numeric',
-    minute: '2-digit'
+    minute: '2-digit',
+    hour12: true
   })
 }
 
