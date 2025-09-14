@@ -123,18 +123,6 @@ interface ProjectsDataTableProps {
   isPublicView?: boolean
 }
 
-const getTypeLabel = (type: string) => {
-  if (!type) return "Unknown"
-  
-  // Handle multiple types (comma-separated)
-  const types = type.split(',').map(t => t.trim())
-  const typeLabels = types.map(t => 
-    ({ em: "EM", ht: "HT", cfd: "CFD", folder: "Folder", file: "File" })[t] || t.toUpperCase()
-  )
-  
-  return typeLabels.join(' + ')
-}
-
 const getTypeBadge = (type: string) => {
   if (!type) return (
     <Badge variant="outline" className="text-xs font-medium">
