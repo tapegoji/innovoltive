@@ -157,7 +157,7 @@ export async function updateProject(projectId: string, data: Partial<CreateProje
   }
 }
 
-export async function duplicateProject(projectId: string, userId: string) {
+export async function duplicateProject(projectId: string, userId: string, allowPublicCopy: boolean = false) {
   try {
     const supabase = getSupabaseClient()
     
@@ -172,7 +172,7 @@ export async function duplicateProject(projectId: string, userId: string) {
       return { success: false, error: 'Project not found or access denied' }
     }
 
-    // Verify user has access to this project
+    // Check user access to this project
     const { data: userProject, error: accessError } = await supabase
       .from('user_projects')
       .select('*')
@@ -180,7 +180,24 @@ export async function duplicateProject(projectId: string, userId: string) {
       .eq('user_id', userId)
       .single()
 
-    if (accessError || !userProject) {
+    // If user doesn't have direct access, check if public copying is allowed and project is public
+    if ((accessError || !userProject) && allowPublicCopy) {
+      const { data: publicAccess, error: publicError } = await supabase
+        .from('user_projects')
+        .select('*')
+        .eq('project_id', projectId)
+        .eq('user_id', 'user_public')
+        .single()
+
+      if (publicError || !publicAccess) {
+        return { success: false, error: 'This project is not publicly accessible' }
+      }
+
+      // Check if user already has access to this project
+      if (!accessError && userProject) {
+        return { success: false, error: 'You already have access to this project' }
+      }
+    } else if (accessError || !userProject) {
       return { success: false, error: 'You do not have permission to duplicate this project' }
     }
 

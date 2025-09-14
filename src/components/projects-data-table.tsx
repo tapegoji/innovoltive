@@ -250,6 +250,7 @@ export function ProjectsDataTable({
   const [editSuccess, setEditSuccess] = React.useState(false)
   const [showShareDialog, setShowShareDialog] = React.useState(false)
   const [sharingProject, setSharingProject] = React.useState<ProjectData | null>(null)
+  const [isCopying, setIsCopying] = React.useState<string | null>(null)
   
   const sortableId = React.useId()
   const sensors = useSensors(
@@ -385,6 +386,29 @@ export function ProjectsDataTable({
     setShowShareDialog(true)
   }, [])
 
+  const handleCopyPublicProject = React.useCallback(async (projectId: string) => {
+    if (!userId) return
+    
+    setIsCopying(projectId)
+    try {
+      const { duplicateProject } = await import('@/lib/actions')
+      const result = await duplicateProject(projectId, userId, true) // allowPublicCopy = true
+      
+      if (result.success) {
+        toast.success('Project copied to your workspace successfully!')
+        // Don't refresh the demo projects list, as it should remain the same
+      } else {
+        console.error('Failed to copy project:', result.error)
+        toast.error(result.error || 'Failed to copy project')
+      }
+    } catch (error) {
+      console.error('Error copying project:', error)
+      toast.error('An error occurred while copying the project')
+    } finally {
+      setIsCopying(null)
+    }
+  }, [userId])
+
   // Create columns definition for projects
   const allColumns: ColumnDef<ProjectData>[] = React.useMemo(() => [
     {
@@ -500,6 +524,22 @@ export function ProjectsDataTable({
         const project = row.original
         const isCurrentlyArchiving = isArchiving === project.id
         const isCurrentlyDuplicating = isDuplicating === project.id
+        const isCurrentlyCopying = isCopying === project.id
+        
+        // For public view, show only copy button
+        if (isPublicView) {
+          return (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleCopyPublicProject(project.id)}
+              disabled={isCurrentlyCopying || !userId}
+              className="text-blue-600 hover:text-blue-700"
+            >
+              {isCurrentlyCopying ? 'Copying...' : 'Copy to My Projects'}
+            </Button>
+          )
+        }
         
         return (
           <DropdownMenu>
@@ -546,16 +586,15 @@ export function ProjectsDataTable({
       },
       size: 40,
     },
-  ], [renderItemLink, handleDeleteSingle, handleEdit, handleDuplicate, handleArchive, handleShare, isArchiving, isDuplicating])
+  ], [renderItemLink, handleDeleteSingle, handleEdit, handleDuplicate, handleArchive, handleShare, handleCopyPublicProject, isArchiving, isDuplicating, isCopying, isPublicView, userId])
 
   // Filter columns based on view mode
   const columns = React.useMemo(() => {
     if (isPublicView) {
-      // For public view, exclude drag, select, and actions columns
+      // For public view, exclude drag and select columns, but keep actions for copy button
       return allColumns.filter(col => 
         col.id !== "drag" && 
-        col.id !== "select" && 
-        col.id !== "actions"
+        col.id !== "select"
       )
     }
     return allColumns
@@ -638,20 +677,22 @@ export function ProjectsDataTable({
       {data.map(item => (
         <Card key={item.id} className={cn(
           "p-3 bg-accent/30 border border-border hover:bg-accent/50 transition-colors shadow-sm hover:shadow-md relative",
-          rowSelection[item.id] ? "bg-accent border-accent-foreground/20 shadow-md" : ""
+          !isPublicView && rowSelection[item.id] ? "bg-accent border-accent-foreground/20 shadow-md" : ""
         )}>
-          <input
-            type="checkbox"
-            checked={!!rowSelection[item.id]}
-            onChange={(e) => {
-              e.stopPropagation()
-              setRowSelection(prev => ({
-                ...prev,
-                [item.id]: e.target.checked
-              }))
-            }}
-            className="absolute top-2 right-2 h-4 w-4"
-          />
+          {!isPublicView && (
+            <input
+              type="checkbox"
+              checked={!!rowSelection[item.id]}
+              onChange={(e) => {
+                e.stopPropagation()
+                setRowSelection(prev => ({
+                  ...prev,
+                  [item.id]: e.target.checked
+                }))
+              }}
+              className="absolute top-2 right-2 h-4 w-4"
+            />
+          )}
           <div className="flex flex-col items-center text-center space-y-2">
             <IconFolder className="h-12 w-12 text-blue-500" />
             <div className="min-w-0 flex-1">
@@ -663,6 +704,17 @@ export function ProjectsDataTable({
                 <p className="text-sm font-medium truncate" title={item.name}>{item.name}</p>
               )}
               <p className="text-xs text-muted-foreground">{item.dateModified}</p>
+              {isPublicView && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleCopyPublicProject(item.id)}
+                  disabled={isCopying === item.id || !userId}
+                  className="mt-2 text-xs h-6 px-2"
+                >
+                  {isCopying === item.id ? 'Copying...' : 'Copy'}
+                </Button>
+              )}
             </div>
           </div>
         </Card>
