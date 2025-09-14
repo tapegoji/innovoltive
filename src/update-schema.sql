@@ -12,13 +12,13 @@
 -- );
 
 -- -- Create the user_projects junction table
-CREATE TABLE user_projects (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id TEXT NOT NULL,
-  project_id TEXT NOT NULL,
-  role TEXT NOT NULL DEFAULT 'owner',
-  UNIQUE(user_id, project_id)
-);
+-- CREATE TABLE user_projects (
+--   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+--   user_id TEXT NOT NULL,
+--   project_id TEXT NOT NULL,
+--   role TEXT NOT NULL DEFAULT 'owner',
+--   UNIQUE(user_id, project_id)
+-- );
 
 -- -- Create indexes for better performance
 -- CREATE INDEX idx_user_projects_user_id ON user_projects(user_id);
