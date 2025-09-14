@@ -177,7 +177,7 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
   },
   {
     accessorKey: "header",
-    header: "Project Name",
+    header: "Name",
     cell: ({ row }) => {
       return <TableCellViewer item={row.original} />
     },
@@ -185,7 +185,7 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
   },
   {
     accessorKey: "type",
-    header: "Project Type",
+    header: "Type",
     cell: ({ row }) => (
       <div className="w-32">
         <Badge variant="outline" className="text-muted-foreground px-1.5">
@@ -480,8 +480,8 @@ export function DataTable({
                 .map((column) => {
                   // Map column IDs to user-friendly names
                   const columnNames: Record<string, string> = {
-                    header: "Project Name",
-                    type: "Project Type",
+                    header: "Name",
+                    type: "Type",
                     status: "Status",
                     target: "Size",
                     limit: "Date Modified",
