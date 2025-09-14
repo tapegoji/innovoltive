@@ -529,9 +529,18 @@ export function DataTable({
               </DialogHeader>
               <ProjectForm 
                 onSubmit={(project) => {
-                  const newProject = {
-                    ...project,
-                    id: Math.max(...data.map(p => p.id), 0) + 1
+                  const newProject: z.infer<typeof schema> = {
+                    id: Math.max(...data.map(p => p.id), 0) + 1,
+                    header: project.header,
+                    type: Array.isArray(project.type) ? project.type.join(', ') : project.type,
+                    status: project.status,
+                    target: 'N/A', // Default value since ProjectForm doesn't provide this
+                    limit: new Date().toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric'
+                    }), // Current date as default
+                    reviewer: project.reviewer,
                   }
                   setData(prev => [...prev, newProject])
                   setIsAddDialogOpen(false) // Close dialog after adding
