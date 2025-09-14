@@ -16,7 +16,7 @@ function Box() {
 
 export default function CanvasPage() {
   return (
-    <div className="w-full h-screen">
+    <div className="w-full h-[calc(100vh-2rem-1px)]">
       <ControlPanel />
       <Canvas
         orthographic

@@ -24,7 +24,7 @@ export default function CanvasClient({ projectId }: CanvasClientProps) {
   console.log('Loading project:', projectId) // TODO: Load project data
   
   return (
-    <div className="w-full h-screen">
+    <div className="w-full h-[calc(100vh-2rem-1px)]">
       <ControlPanel />
       <Canvas
         orthographic
