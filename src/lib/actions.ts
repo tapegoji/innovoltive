@@ -285,3 +285,170 @@ export async function archiveProject(projectId: string, userId: string) {
     return { success: false, error: 'An unexpected error occurred' }
   }
 }
+
+export async function shareProject(
+  projectId: string, 
+  shares: {
+    emails: string[]
+    emailRoles: Record<string, 'viewer' | 'editor'>
+    isPublic: boolean
+    publicRole: 'viewer' | 'editor'
+    ownerId: string
+  }
+) {
+  try {
+    const supabase = getSupabaseClient()
+    
+    // Verify user owns this project
+    const { data: userProject, error: accessError } = await supabase
+      .from('user_projects')
+      .select('*')
+      .eq('project_id', projectId)
+      .eq('user_id', shares.ownerId)
+      .eq('role', 'owner')
+      .single()
+
+    if (accessError || !userProject) {
+      return { success: false, error: 'You do not have permission to share this project' }
+    }
+
+    // First, remove existing shares (except owner)
+    const { error: deleteError } = await supabase
+      .from('user_projects')
+      .delete()
+      .eq('project_id', projectId)
+      .neq('role', 'owner')
+
+    if (deleteError) {
+      console.error('Error removing existing shares:', deleteError)
+      return { success: false, error: 'Failed to update project shares' }
+    }
+
+    // Look up users by email using Clerk and add shares for existing users
+    if (shares.emails.length > 0) {
+      const { clerkClient } = await import('@clerk/nextjs/server')
+      const clerk = await clerkClient()
+      
+      for (const email of shares.emails) {
+        try {
+          // Check if user exists in Clerk
+          const clerkUsers = await clerk.users.getUserList({
+            emailAddress: [email.toLowerCase()]
+          })
+          
+          if (clerkUsers.data.length > 0) {
+            const clerkUser = clerkUsers.data[0]
+            const role = shares.emailRoles[email] || 'viewer'
+            
+            // Add user share
+            const { error: userShareError } = await supabase
+              .from('user_projects')
+              .insert([{
+                user_id: clerkUser.id,
+                project_id: projectId,
+                role: role
+              }])
+
+            if (userShareError) {
+              console.error('Error creating user share for', email, ':', userShareError)
+              // Continue with other users even if one fails
+            }
+          }
+          // If user doesn't exist in Clerk, silently skip (don't reveal user existence)
+        } catch (clerkError) {
+          console.error('Error checking user in Clerk:', clerkError)
+          // Continue with other users
+        }
+      }
+    }
+
+    // Handle public access
+    if (shares.isPublic) {
+      const publicShare = {
+        user_id: 'user_public',
+        project_id: projectId,
+        role: shares.publicRole
+      }
+
+      const { error: publicShareError } = await supabase
+        .from('user_projects')
+        .insert([publicShare])
+
+      if (publicShareError) {
+        console.error('Error creating public share:', publicShareError)
+        return { success: false, error: 'Failed to make project public' }
+      }
+    }
+
+    return { success: true }
+  } catch (error) {
+    console.error('Error in shareProject:', error)
+    return { success: false, error: 'An unexpected error occurred' }
+  }
+}
+
+export async function getProjectShares(projectId: string, userId: string) {
+  try {
+    const supabase = getSupabaseClient()
+    
+    // Verify user has access to this project
+    const { data: userProject, error: accessError } = await supabase
+      .from('user_projects')
+      .select('*')
+      .eq('project_id', projectId)
+      .eq('user_id', userId)
+      .single()
+
+    if (accessError || !userProject) {
+      return { success: false, error: 'You do not have permission to view project shares' }
+    }
+
+    // Get all shares for this project
+    const { data: shares, error: sharesError } = await supabase
+      .from('user_projects')
+      .select('user_id, role')
+      .eq('project_id', projectId)
+      .neq('role', 'owner')
+
+    if (sharesError) {
+      console.error('Error getting project shares:', sharesError)
+      return { success: false, error: 'Failed to load project shares' }
+    }
+
+    // Separate public and user shares
+    const publicShare = shares?.find(share => share.user_id === 'user_public')
+    const userShares = shares?.filter(share => share.user_id !== 'user_public') || []
+
+    // Get user details from Clerk for user shares
+    const emails: { email: string; role: 'viewer' | 'editor' }[] = []
+    if (userShares.length > 0) {
+      const { clerkClient } = await import('@clerk/nextjs/server')
+      const clerk = await clerkClient()
+      
+      for (const userShare of userShares) {
+        try {
+          const clerkUser = await clerk.users.getUser(userShare.user_id)
+          if (clerkUser.emailAddresses.length > 0) {
+            emails.push({
+              email: clerkUser.emailAddresses[0].emailAddress,
+              role: userShare.role as 'viewer' | 'editor'
+            })
+          }
+        } catch (error) {
+          console.error('Error getting user from Clerk:', error)
+          // Skip this user if we can't get their details
+        }
+      }
+    }
+
+    return {
+      success: true,
+      emails,
+      isPublic: !!publicShare,
+      publicRole: publicShare?.role || 'viewer'
+    }
+  } catch (error) {
+    console.error('Error in getProjectShares:', error)
+    return { success: false, error: 'An unexpected error occurred' }
+  }
+}

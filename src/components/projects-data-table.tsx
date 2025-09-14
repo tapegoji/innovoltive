@@ -39,6 +39,7 @@ import {
   IconDevices,
   IconMinus,
 } from "@tabler/icons-react"
+import { ShareProjectDialog } from "@/components/share-project-dialog"
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -245,6 +246,8 @@ export function ProjectsDataTable({
   })
   const [editError, setEditError] = React.useState<string | null>(null)
   const [editSuccess, setEditSuccess] = React.useState(false)
+  const [showShareDialog, setShowShareDialog] = React.useState(false)
+  const [sharingProject, setSharingProject] = React.useState<ProjectData | null>(null)
   
   const sortableId = React.useId()
   const sensors = useSensors(
@@ -374,6 +377,11 @@ export function ProjectsDataTable({
       setIsArchiving(null)
     }
   }, [userId, onItemsDeleted])
+
+  const handleShare = React.useCallback(async (project: ProjectData) => {
+    setSharingProject(project)
+    setShowShareDialog(true)
+  }, [])
 
   // Create columns definition for projects
   const columns: ColumnDef<ProjectData>[] = React.useMemo(() => [
@@ -520,6 +528,9 @@ export function ProjectsDataTable({
               >
                 {isCurrentlyArchiving ? 'Archiving...' : project.status === 'archived' ? 'Archived' : 'Archive'}
               </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleShare(project)}>
+                Share
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem 
                 className="text-destructive focus:text-destructive"
@@ -533,7 +544,7 @@ export function ProjectsDataTable({
       },
       size: 40,
     },
-  ], [renderItemLink, handleDeleteSingle, handleEdit, handleDuplicate, handleArchive, isArchiving, isDuplicating])
+  ], [renderItemLink, handleDeleteSingle, handleEdit, handleDuplicate, handleArchive, handleShare, isArchiving, isDuplicating])
 
   const table = useReactTable({
     data,
@@ -952,6 +963,14 @@ export function ProjectsDataTable({
           />
         </DialogContent>
       </Dialog>
+      
+      {/* Share project dialog */}
+      <ShareProjectDialog
+        project={sharingProject}
+        open={showShareDialog}
+        onOpenChange={setShowShareDialog}
+        userId={userId || ''}
+      />
     </div>
   )
 }

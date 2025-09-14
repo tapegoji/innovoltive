@@ -34,8 +34,7 @@ interface ProjectFormProps {
 const projectTypes = [
   { value: 'em', label: 'Electromagnetic (EM)', description: 'Electromagnetic field simulation and modeling' },
   { value: 'ht', label: 'Heat Transfer (HT)', description: 'Thermal analysis and heat dissipation modeling' },
-  { value: 'cfd', label: 'CFD Simulation', description: 'Computational fluid dynamics analysis' },
-  { value: 'folder', label: 'Folder', description: 'Organization folder for grouping projects' }
+  { value: 'cfd', label: 'CFD Simulation', description: 'Computational fluid dynamics analysis' }
 ]
 
 export function ProjectForm({
