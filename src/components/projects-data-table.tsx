@@ -95,6 +95,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import { ProjectForm, ProjectFormData } from "@/components/project-form"
 
 // Project schema that matches the FileItem interface but works with DataTable
 export const projectSchema = z.object({
@@ -231,6 +232,19 @@ export function ProjectsDataTable({
   })
   const [isDeleting, setIsDeleting] = React.useState(false)
   const [showDeleteDialog, setShowDeleteDialog] = React.useState(false)
+  const [isArchiving, setIsArchiving] = React.useState<string | null>(null)
+  const [isDuplicating, setIsDuplicating] = React.useState<string | null>(null)
+  const [showEditDialog, setShowEditDialog] = React.useState(false)
+  const [editingProject, setEditingProject] = React.useState<ProjectData | null>(null)
+  const [isUpdating, setIsUpdating] = React.useState(false)
+  const [editForm, setEditForm] = React.useState<ProjectFormData>({
+    name: '',
+    description: '',
+    types: [],
+    status: 'active'
+  })
+  const [editError, setEditError] = React.useState<string | null>(null)
+  const [editSuccess, setEditSuccess] = React.useState(false)
   
   const sortableId = React.useId()
   const sensors = useSensors(
@@ -255,6 +269,111 @@ export function ProjectsDataTable({
     setRowSelection({ [projectId]: true })
     setShowDeleteDialog(true)
   }, [userId])
+
+  const handleEdit = React.useCallback(async (project: ProjectData) => {
+    setEditingProject(project)
+    setEditForm({
+      name: project.name,
+      description: project.description || '',
+      types: project.type ? project.type.split(',').map(t => t.trim()) : [],
+      status: project.status
+    })
+    setEditError(null)
+    setEditSuccess(false)
+    setShowEditDialog(true)
+  }, [])
+
+  const handleEditSubmit = React.useCallback(async () => {
+    if (!editingProject || !userId) return
+    
+    setEditError(null)
+    
+    if (!editForm.name.trim()) {
+      setEditError('Project name is required')
+      return
+    }
+    
+    if (editForm.types.length === 0) {
+      setEditError('Please select at least one project type')
+      return
+    }
+    
+    setIsUpdating(true)
+    try {
+      const { updateProject } = await import('@/lib/actions')
+      const result = await updateProject(editingProject.id, {
+        ...editForm,
+        type: editForm.types.join(',') // Join types array into comma-separated string
+      }, userId)
+      
+      if (result.success) {
+        setEditSuccess(true)
+        onItemsDeleted?.() // Refresh the data
+        toast.success('Project updated successfully')
+        
+        // Close dialog after a short delay
+        setTimeout(() => {
+          setShowEditDialog(false)
+          setEditingProject(null)
+          setEditSuccess(false)
+        }, 1500)
+      } else {
+        console.error('Failed to update project:', result.error)
+        setEditError(result.error || 'Failed to update project')
+      }
+    } catch (error) {
+      console.error('Error updating project:', error)
+      setEditError('An error occurred while updating the project')
+    } finally {
+      setIsUpdating(false)
+    }
+  }, [editingProject, editForm, userId, onItemsDeleted])
+
+  const handleDuplicate = React.useCallback(async (projectId: string) => {
+    if (!userId) return
+    
+    setIsDuplicating(projectId)
+    try {
+      const { duplicateProject } = await import('@/lib/actions')
+      const result = await duplicateProject(projectId, userId)
+      
+      if (result.success) {
+        onItemsDeleted?.() // Refresh the data
+        toast.success('Project duplicated successfully')
+      } else {
+        console.error('Failed to duplicate project:', result.error)
+        toast.error(result.error || 'Failed to duplicate project')
+      }
+    } catch (error) {
+      console.error('Error duplicating project:', error)
+      toast.error('An error occurred while duplicating the project')
+    } finally {
+      setIsDuplicating(null)
+    }
+  }, [userId, onItemsDeleted])
+
+  const handleArchive = React.useCallback(async (projectId: string) => {
+    if (!userId) return
+    
+    setIsArchiving(projectId)
+    try {
+      const { archiveProject } = await import('@/lib/actions')
+      const result = await archiveProject(projectId, userId)
+      
+      if (result.success) {
+        onItemsDeleted?.() // Refresh the data
+        toast.success('Project archived successfully')
+      } else {
+        console.error('Failed to archive project:', result.error)
+        toast.error(result.error || 'Failed to archive project')
+      }
+    } catch (error) {
+      console.error('Error archiving project:', error)
+      toast.error('An error occurred while archiving the project')
+    } finally {
+      setIsArchiving(null)
+    }
+  }, [userId, onItemsDeleted])
 
   // Create columns definition for projects
   const columns: ColumnDef<ProjectData>[] = React.useMemo(() => [
@@ -367,35 +486,54 @@ export function ProjectsDataTable({
     },
     {
       id: "actions",
-      cell: ({ row }) => (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
-              size="icon"
-            >
-              <IconDotsVertical />
-              <span className="sr-only">Open menu</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-32">
-            <DropdownMenuItem>Edit</DropdownMenuItem>
-            <DropdownMenuItem>Duplicate</DropdownMenuItem>
-            <DropdownMenuItem>Archive</DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem 
-              className="text-destructive focus:text-destructive"
-              onClick={() => handleDeleteSingle(row.original.id)}
-            >
-              Delete
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      ),
+      cell: ({ row }) => {
+        const project = row.original
+        const isCurrentlyArchiving = isArchiving === project.id
+        const isCurrentlyDuplicating = isDuplicating === project.id
+        
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
+                size="icon"
+                disabled={isCurrentlyArchiving || isCurrentlyDuplicating}
+              >
+                <IconDotsVertical />
+                <span className="sr-only">Open menu</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-32">
+              <DropdownMenuItem onClick={() => handleEdit(project)}>
+                Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => handleDuplicate(project.id)}
+                disabled={isCurrentlyDuplicating}
+              >
+                {isCurrentlyDuplicating ? 'Duplicating...' : 'Duplicate'}
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => handleArchive(project.id)}
+                disabled={isCurrentlyArchiving || project.status === 'archived'}
+              >
+                {isCurrentlyArchiving ? 'Archiving...' : project.status === 'archived' ? 'Archived' : 'Archive'}
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem 
+                className="text-destructive focus:text-destructive"
+                onClick={() => handleDeleteSingle(project.id)}
+              >
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )
+      },
       size: 40,
     },
-  ], [renderItemLink, handleDeleteSingle])
+  ], [renderItemLink, handleDeleteSingle, handleEdit, handleDuplicate, handleArchive, isArchiving, isDuplicating])
 
   const table = useReactTable({
     data,
@@ -790,6 +928,28 @@ export function ProjectsDataTable({
               Delete
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit project dialog */}
+      <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+        <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Edit Project</DialogTitle>
+            <DialogDescription>
+              Make changes to your project details.
+            </DialogDescription>
+          </DialogHeader>
+          <ProjectForm
+            data={editForm}
+            onChange={setEditForm}
+            onSubmit={handleEditSubmit}
+            onCancel={() => setShowEditDialog(false)}
+            isLoading={isUpdating}
+            submitLabel="Update Project"
+            error={editError}
+            success={editSuccess}
+          />
         </DialogContent>
       </Dialog>
     </div>

@@ -4,17 +4,17 @@ import React from 'react'
 import { Plus } from 'lucide-react'
 import { useUser } from '@clerk/nextjs'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { createProject } from '@/lib/actions'
+import { ProjectForm, ProjectFormData } from '@/components/project-form'
+import { toast } from 'sonner'
 
 interface AddProjectDialogProps {
   onProjectAdded?: () => void
@@ -26,21 +26,14 @@ export function AddProjectDialog({ onProjectAdded }: AddProjectDialogProps) {
   const [loading, setLoading] = React.useState(false)
   const [error, setError] = React.useState<string | null>(null)
   const [success, setSuccess] = React.useState(false)
-  const [formData, setFormData] = React.useState({
+  const [formData, setFormData] = React.useState<ProjectFormData>({
     name: '',
     description: '',
-    types: [] as string[], // Changed to array for multiple selections
-    status: 'active' as 'active' | 'completed' | 'paused' | 'archived'
+    types: [],
+    status: 'active'
   })
 
-  const projectTypes = [
-    { value: 'em', label: 'Electromagnetic (EM)', description: 'Electromagnetic field simulation and modeling' },
-    { value: 'ht', label: 'Heat Transfer (HT)', description: 'Thermal analysis and heat dissipation modeling' },
-    { value: 'cfd', label: 'CFD Simulation', description: 'Computational fluid dynamics analysis' }
-  ]
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleSubmit = async () => {
     setError(null)
     setSuccess(false)
     
@@ -78,12 +71,13 @@ export function AddProjectDialog({ onProjectAdded }: AddProjectDialogProps) {
       setFormData({
         name: '',
         description: '',
-        types: [], // Reset to empty array
+        types: [],
         status: 'active'
       })
       
       setSuccess(true)
       onProjectAdded?.()
+      toast.success('Project created successfully!')
       
       // Close dialog after a short delay to show success message
       setTimeout(() => {
@@ -96,6 +90,18 @@ export function AddProjectDialog({ onProjectAdded }: AddProjectDialogProps) {
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleCancel = () => {
+    setOpen(false)
+    setError(null)
+    setSuccess(false)
+    setFormData({
+      name: '',
+      description: '',
+      types: [],
+      status: 'active'
+    })
   }
 
   const handleButtonClick = () => {
@@ -116,7 +122,7 @@ export function AddProjectDialog({ onProjectAdded }: AddProjectDialogProps) {
         </Button>
       </DialogTrigger>
       
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Create New Project</DialogTitle>
           <DialogDescription>
@@ -124,101 +130,16 @@ export function AddProjectDialog({ onProjectAdded }: AddProjectDialogProps) {
           </DialogDescription>
         </DialogHeader>
         
-        {success && (
-          <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-md p-3 mb-4">
-            <p className="text-green-800 dark:text-green-200 text-sm font-medium">
-              Project created successfully!
-            </p>
-          </div>
-        )}
-        
-        {error && (
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md p-3 mb-4">
-            <p className="text-red-800 dark:text-red-200 text-sm font-medium">
-              {error}
-            </p>
-          </div>
-        )}
-        
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-2">
-            <label htmlFor="name" className="text-sm font-medium">
-              Project Name *
-            </label>
-            <Input
-              id="name"
-              value={formData.name}
-              onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-              placeholder="Enter project name"
-              required
-              disabled={loading || success}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label htmlFor="description" className="text-sm font-medium">
-              Description
-            </label>
-            <Input
-              id="description"
-              value={formData.description}
-              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-              placeholder="Brief description of your project"
-              disabled={loading || success}
-            />
-          </div>
-
-          <div className="space-y-3">
-            <label className="text-sm font-medium">Project Type * (Select one or more)</label>
-            <div className="space-y-2">
-              {projectTypes.map((type) => (
-                <div key={type.value} className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    id={type.value}
-                    name="type"
-                    value={type.value}
-                    checked={formData.types.includes(type.value)}
-                    onChange={(e) => {
-                      const { checked, value } = e.target
-                      setFormData(prev => ({
-                        ...prev,
-                        types: checked 
-                          ? [...prev.types, value]
-                          : prev.types.filter(t => t !== value)
-                      }))
-                    }}
-                    className="h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary"
-                    disabled={loading || success}
-                  />
-                  <label htmlFor={type.value} className="text-sm font-medium cursor-pointer">
-                    {type.label}
-                  </label>
-                  <span className="text-xs text-muted-foreground">
-                    {type.description}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setOpen(false)}
-              disabled={loading}
-            >
-              Cancel
-            </Button>
-            <Button 
-              type="submit" 
-              disabled={loading || success}
-            >
-              {loading ? 'Creating...' : success ? 'Created!' : 'Create Project'}
-            </Button>
-          </DialogFooter>
-        </form>
+        <ProjectForm
+          data={formData}
+          onChange={setFormData}
+          onSubmit={handleSubmit}
+          onCancel={handleCancel}
+          isLoading={loading}
+          submitLabel="Create Project"
+          error={error}
+          success={success}
+        />
       </DialogContent>
     </Dialog>
   )
