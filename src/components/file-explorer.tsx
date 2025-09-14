@@ -46,8 +46,17 @@ const getIcon = (type: string) => {
     <File className="h-4 w-4 text-gray-600 flex-shrink-0" />
 }
 
-const getTypeLabel = (type: string) => 
-  ({ em: "EM", ht: "HT", cfd: "CFD", mp: "MP", folder: "Folder", file: "File" })[type] || "File"
+const getTypeLabel = (type: string) => {
+  if (!type) return "Unknown"
+  
+  // Handle multiple types (comma-separated)
+  const types = type.split(',').map(t => t.trim())
+  const typeLabels = types.map(t => 
+    ({ em: "EM", ht: "HT", cfd: "CFD", mp: "MP", folder: "Folder", file: "File" })[t] || t.toUpperCase()
+  )
+  
+  return typeLabels.join(' + ')
+}
 
 const getStatusBadge = (status: string) => (
   <span className={cn(
@@ -70,7 +79,11 @@ export function FileExplorer({ items, currentPath = ["My Projects"], viewMode = 
 
   const sortedItems = React.useMemo(() => {
     return [...items].sort((a, b) => {
-      const getTypePriority = (type: string) => ["em", "ht", "cfd", "mp"].includes(type) ? 0 : type === "folder" ? 1 : 2
+      const getTypePriority = (type: string) => {
+        if (!type) return 3
+        const firstType = type.split(',')[0]?.trim() || ''
+        return ["em", "ht", "cfd", "mp"].includes(firstType) ? 0 : firstType === "folder" ? 1 : 2
+      }
       const aPriority = getTypePriority(a.type)
       const bPriority = getTypePriority(b.type)
       
@@ -82,7 +95,12 @@ export function FileExplorer({ items, currentPath = ["My Projects"], viewMode = 
         case "date": comparison = new Date(a.dateModified).getTime() - new Date(b.dateModified).getTime(); break
         case "size": comparison = (a.size || "").localeCompare(b.size || ""); break
         case "status": comparison = a.status.localeCompare(b.status); break
-        case "type": comparison = a.type.localeCompare(b.type); break
+        case "type": 
+          // For sorting, use the first type in the list
+          const aFirstType = a.type.split(',')[0]?.trim() || ''
+          const bFirstType = b.type.split(',')[0]?.trim() || ''
+          comparison = aFirstType.localeCompare(bFirstType); 
+          break
         case "user": comparison = (a.user || "").localeCompare(b.user || ""); break
       }
       return sortOrder === "asc" ? comparison : -comparison

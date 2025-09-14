@@ -4,7 +4,7 @@ import { getSupabaseClient } from './supabase'
 export interface ProjectDisplay {
   id: string
   name: string
-  type: "em" | "ht" | "cfd" | "mp"
+  type: string // Changed to string to support multiple types (comma-separated)
   description: string | null
   date_modified: string
   size: string | null
@@ -14,7 +14,7 @@ export interface ProjectDisplay {
 export interface FormattedProject {
   id: string
   name: string
-  type: "em" | "ht" | "cfd" | "mp"
+  type: string // Changed to string to support multiple types
   description: string
   dateModified: string
   size: string
@@ -25,7 +25,7 @@ export interface FormattedProject {
 export interface CreateProjectData {
   name: string
   description: string
-  type: 'em' | 'ht' | 'cfd' | 'mp'
+  type: string // Changed to string to support multiple types (comma-separated)
   status: 'active' | 'completed' | 'paused' | 'archived'
   userId: string
 }

@@ -29,7 +29,7 @@ export function AddProjectDialog({ onProjectAdded }: AddProjectDialogProps) {
   const [formData, setFormData] = React.useState({
     name: '',
     description: '',
-    type: 'em' as 'em' | 'ht' | 'cfd' | 'mp',
+    types: [] as string[], // Changed to array for multiple selections
     status: 'active' as 'active' | 'completed' | 'paused' | 'archived'
   })
 
@@ -55,12 +55,17 @@ export function AddProjectDialog({ onProjectAdded }: AddProjectDialogProps) {
       return
     }
 
+    if (formData.types.length === 0) {
+      setError('Please select at least one project type')
+      return
+    }
+
     setLoading(true)
     try {
       const result = await createProject({
         name: formData.name,
         description: formData.description,
-        type: formData.type,
+        type: formData.types.join(','), // Join array into comma-separated string
         status: formData.status,
         userId: user.id
       })
@@ -74,7 +79,7 @@ export function AddProjectDialog({ onProjectAdded }: AddProjectDialogProps) {
       setFormData({
         name: '',
         description: '',
-        type: 'em',
+        types: [], // Reset to empty array
         status: 'active'
       })
       
@@ -165,7 +170,7 @@ export function AddProjectDialog({ onProjectAdded }: AddProjectDialogProps) {
           </div>
 
           <div className="space-y-3">
-            <label className="text-sm font-medium">Project Type *</label>
+            <label className="text-sm font-medium">Project Type * (Select one or more)</label>
             <div className="space-y-2">
               {projectTypes.map((type) => (
                 <div key={type.value} className="flex items-center space-x-2">
@@ -174,11 +179,15 @@ export function AddProjectDialog({ onProjectAdded }: AddProjectDialogProps) {
                     id={type.value}
                     name="type"
                     value={type.value}
-                    checked={formData.type === type.value}
+                    checked={formData.types.includes(type.value)}
                     onChange={(e) => {
-                      if (e.target.checked) {
-                        setFormData(prev => ({ ...prev, type: type.value as 'em' | 'ht' | 'cfd' | 'mp' }))
-                      }
+                      const { checked, value } = e.target
+                      setFormData(prev => ({
+                        ...prev,
+                        types: checked 
+                          ? [...prev.types, value]
+                          : prev.types.filter(t => t !== value)
+                      }))
                     }}
                     className="h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary"
                     disabled={loading || success}
