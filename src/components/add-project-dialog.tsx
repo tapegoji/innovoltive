@@ -36,8 +36,7 @@ export function AddProjectDialog({ onProjectAdded }: AddProjectDialogProps) {
   const projectTypes = [
     { value: 'em', label: 'Electromagnetic (EM)', description: 'Electromagnetic field simulation and modeling' },
     { value: 'ht', label: 'Heat Transfer (HT)', description: 'Thermal analysis and heat dissipation modeling' },
-    { value: 'cfd', label: 'CFD Simulation', description: 'Computational fluid dynamics analysis' },
-    { value: 'mp', label: 'Multiphysics (MP)', description: 'Combined electromagnetic and thermal simulation' }
+    { value: 'cfd', label: 'CFD Simulation', description: 'Computational fluid dynamics analysis' }
   ]
 
   const handleSubmit = async (e: React.FormEvent) => {

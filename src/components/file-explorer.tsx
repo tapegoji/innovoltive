@@ -19,7 +19,7 @@ import {
 export interface FileItem {
   id: string
   name: string
-  type: "em" | "ht" | "cfd" | "mp" | "folder" | "file"
+  type: "em" | "ht" | "cfd" | "folder" | "file"
   size?: string
   dateModified: string
   description?: string
@@ -40,7 +40,7 @@ interface FileExplorerProps {
 }
 
 const getIcon = (type: string) => {
-  const isProject = ["em", "ht", "cfd", "mp"].includes(type)
+  const isProject = ["em", "ht", "cfd"].includes(type)
   return isProject || type === "folder" ? 
     <Folder className="h-4 w-4 text-blue-500 flex-shrink-0" /> : 
     <File className="h-4 w-4 text-gray-600 flex-shrink-0" />
@@ -52,7 +52,7 @@ const getTypeLabel = (type: string) => {
   // Handle multiple types (comma-separated)
   const types = type.split(',').map(t => t.trim())
   const typeLabels = types.map(t => 
-    ({ em: "EM", ht: "HT", cfd: "CFD", mp: "MP", folder: "Folder", file: "File" })[t] || t.toUpperCase()
+    ({ em: "EM", ht: "HT", cfd: "CFD", folder: "Folder", file: "File" })[t] || t.toUpperCase()
   )
   
   return typeLabels.join(' + ')
@@ -82,7 +82,7 @@ export function FileExplorer({ items, currentPath = ["My Projects"], viewMode = 
       const getTypePriority = (type: string) => {
         if (!type) return 3
         const firstType = type.split(',')[0]?.trim() || ''
-        return ["em", "ht", "cfd", "mp"].includes(firstType) ? 0 : firstType === "folder" ? 1 : 2
+        return ["em", "ht", "cfd"].includes(firstType) ? 0 : firstType === "folder" ? 1 : 2
       }
       const aPriority = getTypePriority(a.type)
       const bPriority = getTypePriority(b.type)
