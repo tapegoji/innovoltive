@@ -14,7 +14,7 @@ interface MyProjectsClientProps {
 }
 
 export function MyProjectsClient({ projects, userName, userId, onProjectAdded }: MyProjectsClientProps) {
-  const [viewMode, setViewMode] = React.useState<"grid" | "list">("list")
+  const [viewMode, setViewMode] = React.useState<"grid" | "list" | undefined>(undefined)
 
   const handleItemsDeleted = () => {
     window.location.reload()

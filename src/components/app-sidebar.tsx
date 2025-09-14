@@ -12,18 +12,20 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
+  useSidebar,
 } from "@/components/ui/sidebar"
 import { 
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible"
-import { IconBook, IconFolder, IconRocket, IconSettings, IconShare, IconArchive, IconDevices, IconMenu2 } from "@tabler/icons-react"
+import { IconBook, IconFolder, IconRocket, IconSettings, IconShare, IconArchive, IconDevices, IconMenu2, IconX, IconCircleX } from "@tabler/icons-react"
 import { MdPublic } from "react-icons/md";
 import { Plus, Minus } from "lucide-react"
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
+import { Button } from "@/components/ui/button";
 
 // Menu items.
 const items = [
@@ -98,10 +100,28 @@ export function AppSidebar() {
 function SidebarContentWithSearchParams({ pathname }: { pathname: string }) {
   const searchParams = useSearchParams();
   const section = searchParams.get('section');
+  const { isMobile, setOpenMobile, setOpen } = useSidebar();
+
+  const handleCloseSidebar = () => {
+    if (isMobile) {
+      setOpenMobile(false);
+    } else {
+      setOpen(false);
+    }
+  };
 
   return (
-    <SidebarGroup>
-      <SidebarGroupLabel className="text-lg font-bold">Dashboard</SidebarGroupLabel>
+    <SidebarGroup className="pt-0">
+      <div className="flex h-8 justify-between">
+        <SidebarGroupLabel className="text-md font-bold">Dashboard</SidebarGroupLabel>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handleCloseSidebar}
+        >
+          <IconX className="size-6" />
+        </Button>
+      </div>
       <SidebarGroupContent>
         <SidebarMenu>
           {items.map((item) => {

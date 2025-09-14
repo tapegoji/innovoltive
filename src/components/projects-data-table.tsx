@@ -57,6 +57,7 @@ import { toast } from "sonner"
 import { z } from "zod"
 
 import { cn } from "@/lib/utils"
+import { useIsMobile } from "@/hooks/use-mobile"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -264,7 +265,7 @@ function DraggableRow({ row }: { row: Row<ProjectData> }) {
 
 export function ProjectsDataTable({
   data: initialData,
-  viewMode = "list",
+  viewMode,
   onViewModeChange,
   currentPath = ["My Projects"],
   userId,
@@ -274,6 +275,31 @@ export function ProjectsDataTable({
   emptyState,
   isPublicView = false
 }: ProjectsDataTableProps) {
+  const isMobile = useIsMobile()
+  
+  // Internal state for view mode with mobile-aware default
+  const [internalViewMode, setInternalViewMode] = React.useState<"grid" | "list">(() => 
+    isMobile ? "grid" : "list"
+  )
+  
+  // Update internal view mode when mobile state changes (for initial detection)
+  React.useEffect(() => {
+    if (viewMode === undefined) {
+      setInternalViewMode(isMobile ? "grid" : "list")
+    }
+  }, [isMobile, viewMode])
+  
+  // Use passed viewMode if provided, otherwise use internal mobile-aware state
+  const effectiveViewMode = viewMode ?? internalViewMode
+  
+  // Handle view mode changes
+  const handleViewModeChange = (mode: "grid" | "list") => {
+    if (onViewModeChange) {
+      onViewModeChange(mode)
+    } else {
+      setInternalViewMode(mode)
+    }
+  }
   const [data, setData] = React.useState(() => initialData)
   const [rowSelection, setRowSelection] = React.useState<Record<string, boolean>>({})
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
@@ -838,53 +864,55 @@ export function ProjectsDataTable({
             </Button>
           )}
           
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm">
-                <IconLayoutColumns />
-                Columns
-                <IconChevronDown />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              {table
-                .getAllColumns()
-                .filter(
-                  (column) =>
-                    typeof column.accessorFn !== "undefined" &&
-                    column.getCanHide()
-                )
-                .map((column) => {
-                  return (
-                    <DropdownMenuCheckboxItem
-                      key={column.id}
-                      className="capitalize"
-                      checked={column.getIsVisible()}
-                      onCheckedChange={(value) =>
-                        column.toggleVisibility(!!value)
-                      }
-                    >
-                      {column.id}
-                    </DropdownMenuCheckboxItem>
+          {effectiveViewMode === "list" && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <IconLayoutColumns />
+                  Columns
+                  <IconChevronDown />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                {table
+                  .getAllColumns()
+                  .filter(
+                    (column) =>
+                      typeof column.accessorFn !== "undefined" &&
+                      column.getCanHide()
                   )
-                })}
-            </DropdownMenuContent>
-          </DropdownMenu>
+                  .map((column) => {
+                    return (
+                      <DropdownMenuCheckboxItem
+                        key={column.id}
+                        className="capitalize"
+                        checked={column.getIsVisible()}
+                        onCheckedChange={(value) =>
+                          column.toggleVisibility(!!value)
+                        }
+                      >
+                        {column.id}
+                      </DropdownMenuCheckboxItem>
+                    )
+                  })}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
 
-          {onViewModeChange && (
+          {(onViewModeChange || true) && (
             <div className="flex border rounded-md">
               <Button 
-                variant={viewMode === "grid" ? "default" : "ghost"} 
+                variant={effectiveViewMode === "grid" ? "default" : "ghost"} 
                 size="sm" 
-                onClick={() => onViewModeChange("grid")} 
+                onClick={() => handleViewModeChange("grid")} 
                 className="rounded-r-none"
               >
                 <IconGrid3x3 className="h-4 w-4" />
               </Button>
               <Button 
-                variant={viewMode === "list" ? "default" : "ghost"} 
+                variant={effectiveViewMode === "list" ? "default" : "ghost"} 
                 size="sm" 
-                onClick={() => onViewModeChange("list")} 
+                onClick={() => handleViewModeChange("list")} 
                 className="rounded-l-none"
               >
                 <IconList className="h-4 w-4" />
@@ -896,7 +924,7 @@ export function ProjectsDataTable({
 
       {/* Content */}
       <div className="flex-1 overflow-auto">
-        {viewMode === "grid" ? (
+        {effectiveViewMode === "grid" ? (
           <GridView />
         ) : (
           <div className="flex flex-col h-full">
