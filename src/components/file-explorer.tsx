@@ -261,64 +261,64 @@ export function FileExplorer({ items, currentPath = ["My Projects"], viewMode = 
             ))}
           </div>
         ) : (
-          <div className="space-y-1">
-            <div className="grid grid-cols-14 gap-4 px-3 py-2 text-sm font-medium text-muted-foreground border-b">
-              <div className="col-span-1">
-                <input
-                  type="checkbox"
-                  checked={selectedItems.size === items.length && items.length > 0}
-                  onChange={handleSelectAll}
-                  className="h-4 w-4"
-                />
-              </div>
-              <div className="col-span-3">Name</div>
-              <div className="col-span-1">Type</div>
-              <div className="col-span-2">Status</div>
-              <div className="col-span-1">Size</div>
-              <div className="col-span-2">Date Modified</div>
-              <div className="col-span-2">User</div>
-              <div className="col-span-2">Description</div>
-            </div>
-            {sortedItems.map(item => (
-              <ItemWrapper key={item.id} item={item}>
-                <div className={cn(
-                  "grid grid-cols-14 gap-4 px-3 py-2 text-sm hover:bg-accent/50 rounded transition-colors",
-                  selectedItems.has(item.id) ? "bg-accent" : ""
-                )}>
-                  <div className="col-span-1 flex items-center">
+          <div className="flex flex-col h-full min-h-0">
+            <div className="overflow-auto">
+              <div className="min-w-max">
+                <div className="grid gap-4 px-3 py-2 text-sm font-medium text-muted-foreground border-b sticky top-0 bg-background z-10" style={{gridTemplateColumns: 'minmax(60px, 1fr) minmax(200px, 3fr) minmax(80px, 1fr) minmax(120px, 2fr) minmax(80px, 1fr) minmax(140px, 2fr) minmax(120px, 2fr) minmax(200px, 2fr)'}}>
+                  <div className="flex items-center">
                     <input
                       type="checkbox"
-                      checked={selectedItems.has(item.id)}
-                      onChange={(e) => {
-                        e.stopPropagation()
-                        handleSelectItem(item.id)
-                      }}
+                      checked={selectedItems.size === items.length && items.length > 0}
+                      onChange={handleSelectAll}
                       className="h-4 w-4"
                     />
                   </div>
-                  <div className="col-span-3 flex items-center space-x-2 min-w-0">
-                    {getIcon(item.type)}
-                    {renderItemLink ? (
-                      renderItemLink(item, 
-                        <span className="truncate font-medium hover:underline cursor-pointer" title={item.name}>{item.name}</span>
-                      )
-                    ) : (
-                      <span className="truncate font-medium" title={item.name}>{item.name}</span>
-                    )}
-                  </div>
-                  <div className="col-span-1 text-muted-foreground">{getTypeLabel(item.type)}</div>
-                  <div className="col-span-2">{getStatusBadge(item.status)}</div>
-                  <div className="col-span-1 text-muted-foreground">{item.size || "-"}</div>
-                  <div className="col-span-2 text-muted-foreground">{item.dateModified}</div>
-                  <div className="col-span-2 text-muted-foreground">
-                    <span className="truncate" title={item.user}>{item.user || "-"}</span>
-                  </div>
-                  <div className="col-span-2 text-muted-foreground">
-                    <span className="truncate" title={item.description}>{item.description || "-"}</span>
-                  </div>
+                  <div className="break-words">Name</div>
+                  <div className="break-words">Type</div>
+                  <div className="break-words">Status</div>
+                  <div className="break-words">Size</div>
+                  <div className="break-words">Date Modified</div>
+                  <div className="break-words">User</div>
+                  <div className="break-words">Description</div>
                 </div>
-              </ItemWrapper>
-            ))}
+                {sortedItems.map(item => (
+                  <ItemWrapper key={item.id} item={item}>
+                    <div className={cn(
+                      "grid gap-4 px-3 py-2 text-sm hover:bg-accent/50 rounded transition-colors",
+                      selectedItems.has(item.id) ? "bg-accent" : ""
+                    )} style={{gridTemplateColumns: 'minmax(60px, 1fr) minmax(200px, 3fr) minmax(80px, 1fr) minmax(120px, 2fr) minmax(80px, 1fr) minmax(140px, 2fr) minmax(120px, 2fr) minmax(200px, 2fr)'}}>
+                      <div className="flex items-center">
+                        <input
+                          type="checkbox"
+                          checked={selectedItems.has(item.id)}
+                          onChange={(e) => {
+                            e.stopPropagation()
+                            handleSelectItem(item.id)
+                          }}
+                          className="h-4 w-4"
+                        />
+                      </div>
+                      <div className="flex items-center space-x-2 min-w-0">
+                        {getIcon(item.type)}
+                        {renderItemLink ? (
+                          renderItemLink(item, 
+                            <span className="break-words font-medium hover:underline cursor-pointer" title={item.name}>{item.name}</span>
+                          )
+                        ) : (
+                          <span className="break-words font-medium" title={item.name}>{item.name}</span>
+                        )}
+                      </div>
+                      <div className="text-muted-foreground break-words">{getTypeLabel(item.type)}</div>
+                      <div className="flex items-start">{getStatusBadge(item.status)}</div>
+                      <div className="text-muted-foreground break-words">{item.size || "-"}</div>
+                      <div className="text-muted-foreground break-words">{item.dateModified}</div>
+                      <div className="text-muted-foreground break-words">{item.user || "-"}</div>
+                      <div className="text-muted-foreground break-words">{item.description || "-"}</div>
+                    </div>
+                  </ItemWrapper>
+                ))}
+              </div>
+            </div>
           </div>
         )}
       </div>
