@@ -1,4 +1,4 @@
-import { supabase } from './supabase'
+import { getSupabaseClient } from './supabase'
 
 // Types for our data
 export interface Project {
@@ -37,6 +37,8 @@ function formatDate(dateString: string): string {
 // Fetch user projects using optimized approach to avoid waterfalls
 export async function fetchUserProjects(userId: string): Promise<Project[]> {
   try {
+    const supabase = getSupabaseClient()
+    
     // First get the project IDs
     const { data: userProjects, error: userProjectsError } = await supabase
       .from('user_projects')
@@ -53,7 +55,7 @@ export async function fetchUserProjects(userId: string): Promise<Project[]> {
     }
 
     // Extract project IDs
-    const projectIds = userProjects.map(up => up.project_id)
+    const projectIds = userProjects.map((up: { project_id: string }) => up.project_id)
 
     // Fetch project details in a single query
     const { data: projects, error: projectsError } = await supabase

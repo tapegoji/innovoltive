@@ -5,7 +5,7 @@ import { Plus } from 'lucide-react'
 import { useUser } from '@clerk/nextjs'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { supabase } from '@/lib/supabase'
+import { createProject } from '@/lib/actions'
 
 interface AddProjectDialogProps {
   onProjectAdded?: () => void
@@ -43,49 +43,17 @@ export function AddProjectDialog({ onProjectAdded }: AddProjectDialogProps) {
 
     setLoading(true)
     try {
-      // Generate a unique ID for the project
-      const projectId = crypto.randomUUID()
-
-      const projectData = {
-        id: projectId,
-        name: formData.name.trim(),
-        description: formData.description.trim(),
+      const result = await createProject({
+        name: formData.name,
+        description: formData.description,
         type: formData.type,
         status: formData.status,
-        user_id: user.id,
-        date_modified: new Date().toISOString(),
-        size: '0 MB' // Default size for new projects
-      }
+        userId: user.id
+      })
 
-      // First, insert the project
-      const { data: projectResult, error: projectError } = await supabase
-        .from('projects')
-        .insert([projectData])
-        .select()
-
-      if (projectError) {
-        console.error('Error creating project:', projectError)
-        alert(`Failed to create project: ${projectError.message}`)
+      if (!result.success) {
+        alert(result.error)
         return
-      }
-
-      // Then, create the user-project relationship
-      const userProjectData = {
-        user_id: user.id,
-        project_id: projectId,
-        role: 'owner'
-      }
-
-      const { data: userProjectResult, error: userProjectError } = await supabase
-        .from('user_projects')
-        .insert([userProjectData])
-
-      if (userProjectError) {
-        console.error('Error creating user-project relationship:', userProjectError)
-        // Don't fail the whole operation, but log the error
-        console.warn('Project created but user association failed')
-      } else {
-        // User-project relationship created successfully
       }
       
       // Reset form
@@ -99,6 +67,7 @@ export function AddProjectDialog({ onProjectAdded }: AddProjectDialogProps) {
       setOpen(false)
       onProjectAdded?.()
       
+      alert('Project created successfully!')
     } catch (err) {
       console.error('Error creating project:', err)
       alert('Failed to create project. Please try again.')
@@ -168,7 +137,7 @@ export function AddProjectDialog({ onProjectAdded }: AddProjectDialogProps) {
                         checked={formData.type === type.value}
                         onChange={(e) => {
                           if (e.target.checked) {
-                            setFormData(prev => ({ ...prev, type: type.value as any }))
+                            setFormData(prev => ({ ...prev, type: type.value as 'em' | 'ht' | 'cfd' | 'mp' }))
                           }
                         }}
                         className="h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary"
