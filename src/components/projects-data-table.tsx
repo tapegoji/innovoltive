@@ -34,11 +34,8 @@ import {
   IconGrid3x3,
   IconList,
   IconTrash,
-  IconFolder,
-  IconFile,
   IconDevices,
   IconMinus,
-  IconAtom,
 } from "@tabler/icons-react"
 import { ShareProjectDialog } from "@/components/share-project-dialog"
 import {
@@ -124,24 +121,6 @@ interface ProjectsDataTableProps {
   toolbarActions?: React.ReactNode
   emptyState?: React.ReactNode
   isPublicView?: boolean
-}
-
-// Helper functions for project display
-const getIcon = (type: string, size: "small" | "large" = "small") => {
-  // Handle multiple types (comma-separated)
-  const types = type.split(',').map(t => t.trim().toLowerCase())
-  const hasProjectType = types.some(t => ["em", "ht", "cfd"].includes(t))
-  
-  const iconSize = size === "large" ? "h-12 w-12" : "h-4 w-4"
-  const colorClass = hasProjectType || type === "folder" ? "text-blue-500" : "text-gray-600"
-  
-  if (hasProjectType) {
-    return <IconAtom className={`${iconSize} ${colorClass} flex-shrink-0`} />
-  }
-  
-  return type === "folder" ? 
-    <IconFolder className={`${iconSize} ${colorClass} flex-shrink-0`} /> : 
-    <IconFile className={`${iconSize} ${colorClass} flex-shrink-0`} />
 }
 
 const getTypeLabel = (type: string) => {

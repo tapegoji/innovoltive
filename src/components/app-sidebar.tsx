@@ -23,6 +23,7 @@ import { MdPublic } from "react-icons/md";
 import { Plus, Minus } from "lucide-react"
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
 // Menu items.
 const items = [
@@ -82,21 +83,32 @@ const items = [
 
 export function AppSidebar() {
   const pathname = usePathname();
+  
+  return (
+    <Sidebar>
+      <SidebarContent>
+        <Suspense fallback={<div>Loading...</div>}>
+          <SidebarContentWithSearchParams pathname={pathname} />
+        </Suspense>
+      </SidebarContent>
+    </Sidebar>
+  )
+}
+
+function SidebarContentWithSearchParams({ pathname }: { pathname: string }) {
   const searchParams = useSearchParams();
   const section = searchParams.get('section');
 
   return (
-    <Sidebar>
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel className="text-lg font-bold">Dashboard</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {items.map((item) => {
-                const isActive = pathname === item.url || (pathname === "/documentation" && !section && item.url === "/documentation");
-                
-                // Handle items with sub-items (like Documentation)
-                if (item.items?.length) {
+    <SidebarGroup>
+      <SidebarGroupLabel className="text-lg font-bold">Dashboard</SidebarGroupLabel>
+      <SidebarGroupContent>
+        <SidebarMenu>
+          {items.map((item) => {
+            const isActive = pathname === item.url || (pathname === "/documentation" && !section && item.url === "/documentation");
+            
+            // Handle items with sub-items (like Documentation)
+            if (item.items?.length) {
                   return (
                     <Collapsible key={item.title} className="group/collapsible">
                       <SidebarMenuItem>
@@ -150,7 +162,5 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-      </SidebarContent>
-    </Sidebar>
   )
 }

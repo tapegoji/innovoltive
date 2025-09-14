@@ -1,7 +1,7 @@
 'use client'
 
-import React from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import React, { Suspense } from 'react'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { 
@@ -27,6 +27,7 @@ import {
   IconMenu2
 } from '@tabler/icons-react'
 import { useSearchParams, useRouter } from 'next/navigation'
+import dynamic from 'next/dynamic'
 
 // Define sections
 const sections = [
@@ -74,7 +75,7 @@ const sections = [
   }
 ]
 
-export default function DocumentationPage() {
+function DocumentationContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const urlSection = searchParams.get('section')
@@ -149,8 +150,8 @@ export default function DocumentationPage() {
       <div className="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-lg">
         <h3 className="font-semibold text-blue-800 dark:text-blue-200 mb-2">Quick Start</h3>
         <p className="text-sm text-blue-700 dark:text-blue-300">
-          New to the platform? Start with <strong>"Getting Started"</strong> to create your first project, 
-          then explore <strong>"Project Management"</strong> to learn essential operations.
+          New to the platform? Start with <strong>&quot;Getting Started&quot;</strong> to create your first project, 
+          then explore <strong>&quot;Project Management&quot;</strong> to learn essential operations.
         </p>
       </div>
     </div>
@@ -175,14 +176,14 @@ export default function DocumentationPage() {
             <div>
               <h4 className="font-medium mb-2">1. Navigate to My Projects</h4>
               <p className="text-sm text-muted-foreground">
-                From the dashboard, click on "My Projects" to access your personal workspace.
+                From the dashboard, click on &quot;My Projects&quot; to access your personal workspace.
               </p>
             </div>
             
             <div>
-              <h4 className="font-medium mb-2">2. Click "New Project"</h4>
+              <h4 className="font-medium mb-2">2. Click &quot;New Project&quot;</h4>
               <p className="text-sm text-muted-foreground">
-                Click the blue "New Project" button to open the project creation dialog.
+                Click the blue &quot;New Project&quot; button to open the project creation dialog.
               </p>
             </div>
             
@@ -302,7 +303,7 @@ export default function DocumentationPage() {
             <div>
               <h4 className="font-medium mb-1">Edit Project Details</h4>
               <p className="text-sm text-muted-foreground mb-2">
-                Click the three-dot menu (⋮) next to any project and select "Edit" to modify:
+                Click the three-dot menu (⋮) next to any project and select &quot;Edit&quot; to modify:
               </p>
               <ul className="text-sm text-muted-foreground space-y-1">
                 <li>• Project name and description</li>
@@ -324,14 +325,14 @@ export default function DocumentationPage() {
             <div>
               <h4 className="font-medium mb-1">Create Copies</h4>
               <p className="text-sm text-muted-foreground">
-                From the project menu, select "Duplicate" to create an exact copy of your project with all settings and geometry.
+                From the project menu, select &quot;Duplicate&quot; to create an exact copy of your project with all settings and geometry.
               </p>
             </div>
             
             <div>
               <h4 className="font-medium mb-1">Copy Public Projects</h4>
               <p className="text-sm text-muted-foreground">
-                In "Demo Projects", use the "Copy to My Projects" button to add public projects to your workspace.
+                In &quot;Demo Projects&quot;, use the &quot;Copy to My Projects&quot; button to add public projects to your workspace.
               </p>
             </div>
           </CardContent>
@@ -360,7 +361,7 @@ export default function DocumentationPage() {
               <h4 className="font-medium mb-2">Share with Specific Users</h4>
               <ol className="text-sm text-muted-foreground space-y-2">
                 <li>1. Click the menu (⋮) next to your project</li>
-                <li>2. Select "Share" from the dropdown</li>
+                <li>2. Select &quot;Share&quot; from the dropdown</li>
                 <li>3. Enter email addresses of users to share with</li>
                 <li>4. Choose permissions for each user:</li>
               </ol>
@@ -397,16 +398,16 @@ export default function DocumentationPage() {
               <h4 className="font-medium mb-2">Make Project Public</h4>
               <ol className="text-sm text-muted-foreground space-y-2">
                 <li>1. Open the Share dialog for your project</li>
-                <li>2. Select "Make public" from the dropdown</li>
+                <li>2. Select &quot;Make public&quot; from the dropdown</li>
                 <li>3. Confirm that you want to make it publicly accessible</li>
-                <li>4. Click "Share Project" to apply changes</li>
+                <li>4. Click &quot;Share Project&quot; to apply changes</li>
               </ol>
             </div>
             
             <div>
               <h4 className="font-medium mb-2">Public Project Benefits</h4>
               <ul className="text-sm text-muted-foreground space-y-1">
-                <li>• Appears in the "Demo Projects" section</li>
+                <li>• Appears in the &quot;Demo Projects&quot; section</li>
                 <li>• Accessible to anyone with the link</li>
                 <li>• Others can copy it to their workspace</li>
                 <li>• Great for showcasing your work</li>
@@ -472,7 +473,7 @@ export default function DocumentationPage() {
             <div>
               <h4 className="font-medium mb-1">Archive Old Projects</h4>
               <p className="text-sm text-muted-foreground mb-2">
-                Use the "Archive" option in the project menu to move completed or unused projects to archived status.
+                Use the &quot;Archive&quot; option in the project menu to move completed or unused projects to archived status.
               </p>
             </div>
             
@@ -498,7 +499,7 @@ export default function DocumentationPage() {
             <div>
               <h4 className="font-medium mb-1">Permanent Deletion</h4>
               <p className="text-sm text-muted-foreground mb-2">
-                Use the "Delete" option carefully - this action cannot be undone.
+                Use the &quot;Delete&quot; option carefully - this action cannot be undone.
               </p>
             </div>
             
@@ -506,7 +507,7 @@ export default function DocumentationPage() {
               <h4 className="font-medium mb-1">Bulk Operations</h4>
               <ul className="text-sm text-muted-foreground space-y-1">
                 <li>• Select multiple projects using checkboxes</li>
-                <li>• Use "Delete (X)" button for bulk deletion</li>
+                <li>• Use &quot;Delete (X)&quot; button for bulk deletion</li>
                 <li>• Confirm deletion in the dialog</li>
               </ul>
             </div>
@@ -571,7 +572,7 @@ export default function DocumentationPage() {
             <div>
               <h4 className="font-medium mb-2">Explore Examples</h4>
               <p className="text-sm text-muted-foreground mb-2">
-                Visit the "Demo Projects" section to:
+                Visit the &quot;Demo Projects&quot; section to:
               </p>
               <ul className="text-sm text-muted-foreground space-y-1">
                 <li>• Browse public projects from other users</li>
@@ -740,3 +741,18 @@ export default function DocumentationPage() {
     </div>
   )
 }
+
+const DocumentationPage = dynamic(() => Promise.resolve(DocumentationContentWrapper), {
+  ssr: false,
+  loading: () => <div className="container mx-auto p-6 max-w-5xl">Loading...</div>
+})
+
+function DocumentationContentWrapper() {
+  return (
+    <Suspense fallback={<div className="container mx-auto p-6 max-w-5xl">Loading...</div>}>
+      <DocumentationContent />
+    </Suspense>
+  )
+}
+
+export default DocumentationPage
