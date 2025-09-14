@@ -1,4 +1,4 @@
-import { ProjectsDataTable } from '@/components/projects-data-table'
+import { ProjectsDataTable } from '@/components/projects/projects-data'
 import { getPublicProjects } from '@/lib/actions'
 import { currentUser } from '@clerk/nextjs/server'
 

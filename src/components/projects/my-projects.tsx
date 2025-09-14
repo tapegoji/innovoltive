@@ -3,8 +3,8 @@
 import React from 'react'
 import Link from 'next/link'
 import { IconFolder } from '@tabler/icons-react'
-import { ProjectsDataTable, ProjectData } from '@/components/projects-data-table'
-import { AddProjectDialog } from '@/components/add-project-dialog'
+import { ProjectsDataTable, ProjectData } from '@/components/projects/projects-data'
+import { AddProjectDialog } from '@/components/projects/add-project-dialog'
 
 interface MyProjectsClientProps {
   projects: ProjectData[]

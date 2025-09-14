@@ -5,15 +5,18 @@ import { Plus } from 'lucide-react'
 import { useUser } from '@clerk/nextjs'
 import { Button } from '@/components/ui/button'
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 import { createProject } from '@/lib/actions'
-import { ProjectForm, ProjectFormData } from '@/components/project-form'
+import { ProjectForm, ProjectFormData } from '@/components/projects/project-form'
 import { toast } from 'sonner'
 
 interface AddProjectDialogProps {
@@ -111,8 +114,8 @@ export function AddProjectDialog({ onProjectAdded }: AddProjectDialogProps) {
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
+    <AlertDialog open={open} onOpenChange={setOpen}>
+      <AlertDialogTrigger asChild>
         <Button 
           className="flex items-center gap-2"
           onClick={handleButtonClick}
@@ -120,15 +123,15 @@ export function AddProjectDialog({ onProjectAdded }: AddProjectDialogProps) {
           <Plus className="h-4 w-4" />
           New Project
         </Button>
-      </DialogTrigger>
+      </AlertDialogTrigger>
       
-      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Create New Project</DialogTitle>
-          <DialogDescription>
+      <AlertDialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
+        <AlertDialogHeader>
+          <AlertDialogTitle>Create New Project</AlertDialogTitle>
+          <AlertDialogDescription>
             Create a new CAD modeling and simulation project
-          </DialogDescription>
-        </DialogHeader>
+          </AlertDialogDescription>
+        </AlertDialogHeader>
         
         <ProjectForm
           data={formData}
@@ -140,7 +143,7 @@ export function AddProjectDialog({ onProjectAdded }: AddProjectDialogProps) {
           error={error}
           success={success}
         />
-      </DialogContent>
-    </Dialog>
+      </AlertDialogContent>
+    </AlertDialog>
   )
 }

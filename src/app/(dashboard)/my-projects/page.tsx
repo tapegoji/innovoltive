@@ -1,8 +1,8 @@
 import { auth, currentUser } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
 import { fetchUserProjects, formatProjectsForDisplay } from '@/lib/data'
-import { MyProjectsClient } from '@/components/my-projects-client'
-import { ProjectData } from '@/components/projects-data-table'
+import { MyProjectsClient } from '@/components/projects/my-projects'
+import { ProjectData } from '@/components/projects/projects-data'
 
 export default async function MyProjectsPage() {
   // Get authenticated user from server

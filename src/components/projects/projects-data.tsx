@@ -37,7 +37,7 @@ import {
   IconDevices,
   IconMinus,
 } from "@tabler/icons-react"
-import { ShareProjectDialog } from "@/components/share-project-dialog"
+import { ShareProjectDialog } from "@/components/projects/share-project-dialog"
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -95,7 +95,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { ProjectForm, ProjectFormData } from "@/components/project-form"
+import { ProjectForm, ProjectFormData } from "@/components/projects/project-form"
 
 // Project schema that matches the FileItem interface but works with DataTable
 export const projectSchema = z.object({
