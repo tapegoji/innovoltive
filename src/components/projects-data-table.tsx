@@ -122,6 +122,7 @@ interface ProjectsDataTableProps {
   renderItemLink?: (item: ProjectData, children: React.ReactNode) => React.ReactNode
   toolbarActions?: React.ReactNode
   emptyState?: React.ReactNode
+  isPublicView?: boolean
 }
 
 // Helper functions for project display
@@ -220,7 +221,8 @@ export function ProjectsDataTable({
   onItemsDeleted,
   renderItemLink,
   toolbarActions,
-  emptyState
+  emptyState,
+  isPublicView = false
 }: ProjectsDataTableProps) {
   const [data, setData] = React.useState(() => initialData)
   const [rowSelection, setRowSelection] = React.useState<Record<string, boolean>>({})
@@ -384,7 +386,7 @@ export function ProjectsDataTable({
   }, [])
 
   // Create columns definition for projects
-  const columns: ColumnDef<ProjectData>[] = React.useMemo(() => [
+  const allColumns: ColumnDef<ProjectData>[] = React.useMemo(() => [
     {
       id: "drag",
       header: () => null,
@@ -545,6 +547,19 @@ export function ProjectsDataTable({
       size: 40,
     },
   ], [renderItemLink, handleDeleteSingle, handleEdit, handleDuplicate, handleArchive, handleShare, isArchiving, isDuplicating])
+
+  // Filter columns based on view mode
+  const columns = React.useMemo(() => {
+    if (isPublicView) {
+      // For public view, exclude drag, select, and actions columns
+      return allColumns.filter(col => 
+        col.id !== "drag" && 
+        col.id !== "select" && 
+        col.id !== "actions"
+      )
+    }
+    return allColumns
+  }, [allColumns, isPublicView])
 
   const table = useReactTable({
     data,

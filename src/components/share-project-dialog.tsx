@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { Search, Users, Globe, X, ChevronDown } from 'lucide-react'
+import { Users, Globe, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import {
@@ -26,11 +26,6 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
 import { Badge } from '@/components/ui/badge'
 import { toast } from 'sonner'
 
@@ -68,7 +63,6 @@ export function ShareProjectDialog({
   const [isPublic, setIsPublic] = React.useState(false)
   const publicRole = 'viewer' // Public access is always viewer
   const [isSharing, setIsSharing] = React.useState(false)
-  const [comboboxOpen, setComboboxOpen] = React.useState(false)
 
   // Reset state when dialog opens/closes
   React.useEffect(() => {
@@ -127,9 +121,8 @@ export function ShareProjectDialog({
 
   const handleSelectPublic = () => {
     setShareOption('public')
-    setIsPublic(true)
+    setIsPublic(false)  // Don't auto-enable, let user choose
     setEmailInput('')
-    setComboboxOpen(false)
   }
 
   const handleRemoveEmail = (email: string) => {
@@ -200,69 +193,38 @@ export function ShareProjectDialog({
           {/* Unified Share Input */}
           <div className="space-y-3">
             <Label>Share with</Label>
-            <Popover open={comboboxOpen} onOpenChange={setComboboxOpen}>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  role="combobox"
-                  aria-expanded={comboboxOpen}
-                  className="w-full justify-between"
-                >
-                  {shareOption === 'public' ? (
-                    <>
-                      <Globe className="h-4 w-4 mr-2" />
-                      Make public
-                    </>
-                  ) : emailInput ? (
-                    emailInput
+            <Command className="rounded-lg border shadow-sm">
+              <CommandInput 
+                placeholder="Enter email address or select option..."
+                value={emailInput}
+                onValueChange={setEmailInput}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && emailInput && emailInput.includes('@')) {
+                    e.preventDefault()
+                    handleAddEmail()
+                  }
+                }}
+              />
+              <CommandList>
+                <CommandEmpty>
+                  {emailInput && emailInput.includes('@') ? (
+                    "Press Enter to add this email"
                   ) : (
-                    <>
-                      <Search className="h-4 w-4 mr-2" />
-                      Enter email address...
-                    </>
+                    "Enter an email address"
                   )}
-                  <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-full p-0">
-                <Command>
-                  <CommandInput 
-                    placeholder="Search or enter email..." 
-                    value={emailInput}
-                    onValueChange={setEmailInput}
-                  />
-                  <CommandList>
-                    <CommandEmpty>
-                      {emailInput && emailInput.includes('@') ? (
-                        <CommandItem
-                          onSelect={() => {
-                            setShareOption('email')
-                            setComboboxOpen(false)
-                          }}
-                          className="cursor-pointer"
-                        >
-                          <Search className="mr-2 h-4 w-4" />
-                          Add &quot;{emailInput}&quot;
-                        </CommandItem>
-                      ) : (
-                        "Enter an email address"
-                      )}
-                    </CommandEmpty>
-                    <CommandGroup>
-                      <CommandItem
-                        onSelect={handleSelectPublic}
-                        className="cursor-pointer"
-                      >
-                        <Globe className="mr-2 h-4 w-4" />
-                        Make public
-                      </CommandItem>
-                    </CommandGroup>
-                  </CommandList>
-                </Command>
-              </PopoverContent>
-            </Popover>
+                </CommandEmpty>
+                <CommandGroup>
+                  <CommandItem
+                    onSelect={handleSelectPublic}
+                  >
+                    <Globe className="mr-2 h-4 w-4" />
+                    <span>Make public</span>
+                  </CommandItem>
+                </CommandGroup>
+              </CommandList>
+            </Command>
             
-            {shareOption === 'email' && emailInput && (
+            {shareOption === 'email' && emailInput && emailInput.includes('@') && (
               <div className="flex items-center space-x-2">
                 <Select
                   value="viewer"

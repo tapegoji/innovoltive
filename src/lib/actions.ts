@@ -452,3 +452,53 @@ export async function getProjectShares(projectId: string, userId: string) {
     return { success: false, error: 'An unexpected error occurred' }
   }
 }
+
+export async function getPublicProjects() {
+  try {
+    const supabase = getSupabaseClient()
+
+    // Get all projects that have public access
+    const { data: publicProjectIds, error: publicError } = await supabase
+      .from('user_projects')
+      .select('project_id')
+      .eq('user_id', 'user_public')
+
+    if (publicError) {
+      console.error('Error getting public project IDs:', publicError)
+      return { success: false, error: 'Failed to load public projects' }
+    }
+
+    if (!publicProjectIds || publicProjectIds.length === 0) {
+      return { success: true, projects: [] }
+    }
+
+    // Get the actual project details for public projects
+    const projectIds = publicProjectIds.map(p => p.project_id)
+    const { data: projects, error: projectsError } = await supabase
+      .from('projects')
+      .select('*')
+      .in('id', projectIds)
+      .order('date_modified', { ascending: false })
+
+    if (projectsError) {
+      console.error('Error getting public projects:', projectsError)
+      return { success: false, error: 'Failed to load public projects' }
+    }
+
+    // Transform projects to match the expected format
+    const transformedProjects = projects?.map(project => ({
+      id: project.id,
+      name: project.name,
+      type: project.type,
+      status: project.status,
+      dateModified: project.date_modified,
+      description: project.description || '',
+      user: 'Public'
+    })) || []
+
+    return { success: true, projects: transformedProjects }
+  } catch (error) {
+    console.error('Error in getPublicProjects:', error)
+    return { success: false, error: 'An unexpected error occurred' }
+  }
+}
