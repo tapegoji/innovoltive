@@ -637,8 +637,8 @@ export function ProjectsDataTable({
     <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 p-4">
       {data.map(item => (
         <Card key={item.id} className={cn(
-          "p-3 hover:bg-accent/50 transition-colors border-0 shadow-none hover:shadow-sm relative",
-          rowSelection[item.id] ? "bg-accent shadow-sm" : ""
+          "p-3 bg-accent/30 border border-border hover:bg-accent/50 transition-colors shadow-sm hover:shadow-md relative",
+          rowSelection[item.id] ? "bg-accent border-accent-foreground/20 shadow-md" : ""
         )}>
           <input
             type="checkbox"
