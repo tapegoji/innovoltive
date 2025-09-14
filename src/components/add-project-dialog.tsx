@@ -22,9 +22,6 @@ export function AddProjectDialog({ onProjectAdded }: AddProjectDialogProps) {
     status: 'active' as 'active' | 'completed' | 'paused' | 'archived'
   })
 
-  console.log('AddProjectDialog rendered, user:', user?.id)
-  console.log('Dialog open state:', open)
-
   const projectTypes = [
     { value: 'em', label: 'Electromagnetic (EM)', description: 'Electromagnetic field simulation and modeling' },
     { value: 'ht', label: 'Heat Transfer (HT)', description: 'Thermal analysis and heat dissipation modeling' },
@@ -60,8 +57,6 @@ export function AddProjectDialog({ onProjectAdded }: AddProjectDialogProps) {
         size: '0 MB' // Default size for new projects
       }
 
-      console.log('Creating project:', projectData)
-
       // First, insert the project
       const { data: projectResult, error: projectError } = await supabase
         .from('projects')
@@ -73,8 +68,6 @@ export function AddProjectDialog({ onProjectAdded }: AddProjectDialogProps) {
         alert(`Failed to create project: ${projectError.message}`)
         return
       }
-
-      console.log('Project created successfully:', projectResult)
 
       // Then, create the user-project relationship
       const userProjectData = {
@@ -92,7 +85,7 @@ export function AddProjectDialog({ onProjectAdded }: AddProjectDialogProps) {
         // Don't fail the whole operation, but log the error
         console.warn('Project created but user association failed')
       } else {
-        console.log('User-project relationship created:', userProjectResult)
+        // User-project relationship created successfully
       }
       
       // Reset form
@@ -115,10 +108,7 @@ export function AddProjectDialog({ onProjectAdded }: AddProjectDialogProps) {
   }
 
   const handleButtonClick = () => {
-    console.log('New Project button clicked!')
-    console.log('Current open state:', open)
     setOpen(true)
-    console.log('Setting open to: true')
   }
 
   return (
