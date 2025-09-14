@@ -126,11 +126,17 @@ interface ProjectsDataTableProps {
 }
 
 // Helper functions for project display
-const getIcon = (type: string) => {
-  const isProject = ["em", "ht", "cfd"].includes(type)
-  return isProject || type === "folder" ? 
-    <IconFolder className="h-4 w-4 text-blue-500 flex-shrink-0" /> : 
-    <IconFile className="h-4 w-4 text-gray-600 flex-shrink-0" />
+const getIcon = (type: string, size: "small" | "large" = "small") => {
+  // Handle multiple types (comma-separated)
+  const types = type.split(',').map(t => t.trim().toLowerCase())
+  const hasProjectType = types.some(t => ["em", "ht", "cfd"].includes(t))
+  
+  const iconSize = size === "large" ? "h-12 w-12" : "h-4 w-4"
+  const colorClass = hasProjectType || type === "folder" ? "text-blue-500" : "text-gray-600"
+  
+  return hasProjectType || type === "folder" ? 
+    <IconFolder className={`${iconSize} ${colorClass} flex-shrink-0`} /> : 
+    <IconFile className={`${iconSize} ${colorClass} flex-shrink-0`} />
 }
 
 const getTypeLabel = (type: string) => {
@@ -694,7 +700,7 @@ export function ProjectsDataTable({
             />
           )}
           <div className="flex flex-col items-center text-center space-y-2">
-            <IconFolder className="h-12 w-12 text-blue-500" />
+            {getIcon(item.type, "large")}
             <div className="min-w-0 flex-1">
               {renderItemLink ? (
                 renderItemLink(item, 
