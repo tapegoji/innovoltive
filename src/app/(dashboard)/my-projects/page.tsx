@@ -23,5 +23,9 @@ export default async function MyProjectsPage() {
     user.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : user.username || 'Unknown User'
   )
 
-  return <MyProjectsClient projects={formattedProjects as FileItem[]} userName={userName} />
+  return <MyProjectsClient 
+    projects={formattedProjects as FileItem[]} 
+    userName={userName}
+    userId={userId}
+  />
 }

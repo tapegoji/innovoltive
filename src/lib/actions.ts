@@ -65,3 +65,37 @@ export async function createProject(data: CreateProjectData) {
     return { success: false, error: 'An unexpected error occurred' }
   }
 }
+
+export async function deleteProjects(projectIds: string[], userId: string) {
+  try {
+    const supabase = getSupabaseClient()
+    
+    // First, delete from user_projects table
+    const { error: userProjectsError } = await supabase
+      .from('user_projects')
+      .delete()
+      .in('project_id', projectIds)
+      .eq('user_id', userId)
+
+    if (userProjectsError) {
+      console.error('Error deleting user-project relationships:', userProjectsError)
+      return { success: false, error: `Failed to delete user-project relationships: ${userProjectsError.message}` }
+    }
+
+    // Then, delete from projects table
+    const { error: projectsError } = await supabase
+      .from('projects')
+      .delete()
+      .in('id', projectIds)
+
+    if (projectsError) {
+      console.error('Error deleting projects:', projectsError)
+      return { success: false, error: `Failed to delete projects: ${projectsError.message}` }
+    }
+
+    return { success: true, deletedCount: projectIds.length }
+  } catch (error) {
+    console.error('Error in deleteProjects:', error)
+    return { success: false, error: 'An unexpected error occurred' }
+  }
+}

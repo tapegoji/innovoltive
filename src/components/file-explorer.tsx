@@ -1,12 +1,20 @@
 "use client"
 
 import React from "react"
-import { Folder, File, Grid3X3, List, ArrowUpDown, HardDrive } from "lucide-react"
+import { Folder, File, Grid3X3, List, ArrowUpDown, HardDrive, Trash2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Card } from "@/components/ui/card"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 
 export interface FileItem {
   id: string
@@ -26,6 +34,9 @@ interface FileExplorerProps {
   onViewModeChange?: (mode: "grid" | "list") => void
   renderItemLink?: (item: FileItem, children: React.ReactNode) => React.ReactNode
   toolbarActions?: React.ReactNode
+  onItemsDeleted?: () => void
+  userId?: string
+  emptyState?: React.ReactNode
 }
 
 const getIcon = (type: string) => {
@@ -50,9 +61,12 @@ const getStatusBadge = (status: string) => (
   </span>
 )
 
-export function FileExplorer({ items, currentPath = ["My Projects"], viewMode = "list", onViewModeChange, renderItemLink, toolbarActions }: FileExplorerProps) {
+export function FileExplorer({ items, currentPath = ["My Projects"], viewMode = "list", onViewModeChange, renderItemLink, toolbarActions, onItemsDeleted, userId, emptyState }: FileExplorerProps) {
   const [sortBy, setSortBy] = React.useState<"name" | "type" | "status" | "date" | "size" | "user">("name")
   const [sortOrder, setSortOrder] = React.useState<"asc" | "desc">("asc")
+  const [selectedItems, setSelectedItems] = React.useState<Set<string>>(new Set())
+  const [isDeleting, setIsDeleting] = React.useState(false)
+  const [showDeleteDialog, setShowDeleteDialog] = React.useState(false)
 
   const sortedItems = React.useMemo(() => {
     return [...items].sort((a, b) => {
@@ -80,8 +94,52 @@ export function FileExplorer({ items, currentPath = ["My Projects"], viewMode = 
     setSortBy(newSortBy)
   }
 
+  const handleSelectItem = (itemId: string) => {
+    const newSelected = new Set(selectedItems)
+    if (newSelected.has(itemId)) {
+      newSelected.delete(itemId)
+    } else {
+      newSelected.add(itemId)
+    }
+    setSelectedItems(newSelected)
+  }
+
+  const handleSelectAll = () => {
+    if (selectedItems.size === items.length) {
+      setSelectedItems(new Set())
+    } else {
+      setSelectedItems(new Set(items.map(item => item.id)))
+    }
+  }
+
+  const handleDeleteSelected = async () => {
+    if (selectedItems.size === 0 || !userId) return
+    setShowDeleteDialog(true)
+  }
+
+  const confirmDelete = async () => {
+    if (!userId) return
+    setShowDeleteDialog(false)
+    setIsDeleting(true)
+    try {
+      const { deleteProjects } = await import('@/lib/actions')
+      const result = await deleteProjects(Array.from(selectedItems), userId)
+      
+      if (result.success) {
+        setSelectedItems(new Set())
+        onItemsDeleted?.()
+      } else {
+        console.error('Failed to delete projects:', result.error)
+      }
+    } catch (error) {
+      console.error('Error deleting projects:', error)
+    } finally {
+      setIsDeleting(false)
+    }
+  }
+
   const ItemWrapper = ({ item, children }: { item: FileItem; children: React.ReactNode }) => 
-    renderItemLink ? renderItemLink(item, children) : children
+    children
 
   return (
     <div className="h-full flex flex-col bg-background">
@@ -107,6 +165,19 @@ export function FileExplorer({ items, currentPath = ["My Projects"], viewMode = 
 
         <div className="flex items-center gap-2">
           {toolbarActions}
+          
+          {selectedItems.size > 0 && (
+            <Button 
+              variant="destructive" 
+              size="sm" 
+              onClick={handleDeleteSelected}
+              disabled={isDeleting}
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              {isDeleting ? 'Deleting...' : `Delete (${selectedItems.size})`}
+            </Button>
+          )}
+          
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm">
@@ -135,15 +206,35 @@ export function FileExplorer({ items, currentPath = ["My Projects"], viewMode = 
 
       {/* Content */}
       <div className="flex-1 p-4 overflow-auto">
-        {viewMode === "grid" ? (
+        {items.length === 0 && emptyState ? (
+          emptyState
+        ) : viewMode === "grid" ? (
           <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
             {sortedItems.map(item => (
               <ItemWrapper key={item.id} item={item}>
-                <Card className="p-3 cursor-pointer hover:bg-accent/50 transition-colors border-0 shadow-none hover:shadow-sm">
+                <Card className={cn(
+                  "p-3 hover:bg-accent/50 transition-colors border-0 shadow-none hover:shadow-sm relative",
+                  selectedItems.has(item.id) ? "bg-accent shadow-sm" : ""
+                )}>
+                  <input
+                    type="checkbox"
+                    checked={selectedItems.has(item.id)}
+                    onChange={(e) => {
+                      e.stopPropagation()
+                      handleSelectItem(item.id)
+                    }}
+                    className="absolute top-2 right-2 h-4 w-4"
+                  />
                   <div className="flex flex-col items-center text-center space-y-2">
                     <Folder className="h-12 w-12 text-blue-500" />
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium truncate" title={item.name}>{item.name}</p>
+                      {renderItemLink ? (
+                        renderItemLink(item, 
+                          <p className="text-sm font-medium truncate hover:underline cursor-pointer" title={item.name}>{item.name}</p>
+                        )
+                      ) : (
+                        <p className="text-sm font-medium truncate" title={item.name}>{item.name}</p>
+                      )}
                       <p className="text-xs text-muted-foreground">{item.dateModified}</p>
                     </div>
                   </div>
@@ -153,7 +244,15 @@ export function FileExplorer({ items, currentPath = ["My Projects"], viewMode = 
           </div>
         ) : (
           <div className="space-y-1">
-            <div className="grid grid-cols-13 gap-4 px-3 py-2 text-sm font-medium text-muted-foreground border-b">
+            <div className="grid grid-cols-14 gap-4 px-3 py-2 text-sm font-medium text-muted-foreground border-b">
+              <div className="col-span-1">
+                <input
+                  type="checkbox"
+                  checked={selectedItems.size === items.length && items.length > 0}
+                  onChange={handleSelectAll}
+                  className="h-4 w-4"
+                />
+              </div>
               <div className="col-span-3">Name</div>
               <div className="col-span-1">Type</div>
               <div className="col-span-2">Status</div>
@@ -164,10 +263,30 @@ export function FileExplorer({ items, currentPath = ["My Projects"], viewMode = 
             </div>
             {sortedItems.map(item => (
               <ItemWrapper key={item.id} item={item}>
-                <div className="grid grid-cols-13 gap-4 px-3 py-2 text-sm cursor-pointer hover:bg-accent/50 rounded transition-colors">
+                <div className={cn(
+                  "grid grid-cols-14 gap-4 px-3 py-2 text-sm hover:bg-accent/50 rounded transition-colors",
+                  selectedItems.has(item.id) ? "bg-accent" : ""
+                )}>
+                  <div className="col-span-1 flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={selectedItems.has(item.id)}
+                      onChange={(e) => {
+                        e.stopPropagation()
+                        handleSelectItem(item.id)
+                      }}
+                      className="h-4 w-4"
+                    />
+                  </div>
                   <div className="col-span-3 flex items-center space-x-2 min-w-0">
                     {getIcon(item.type)}
-                    <span className="truncate font-medium" title={item.name}>{item.name}</span>
+                    {renderItemLink ? (
+                      renderItemLink(item, 
+                        <span className="truncate font-medium hover:underline cursor-pointer" title={item.name}>{item.name}</span>
+                      )
+                    ) : (
+                      <span className="truncate font-medium" title={item.name}>{item.name}</span>
+                    )}
                   </div>
                   <div className="col-span-1 text-muted-foreground">{getTypeLabel(item.type)}</div>
                   <div className="col-span-2">{getStatusBadge(item.status)}</div>
@@ -185,6 +304,25 @@ export function FileExplorer({ items, currentPath = ["My Projects"], viewMode = 
           </div>
         )}
       </div>
+      
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Projects</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete {selectedItems.size} project{selectedItems.size > 1 ? 's' : ''}? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowDeleteDialog(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={confirmDelete}>
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

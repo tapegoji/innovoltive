@@ -5,6 +5,15 @@ import { Plus } from 'lucide-react'
 import { useUser } from '@clerk/nextjs'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import { createProject } from '@/lib/actions'
 
 interface AddProjectDialogProps {
@@ -15,6 +24,8 @@ export function AddProjectDialog({ onProjectAdded }: AddProjectDialogProps) {
   const { user } = useUser()
   const [open, setOpen] = React.useState(false)
   const [loading, setLoading] = React.useState(false)
+  const [error, setError] = React.useState<string | null>(null)
+  const [success, setSuccess] = React.useState(false)
   const [formData, setFormData] = React.useState({
     name: '',
     description: '',
@@ -31,13 +42,16 @@ export function AddProjectDialog({ onProjectAdded }: AddProjectDialogProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setError(null)
+    setSuccess(false)
+    
     if (!user?.id) {
-      alert('Please sign in to create a project')
+      setError('Please sign in to create a project')
       return
     }
 
     if (!formData.name.trim()) {
-      alert('Project name is required')
+      setError('Project name is required')
       return
     }
 
@@ -52,7 +66,7 @@ export function AddProjectDialog({ onProjectAdded }: AddProjectDialogProps) {
       })
 
       if (!result.success) {
-        alert(result.error)
+        setError(result.error || 'Failed to create project')
         return
       }
       
@@ -64,13 +78,17 @@ export function AddProjectDialog({ onProjectAdded }: AddProjectDialogProps) {
         status: 'active'
       })
       
-      setOpen(false)
+      setSuccess(true)
       onProjectAdded?.()
       
-      alert('Project created successfully!')
+      // Close dialog after a short delay to show success message
+      setTimeout(() => {
+        setOpen(false)
+        setSuccess(false)
+      }, 1500)
     } catch (err) {
       console.error('Error creating project:', err)
-      alert('Failed to create project. Please try again.')
+      setError('Failed to create project. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -78,98 +96,122 @@ export function AddProjectDialog({ onProjectAdded }: AddProjectDialogProps) {
 
   const handleButtonClick = () => {
     setOpen(true)
+    setError(null)
+    setSuccess(false)
   }
 
   return (
-    <>
-      <Button 
-        className="flex items-center gap-2"
-        onClick={handleButtonClick}
-      >
-        <Plus className="h-4 w-4" />
-        New Project
-      </Button>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button 
+          className="flex items-center gap-2"
+          onClick={handleButtonClick}
+        >
+          <Plus className="h-4 w-4" />
+          New Project
+        </Button>
+      </DialogTrigger>
       
-      {open && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg max-w-2xl w-full m-4 max-h-[90vh] overflow-y-auto">
-            <div className="mb-6">
-              <h2 className="text-xl font-bold mb-2">Create New Project</h2>
-              <p className="text-muted-foreground">Create a new CAD modeling and simulation project</p>
-            </div>
-            
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="space-y-2">
-                <label htmlFor="name" className="text-sm font-medium">
-                  Project Name *
-                </label>
-                <Input
-                  id="name"
-                  value={formData.name}
-                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                  placeholder="Enter project name"
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label htmlFor="description" className="text-sm font-medium">
-                  Description
-                </label>
-                <Input
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                  placeholder="Brief description of your project"
-                />
-              </div>
-
-              <div className="space-y-3">
-                <label className="text-sm font-medium">Project Type *</label>
-                <div className="space-y-2">
-                  {projectTypes.map((type) => (
-                    <div key={type.value} className="flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        id={type.value}
-                        name="type"
-                        value={type.value}
-                        checked={formData.type === type.value}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setFormData(prev => ({ ...prev, type: type.value as 'em' | 'ht' | 'cfd' | 'mp' }))
-                          }
-                        }}
-                        className="h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary"
-                      />
-                      <label htmlFor={type.value} className="text-sm font-medium cursor-pointer">
-                        {type.label}
-                      </label>
-                      <span className="text-xs text-muted-foreground">
-                        {type.description}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="flex justify-end gap-3 pt-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setOpen(false)}
-                  disabled={loading}
-                >
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={loading}>
-                  {loading ? 'Creating...' : 'Create Project'}
-                </Button>
-              </div>
-            </form>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Create New Project</DialogTitle>
+          <DialogDescription>
+            Create a new CAD modeling and simulation project
+          </DialogDescription>
+        </DialogHeader>
+        
+        {success && (
+          <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-md p-3 mb-4">
+            <p className="text-green-800 dark:text-green-200 text-sm font-medium">
+              Project created successfully!
+            </p>
           </div>
-        </div>
-      )}
-    </>
+        )}
+        
+        {error && (
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md p-3 mb-4">
+            <p className="text-red-800 dark:text-red-200 text-sm font-medium">
+              {error}
+            </p>
+          </div>
+        )}
+        
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-2">
+            <label htmlFor="name" className="text-sm font-medium">
+              Project Name *
+            </label>
+            <Input
+              id="name"
+              value={formData.name}
+              onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+              placeholder="Enter project name"
+              required
+              disabled={loading || success}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label htmlFor="description" className="text-sm font-medium">
+              Description
+            </label>
+            <Input
+              id="description"
+              value={formData.description}
+              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+              placeholder="Brief description of your project"
+              disabled={loading || success}
+            />
+          </div>
+
+          <div className="space-y-3">
+            <label className="text-sm font-medium">Project Type *</label>
+            <div className="space-y-2">
+              {projectTypes.map((type) => (
+                <div key={type.value} className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id={type.value}
+                    name="type"
+                    value={type.value}
+                    checked={formData.type === type.value}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setFormData(prev => ({ ...prev, type: type.value as 'em' | 'ht' | 'cfd' | 'mp' }))
+                      }
+                    }}
+                    className="h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary"
+                    disabled={loading || success}
+                  />
+                  <label htmlFor={type.value} className="text-sm font-medium cursor-pointer">
+                    {type.label}
+                  </label>
+                  <span className="text-xs text-muted-foreground">
+                    {type.description}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setOpen(false)}
+              disabled={loading}
+            >
+              Cancel
+            </Button>
+            <Button 
+              type="submit" 
+              disabled={loading || success}
+            >
+              {loading ? 'Creating...' : success ? 'Created!' : 'Create Project'}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   )
 }
