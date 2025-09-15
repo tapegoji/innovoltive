@@ -9,6 +9,7 @@ import { DataTableViewOptions } from "./data-table-view-options"
 
 import { types, statuses } from "./data"
 import { DataTableFacetedFilter } from "./data-table-faceted-filter"
+import { IconPlus } from "@tabler/icons-react"
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>
@@ -22,7 +23,10 @@ export function DataTableToolbar<TData>({
   return (
     <div className="flex items-center justify-between gap-4 py-2">
       <div className="flex items-center space-x-2 gap-2">
-        <Button size="sm">Add Project</Button>
+        <Button variant="outline" size="sm">
+          <IconPlus />
+          <span className="hidden lg:inline">Add Project</span>
+        </Button>
       </div>
       <div className="flex flex-1 items-center gap-2">
         <Input
