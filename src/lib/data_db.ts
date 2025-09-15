@@ -94,10 +94,10 @@ export async function CreateNewProject(
       RETURNING id, name, type, description, date_modified, size, status
     `
 
-    // Link the project to the user
+    // Link the project to the user as owner
     await sql`
-      INSERT INTO user_projects (user_id, project_id)
-      VALUES (${userId}, ${project.id})
+      INSERT INTO user_projects (user_id, project_id, role)
+      VALUES (${userId}, ${project.id}, 'owner')
     `
 
     return project
@@ -267,10 +267,10 @@ export async function DuplicateProject(projectId: string, allowPublicCopy: boole
       RETURNING id, name, type, description, date_modified, size, status, user_id
     `
 
-    // Link the duplicated project to the current user
+    // Link the duplicated project to the current user as owner
     await sql`
-      INSERT INTO user_projects (user_id, project_id)
-      VALUES (${userId}, ${duplicatedProject.id})
+      INSERT INTO user_projects (user_id, project_id, role)
+      VALUES (${userId}, ${duplicatedProject.id}, 'owner')
     `
 
     // Add user name to the project
@@ -311,13 +311,14 @@ export async function ShareProject(
 
     // Use Clerk API to find users by email
     const { clerkClient } = await import('@clerk/nextjs/server')
+    const client = await clerkClient()
     const sharedWith: string[] = []
     const notFound: string[] = []
 
     for (const email of emails) {
       try {
         // Search for user by email in Clerk
-        const users = await clerkClient.users.getUserList({
+        const users = await client.users.getUserList({
           emailAddress: [email.toLowerCase()]
         })
 
@@ -331,11 +332,17 @@ export async function ShareProject(
           `
           
           if (existingAccess.length === 0) {
-            // Add user to the project
+            // Add user to the project (assuming user_projects table has role column)
             await sql`
               INSERT INTO user_projects (user_id, project_id, role)
               VALUES (${targetUserId}, ${projectId}, ${role})
-              ON CONFLICT (user_id, project_id) DO UPDATE SET role = ${role}
+            `
+          } else {
+            // Update existing role
+            await sql`
+              UPDATE user_projects 
+              SET role = ${role}
+              WHERE user_id = ${targetUserId} AND project_id = ${projectId}
             `
           }
           

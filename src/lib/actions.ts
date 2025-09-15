@@ -3,7 +3,7 @@
 import { z } from 'zod'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { CreateNewProject, UpdateProject, DeleteProjects, DuplicateProject } from './data_db'
+import { CreateNewProject, UpdateProject, DeleteProjects, DuplicateProject, ShareProject } from './data_db'
 
 // Schema for validating the create project form data
 const CreateProjectSchema = z.object({
@@ -131,5 +131,30 @@ export async function duplicateProject(projectId: string, allowPublicCopy: boole
   } catch (error) {
     console.error('Failed to duplicate project:', error)
     return { success: false, error: 'Failed to duplicate project' }
+  }
+}
+
+export async function shareProject(projectId: string, formData: FormData) {
+  try {
+    const email = formData.get('email') as string
+    const role = formData.get('role') as 'viewer' | 'owner'
+    
+    if (!email || !email.includes('@')) {
+      return { success: false, error: 'Valid email is required' }
+    }
+
+    const result = await ShareProject(projectId, [email], role)
+    
+    if (result.notFound.length > 0) {
+      return { 
+        success: false, 
+        error: `User with email ${email} not found. They need to create an account first.` 
+      }
+    }
+    
+    return { success: true, message: `Project shared with ${email}` }
+  } catch (error) {
+    console.error('Failed to share project:', error)
+    return { success: false, error: 'Failed to share project' }
   }
 }
