@@ -63,18 +63,14 @@ export const columns: ColumnDef<Project>[] = [
         .filter(Boolean)
 
       if (matchedTypes.length === 0) {
-        return <div className="text-red-500 text-sm">Unknown: {typeValue}</div>
+        return <div className="text-red-500 text-sm">Unknown type</div>
       }
 
       return (
         <div className="flex w-[100px] items-center gap-1 flex-wrap">
           {matchedTypes.map((type, index) => {
-            const TypeIcon = type!.icon
             return (
               <div key={index} className="flex items-center gap-1">
-                {TypeIcon && (
-                  <TypeIcon className="text-muted-foreground size-3" />
-                )}
                 <span className="text-xs">{type!.label}</span>
                 {index < matchedTypes.length - 1 && <span className="text-xs">,</span>}
               </div>
@@ -107,9 +103,6 @@ export const columns: ColumnDef<Project>[] = [
 
       return (
         <div className="flex w-[100px] items-center gap-2">
-          {status.icon && (
-            <status.icon className="text-muted-foreground size-4" />
-          )}
           <span>{status.label}</span>
         </div>
       )
