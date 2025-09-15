@@ -23,7 +23,7 @@ export type projects = {
   status: "active" | "paused" | "archived"
   size: string,
   date_modified: string,
-  user_id: string,
+  // user_id: string,
   description: string,
 }
 
@@ -46,6 +46,11 @@ export const columns: ColumnDef<projects>[] = [
       <DataTableColumnHeader column={column} title="Status" />
     ),
   },
+  { accessorKey: "description",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Description" />
+    ),
+  },
   { accessorKey: "size",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Size" />
@@ -56,17 +61,12 @@ export const columns: ColumnDef<projects>[] = [
       <DataTableColumnHeader column={column} title="Date Modified" />
     ),
   },
-  { accessorKey: "user_id",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="User" />
-    ),
-  },
-  { accessorKey: "description",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Description" />
-    ),
-  },
-
+  // { accessorKey: "user_id",
+  //   header: ({ column }) => (
+  //     <DataTableColumnHeader column={column} title="User" />
+  //   ),
+  // },
+  
   {
     id: "actions",
     cell: ({ row }) => {

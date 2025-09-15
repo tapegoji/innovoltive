@@ -20,7 +20,10 @@ export function DataTableToolbar<TData>({
   const isFiltered = table.getState().columnFilters.length > 0
 
   return (
-    <div className="flex items-center justify-between">
+    <div className="flex items-center justify-between gap-4 py-2">
+      <div className="flex items-center space-x-2 gap-2">
+        <Button size="sm">Add Project</Button>
+      </div>
       <div className="flex flex-1 items-center gap-2">
         <Input
           placeholder="Filter by name..."
@@ -57,7 +60,6 @@ export function DataTableToolbar<TData>({
       </div>
       <div className="flex items-center gap-2">
         <DataTableViewOptions table={table} />
-        <Button size="sm">Add Task</Button>
       </div>
     </div>
   )
