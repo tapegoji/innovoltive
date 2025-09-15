@@ -50,14 +50,19 @@ export const columns: ColumnDef<Task>[] = [
       <DataTableColumnHeader column={column} title="Type" />
     ),
     cell: ({ row }) => {
-      const type = types.find((type) => type.value === row.original.type)
+      const type = types.find(
+        (type) => type.value === row.getValue("type")
+      )
+      if (!type) {
+        return null
+      }
 
       return (
-        <div className="flex gap-2">
-          {type && <Badge variant="outline">{type.label}</Badge>}
-          <span className="max-w-[500px] truncate font-medium">
-            {row.getValue("type")}
-          </span>
+        <div className="flex w-[100px] items-center gap-2">
+          {type.icon && (
+            <type.icon className="text-muted-foreground size-4" />
+          )}
+          <span>{type.label}</span>
         </div>
       )
     },

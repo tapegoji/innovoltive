@@ -3,23 +3,9 @@ import {
   Circle,
   CircleOff,
   HelpCircle,
+  icons,
   Timer,
 } from "lucide-react"
-
-export const labels = [
-  {
-    value: "bug",
-    label: "Bug",
-  },
-  {
-    value: "feature",
-    label: "Feature",
-  },
-  {
-    value: "documentation",
-    label: "Documentation",
-  },
-]
 
 export const statuses = [
   {
@@ -51,15 +37,18 @@ export const statuses = [
 
 export const types = [
   {
-    label: "EM",
     value: "em",
+    label: "EM",
+    icon: Circle,
   },
   {
-    label: "HT",
     value: "ht",
+    label: "HT",
+    icon: Circle,
   },
   {
-    label: "CFD",
     value: "cfd",
+    label: "CFD",
+    icon: Circle,
   },
 ]
