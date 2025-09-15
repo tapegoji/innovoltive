@@ -9,7 +9,7 @@ const sql = postgres(process.env.DATABASE_URL!, {
 export interface ProjectData {
   id: string
   name: string
-  type: "EM" | "HT" | "CFD"
+  type: string // Support comma-separated combinations like "EM,HT" or "CFD" or "EM,HT,CFD"
   status: "active" | "paused" | "archived"
   size: string
   date_modified: string
@@ -65,7 +65,7 @@ export async function fetchUserProjects(): Promise<ProjectData[]> {
 }
 
 // Create a new project and associate it with a user
-export async function addNewProject(
+export async function CreateNewProject(
     projectData: ProjectData): Promise<ProjectData> {
   const user = await currentUser()
   const userId = user?.id

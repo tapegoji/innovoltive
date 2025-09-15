@@ -17,20 +17,22 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { IconPlus } from "@tabler/icons-react"
 import { types } from "./data"
 import { useState } from "react"
+import { createProject } from "@/lib/actions"
 
 export function CreateNewProject() {
   const [selectedTypes, setSelectedTypes] = useState<string[]>([])
+  const [isOpen, setIsOpen] = useState(false)
 
   return (
-    <Dialog>
-      <form>
-        <DialogTrigger asChild>
-          <Button variant="default" size="sm">
-            <IconPlus />
-            <span className="hidden lg:inline">Create Project</span>
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogTrigger asChild>
+        <Button variant="default" size="sm">
+          <IconPlus />
+          <span className="hidden lg:inline">Create Project</span>
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px]">
+        <form action={createProject}>
           <DialogHeader>
             <DialogTitle>Create a new project</DialogTitle>
             <DialogDescription>
@@ -40,7 +42,7 @@ export function CreateNewProject() {
           <div className="grid gap-4">
             <div className="grid gap-3">
               <Label htmlFor="name">Name</Label>
-              <Input id="name" name="name" placeholder="Project name" />
+              <Input id="name" name="name" placeholder="Project name" required />
             </div>
             <div className="grid gap-3">
               <Label>Type (select multiple)</Label>
@@ -49,6 +51,8 @@ export function CreateNewProject() {
                   <div key={type.value} className="flex items-center space-x-2">
                     <Checkbox
                       id={type.value}
+                      name="type"
+                      value={type.value}
                       checked={selectedTypes.includes(type.value)}
                       onCheckedChange={(checked) => {
                         if (checked) {
@@ -70,12 +74,12 @@ export function CreateNewProject() {
           </div>
           <DialogFooter>
             <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
+              <Button type="button" variant="outline">Cancel</Button>
             </DialogClose>
             <Button type="submit">Add Project</Button>
           </DialogFooter>
-        </DialogContent>
-      </form>
+        </form>
+      </DialogContent>
     </Dialog>
   )
 }
