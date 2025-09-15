@@ -126,6 +126,17 @@ export const columns: ColumnDef<Project>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Date Modified" />
     ),
+    cell: ({ row }) => {
+      const dateStr = row.getValue("date_modified") as string
+      if (!dateStr) return null
+      const date = new Date(dateStr)
+      const day = date.getDate().toString().padStart(2, '0')
+      const month = date.toLocaleString('en-US', { month: 'short' })
+      const year = date.getFullYear()
+      const hour = date.getHours().toString().padStart(2, '0')
+      const minute = date.getMinutes().toString().padStart(2, '0')
+      return <div>{`${day}-${month}-${year}-${hour}-${minute}`}</div>
+    },
   },
   { accessorKey: "user_id",
     header: ({ column }) => (
