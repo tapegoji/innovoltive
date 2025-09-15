@@ -8,8 +8,8 @@ const sql = postgres(process.env.DATABASE_URL!, {
 export interface ProjectData {
   id: string
   name: string
-  type: string
-  status: string
+  type: "EM" | "HT" | "CFD"
+  status: "active" | "paused" | "archived"
   size: string
   date_modified: string
   user_id: string

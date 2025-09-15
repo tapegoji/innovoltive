@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation'
 import { columns, projects } from "@/components/data-table/columns"
 import { DataTable } from "@/components/data-table/data-table"
 import { fetchUserProjects, DatabaseError } from '@/lib/data_sql2'
-import { ProjectData } from '@/lib/data_sql'
+import { ProjectData } from '@/lib/data_sql2'
 
 export default async function Page() {
   
