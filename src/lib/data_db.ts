@@ -80,13 +80,14 @@ export async function CreateNewProject(
     console.log('Project Data:', projectData)
     // Insert the project
     const [project] = await sql<ProjectData[]>`
-      INSERT INTO projects (id, name, type, description, size, status, date_modified)
+      INSERT INTO projects (id, name, type, description, size, user_id, status, date_modified)
       VALUES (
         ${projectId},
         ${projectData.name},
         ${projectData.type},
         ${projectData.description || ''},
         ${'0 MB'},
+        ${userId},
         ${projectData.status || 'active'},
         ${projectData.date_modified || ''}
       )
@@ -142,6 +143,7 @@ export async function UpdateProject(
     const updatedDescription = projectData.description !== undefined ? projectData.description : currentProject.description
     const updatedStatus = projectData.status || currentProject.status
     const updatedDateModified = projectData.date_modified || new Date().toISOString()
+    const user_id = userId
 
     const [project] = await sql<ProjectData[]>`
       UPDATE projects 
@@ -150,7 +152,8 @@ export async function UpdateProject(
         type = ${updatedType},
         description = ${updatedDescription},
         status = ${updatedStatus},
-        date_modified = ${updatedDateModified}
+        date_modified = ${updatedDateModified},
+        user_id = ${user_id}
       WHERE id = ${projectId}
       RETURNING id, name, type, description, date_modified, size, status, user_id
     `
@@ -250,13 +253,14 @@ export async function DuplicateProject(projectId: string, allowPublicCopy: boole
     const copyName = `${original.name} (Copy)`
     
     const [duplicatedProject] = await sql<ProjectData[]>`
-      INSERT INTO projects (id, name, type, description, size, status, date_modified)
+      INSERT INTO projects (id, name, type, description, size, user_id, status, date_modified)
       VALUES (
         ${newProjectId},
         ${copyName},
         ${original.type},
         ${original.description},
         ${'0 MB'},
+        ${userId},
         ${'active'},
         ${new Date().toISOString()}
       )
