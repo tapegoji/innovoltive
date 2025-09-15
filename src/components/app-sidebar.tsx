@@ -133,7 +133,7 @@ function SidebarContentWithSearchParams({ pathname }: { pathname: string }) {
                     <Collapsible key={item.title} className="group/collapsible">
                       <SidebarMenuItem>
                         <CollapsibleTrigger asChild>
-                          <SidebarMenuButton>
+                          <SidebarMenuButton suppressHydrationWarning={true}>
                             <item.icon />
                             <span>{item.title}</span>
                             <Plus className="ml-auto group-data-[state=open]/collapsible:hidden" />
