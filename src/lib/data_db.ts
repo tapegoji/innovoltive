@@ -74,14 +74,18 @@ export async function addNewProject(
   }
 
   try {
-    // Start a transaction
+    // Generate a UUID for the project
+    const projectId = crypto.randomUUID()
+    
+    // Insert the project
     const [project] = await sql<ProjectData[]>`
-      INSERT INTO projects (name, type, description, size, status, date_modified)
+      INSERT INTO projects (id, name, type, description, size, status, date_modified)
       VALUES (
+        ${projectId},
         ${projectData.name},
         ${projectData.type},
-        ${projectData.description || null},
-        ${projectData.size || null},
+        ${projectData.description || ''},
+        ${'0 MB'},
         ${projectData.status || 'active'},
         NOW()
       )
