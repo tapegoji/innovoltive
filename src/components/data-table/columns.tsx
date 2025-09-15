@@ -6,11 +6,11 @@ import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
 
 import { types, statuses } from "./data"
-import { Task } from "./schema"
+import { Project } from "./schema"
 import { DataTableColumnHeader } from "./data-table-column-header"
 import { DataTableRowActions } from "./data-table-row-actions"
 
-export const columns: ColumnDef<Task>[] = [
+export const columns: ColumnDef<Project>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -50,24 +50,46 @@ export const columns: ColumnDef<Task>[] = [
       <DataTableColumnHeader column={column} title="Type" />
     ),
     cell: ({ row }) => {
-      const type = types.find(
-        (type) => type.value === row.getValue("type")
-      )
-      if (!type) {
+      const typeValue = row.getValue("type") as string
+      
+      if (!typeValue) {
         return null
       }
 
+      // Split comma-separated values and find individual matches
+      const typeValues = typeValue.split(',').map(t => t.trim())
+      const matchedTypes = typeValues
+        .map(val => types.find(type => type.value.toLowerCase() === val.toLowerCase()))
+        .filter(Boolean)
+
+      if (matchedTypes.length === 0) {
+        return <div className="text-red-500 text-sm">Unknown: {typeValue}</div>
+      }
+
       return (
-        <div className="flex w-[100px] items-center gap-2">
-          {type.icon && (
-            <type.icon className="text-muted-foreground size-4" />
-          )}
-          <span>{type.label}</span>
+        <div className="flex w-[100px] items-center gap-1 flex-wrap">
+          {matchedTypes.map((type, index) => {
+            const TypeIcon = type!.icon
+            return (
+              <div key={index} className="flex items-center gap-1">
+                {TypeIcon && (
+                  <TypeIcon className="text-muted-foreground size-3" />
+                )}
+                <span className="text-xs">{type!.label}</span>
+                {index < matchedTypes.length - 1 && <span className="text-xs">,</span>}
+              </div>
+            )
+          })}
         </div>
       )
     },
     filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id))
+      const typeValue = row.getValue(id) as string
+      if (!typeValue) return false
+      const typeValues = typeValue.split(',').map(t => t.trim().toLowerCase())
+      return value.some((filterValue: string) => 
+        typeValues.includes(filterValue.toLowerCase())
+      )
     },
   },
   {

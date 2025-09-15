@@ -1,6 +1,6 @@
 import { auth, currentUser } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
-import { columns, projects } from "@/components/data-table/columns"
+import { columns } from "@/components/data-table/columns"
 import { DataTable } from "@/components/data-table/data-table"
 import { fetchUserProjects, DatabaseError } from '@/lib/data_db'
 import { ProjectData } from '@/lib/data_db'

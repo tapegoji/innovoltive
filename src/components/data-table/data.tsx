@@ -3,7 +3,6 @@ import {
   Circle,
   CircleOff,
   HelpCircle,
-  icons,
   Timer,
 } from "lucide-react"
 
@@ -37,18 +36,18 @@ export const statuses = [
 
 export const types = [
   {
-    value: "em",
+    value: "EM",
     label: "EM",
     icon: Circle,
   },
   {
-    value: "ht",
+    value: "HT",
     label: "HT",
     icon: Circle,
   },
   {
-    value: "cfd",
+    value: "CFD",
     label: "CFD",
     icon: Circle,
-  },
+  }
 ]

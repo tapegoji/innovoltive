@@ -12,7 +12,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
-import { taskSchema } from "./schema"
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>
@@ -21,7 +20,6 @@ interface DataTableRowActionsProps<TData> {
 export function DataTableRowActions<TData>({
   row,
 }: DataTableRowActionsProps<TData>) {
-  const task = taskSchema.parse(row.original)
 
   return (
     <DropdownMenu>
@@ -43,7 +41,7 @@ export function DataTableRowActions<TData>({
         {/* <DropdownMenuSub>
           <DropdownMenuSubTrigger>Labels</DropdownMenuSubTrigger>
           <DropdownMenuSubContent>
-            <DropdownMenuRadioGroup value={task.type}>
+            <DropdownMenuRadioGroup value={project.type}>
               {types.map((type) => (
                 <DropdownMenuRadioItem key={type.value} value={type.value}>
                   {type.label}
