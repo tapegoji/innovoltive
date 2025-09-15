@@ -87,7 +87,7 @@ export async function CreateNewProject(
         ${projectData.description || ''},
         ${'0 MB'},
         ${projectData.status || 'active'},
-        NOW()
+        ${projectData.date_modified || ''}
       )
       RETURNING id, name, type, description, date_modified, size, status
     `

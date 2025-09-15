@@ -134,7 +134,7 @@ export const columns: ColumnDef<Project>[] = [
       const year = date.getFullYear()
       const hour = date.getHours().toString().padStart(2, '0')
       const minute = date.getMinutes().toString().padStart(2, '0')
-      return <div>{`${day}-${month}-${year}-${hour}-${minute}`}</div>
+      return <div>{`${day}-${month}-${year}: ${hour}-${minute}`}</div>
     },
   },
   { accessorKey: "user_name",
