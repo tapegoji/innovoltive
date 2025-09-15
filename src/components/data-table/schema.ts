@@ -9,6 +9,7 @@ export const projectSchema = z.object({
   size: z.string(),
   date_modified: z.string(),
   user_id: z.string(),
+  user_name: z.string(),
   description: z.string(),
 })
 

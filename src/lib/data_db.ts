@@ -14,6 +14,7 @@ export interface ProjectData {
   size: string
   date_modified: string
   user_id: string
+  user_name: string
   description: string
 }
 
@@ -49,7 +50,14 @@ export async function fetchUserProjects(): Promise<ProjectData[]> {
       ORDER BY projects.date_modified DESC
     `
 
-    return projects
+    // Add user name to each project
+    const userName = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.username || 'Unknown User'
+    const projectsFinal = projects.map(project => ({
+      ...project,
+      user_name: userName
+    }))
+
+    return projectsFinal
   } catch (error) {
     console.error('Database error fetching user projects:', error)
     throw new DatabaseError('Failed to fetch projects', error as Error)

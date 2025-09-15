@@ -2,7 +2,6 @@
 
 import { ColumnDef } from "@tanstack/react-table"
 
-import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
 
 import { types, statuses } from "./data"
@@ -138,7 +137,7 @@ export const columns: ColumnDef<Project>[] = [
       return <div>{`${day}-${month}-${year}-${hour}-${minute}`}</div>
     },
   },
-  { accessorKey: "user_id",
+  { accessorKey: "user_name",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="User" />
     ),
