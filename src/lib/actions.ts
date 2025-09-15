@@ -139,7 +139,21 @@ export async function shareProject(projectId: string, formData: FormData) {
     const email = formData.get('email') as string
     const role = formData.get('role') as 'viewer' | 'owner'
     
-    if (!email || !email.includes('@')) {
+    if (!email) {
+      return { success: false, error: 'Email is required' }
+    }
+
+    // Handle public sharing
+    if (email === 'user_public') {
+      const result = await ShareProject(projectId, [email], role)
+      return { 
+        success: true, 
+        message: 'Project made public successfully. It will now appear in the demo projects section.' 
+      }
+    }
+
+    // Handle regular email sharing
+    if (!email.includes('@')) {
       return { success: false, error: 'Valid email is required' }
     }
 

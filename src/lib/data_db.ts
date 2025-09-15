@@ -317,7 +317,34 @@ export async function ShareProject(
 
     for (const email of emails) {
       try {
-        // Search for user by email in Clerk
+        // Handle special case for public sharing
+        if (email === 'user_public') {
+          // Check if public access already exists
+          const existingPublicAccess = await sql`
+            SELECT 1 FROM user_projects 
+            WHERE user_id = 'user_public' AND project_id = ${projectId}
+          `
+          
+          if (existingPublicAccess.length === 0) {
+            // Add public access
+            await sql`
+              INSERT INTO user_projects (user_id, project_id, role)
+              VALUES ('user_public', ${projectId}, ${role})
+            `
+          } else {
+            // Update existing public access role
+            await sql`
+              UPDATE user_projects 
+              SET role = ${role}
+              WHERE user_id = 'user_public' AND project_id = ${projectId}
+            `
+          }
+          
+          sharedWith.push('public')
+          continue
+        }
+
+        // Regular email sharing - search for user by email in Clerk
         const users = await client.users.getUserList({
           emailAddress: [email.toLowerCase()]
         })
