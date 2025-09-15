@@ -10,6 +10,7 @@ const CreateProjectSchema = z.object({
   name: z.string().min(1, 'Project name is required'),
   type: z.array(z.enum(['EM', 'HT', 'CFD'])).min(1, 'At least one type must be selected'),
   description: z.string().optional(),
+  clientTime: z.string().optional(),
 })
 
 export async function createProject(formData: FormData) {
@@ -20,15 +21,15 @@ export async function createProject(formData: FormData) {
     name: formData.get('name'),
     type: types,
     description: formData.get('description'),
+    clientTime: formData.get('clientTime'),
   })
 
   // If form validation fails, return early
   if (!validatedFields.success) {
-    console.error('Validation failed:', validatedFields.error.flatten())
     throw new Error('Invalid form data')
   }
 
-  const { name, type, description } = validatedFields.data
+  const { name, type, description, clientTime } = validatedFields.data
 
   try {
     // Join multiple types with comma separator to support combinations
@@ -40,7 +41,7 @@ export async function createProject(formData: FormData) {
       type: typeString,
       status: 'active' as const,
       size: '0 MB',
-      date_modified: new Date().toISOString(),
+      date_modified: clientTime || '',
       user_id: '', // Will be set in NewProject
       user_name: '', // Will be set in NewProject
       description: description || '',

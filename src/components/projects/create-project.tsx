@@ -23,6 +23,9 @@ export function CreateNewProject() {
   const [selectedTypes, setSelectedTypes] = useState<string[]>([])
   const [isOpen, setIsOpen] = useState(false)
 
+  const now = new Date()
+  const clientTime = now.toString()
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
@@ -33,6 +36,7 @@ export function CreateNewProject() {
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <form action={createProject}>
+          <input type="hidden" name="clientTime" value={clientTime} />
           <DialogHeader>
             <DialogTitle>Create a new project</DialogTitle>
             <DialogDescription>

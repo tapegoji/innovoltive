@@ -76,7 +76,8 @@ export async function CreateNewProject(
   try {
     // Generate a UUID for the project
     const projectId = crypto.randomUUID()
-    
+    //log the projectdata
+    console.log('Project Data:', projectData)
     // Insert the project
     const [project] = await sql<ProjectData[]>`
       INSERT INTO projects (id, name, type, description, size, status, date_modified)
