@@ -18,7 +18,7 @@ import { IconPlus } from "@tabler/icons-react"
 import { types } from "./data"
 import { useState } from "react"
 
-export function AddNewProject() {
+export function CreateNewProject() {
   const [selectedTypes, setSelectedTypes] = useState<string[]>([])
 
   return (
@@ -27,12 +27,12 @@ export function AddNewProject() {
         <DialogTrigger asChild>
           <Button variant="default" size="sm">
             <IconPlus />
-            <span className="hidden lg:inline">Add Project</span>
+            <span className="hidden lg:inline">Create Project</span>
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Add a new project</DialogTitle>
+            <DialogTitle>Create a new project</DialogTitle>
             <DialogDescription>
               Add your project details here. Click save when you&apos;re done.
             </DialogDescription>
