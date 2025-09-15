@@ -55,7 +55,7 @@ export async function fetchUserProjects(userId: string): Promise<ProjectData[]> 
 
 
 // Create a new project and associate it with a user
-export async function addProject(
+export async function addNewProject(
     userId: string, projectData: ProjectData): Promise<ProjectData> {
   if (!userId) {
     throw new DatabaseError('User ID is required')

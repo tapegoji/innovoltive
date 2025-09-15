@@ -11,13 +11,22 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Checkbox } from "@/components/ui/checkbox"
+import { IconPlus } from "@tabler/icons-react"
+import { types } from "./data"
+import { useState } from "react"
 
-export function DialogDemo() {
+export function AddNewProject() {
+  const [selectedTypes, setSelectedTypes] = useState<string[]>([])
+
   return (
     <Dialog>
       <form>
         <DialogTrigger asChild>
-          <Button variant="outline">Open Dialog</Button>
+          <Button variant="default" size="sm">
+            <IconPlus />
+            <span className="hidden lg:inline">Add Project</span>
+          </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
@@ -28,19 +37,40 @@ export function DialogDemo() {
           </DialogHeader>
           <div className="grid gap-4">
             <div className="grid gap-3">
-              <Label htmlFor="name-1">Name</Label>
-              <Input id="name-1" name="name" defaultValue="Pedro Duarte" />
+              <Label htmlFor="name">Name</Label>
+              <Input id="name" name="name" placeholder="Project name" />
             </div>
             <div className="grid gap-3">
-              <Label htmlFor="username-1">Username</Label>
-              <Input id="username-1" name="username" defaultValue="@peduarte" />
+              <Label>Type (select multiple)</Label>
+              <div className="flex flex-col gap-2">
+                {types.map((type) => (
+                  <div key={type.value} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={type.value}
+                      checked={selectedTypes.includes(type.value)}
+                      onCheckedChange={(checked) => {
+                        if (checked) {
+                          setSelectedTypes([...selectedTypes, type.value])
+                        } else {
+                          setSelectedTypes(selectedTypes.filter(t => t !== type.value))
+                        }
+                      }}
+                    />
+                    <Label htmlFor={type.value}>{type.label}</Label>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="grid gap-3">
+              <Label htmlFor="description">Description</Label>
+              <Input id="description" name="description" placeholder="Project description" />
             </div>
           </div>
           <DialogFooter>
             <DialogClose asChild>
               <Button variant="outline">Cancel</Button>
             </DialogClose>
-            <Button type="submit">Save changes</Button>
+            <Button type="submit">Add Project</Button>
           </DialogFooter>
         </DialogContent>
       </form>
