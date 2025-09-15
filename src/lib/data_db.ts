@@ -105,3 +105,69 @@ export async function CreateNewProject(
     throw new DatabaseError('Failed to create project', error as Error)
   }
 }
+
+// Update an existing project
+export async function UpdateProject(
+    projectId: string, 
+    projectData: Partial<ProjectData>): Promise<ProjectData> {
+  const user = await currentUser()
+  const userId = user?.id
+  if (!userId) {
+    throw new DatabaseError('User ID is required')
+  }
+
+  try {
+    // Check if user owns this project
+    const ownership = await sql`
+      SELECT 1 FROM user_projects 
+      WHERE user_id = ${userId} AND project_id = ${projectId}
+    `
+    
+    if (ownership.length === 0) {
+      throw new DatabaseError('Project not found or access denied')
+    }
+
+    // Get current project data first
+    const [currentProject] = await sql<ProjectData[]>`
+      SELECT * FROM projects WHERE id = ${projectId}
+    `
+
+    if (!currentProject) {
+      throw new DatabaseError('Project not found')
+    }
+
+    // Update the project with explicit values
+    const updatedName = projectData.name || currentProject.name
+    const updatedType = projectData.type || currentProject.type
+    const updatedDescription = projectData.description !== undefined ? projectData.description : currentProject.description
+    const updatedStatus = projectData.status || currentProject.status
+    const updatedDateModified = projectData.date_modified || new Date().toISOString()
+
+    const [project] = await sql<ProjectData[]>`
+      UPDATE projects 
+      SET 
+        name = ${updatedName},
+        type = ${updatedType},
+        description = ${updatedDescription},
+        status = ${updatedStatus},
+        date_modified = ${updatedDateModified}
+      WHERE id = ${projectId}
+      RETURNING id, name, type, description, date_modified, size, status, user_id
+    `
+
+    if (!project) {
+      throw new DatabaseError('Failed to update project')
+    }
+
+    // Add user name to the project
+    const userName = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.username || 'Unknown User'
+    
+    return {
+      ...project,
+      user_name: userName
+    }
+  } catch (error) {
+    console.error('Database error updating project:', error)
+    throw new DatabaseError('Failed to update project', error as Error)
+  }
+}

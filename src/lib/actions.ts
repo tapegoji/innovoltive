@@ -3,7 +3,7 @@
 import { z } from 'zod'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { CreateNewProject } from './data_db'
+import { CreateNewProject, UpdateProject } from './data_db'
 
 // Schema for validating the create project form data
 const CreateProjectSchema = z.object({
@@ -11,6 +11,14 @@ const CreateProjectSchema = z.object({
   type: z.array(z.enum(['EM', 'HT', 'CFD'])).min(1, 'At least one type must be selected'),
   description: z.string().optional(),
   clientTime: z.string().optional(),
+})
+
+// Schema for validating the update project form data
+const UpdateProjectSchema = z.object({
+  name: z.string().min(1, 'Project name is required'),
+  type: z.string().min(1, 'At least one type must be selected'),
+  description: z.string().optional(),
+  status: z.enum(['active', 'paused', 'archived']),
 })
 
 export async function createProject(formData: FormData) {
@@ -54,6 +62,47 @@ export async function createProject(formData: FormData) {
   }
 
   // Revalidate the projects page to show the new project
+  revalidatePath('/my-projects')
+  revalidatePath('/dashboard')
+  
+  // Redirect to the projects page
+  redirect('/my-projects')
+}
+
+export async function updateProject(id: string, formData: FormData) {
+  // Extract and validate form data
+  const types = formData.getAll('type') as string[]
+  
+  const validatedFields = UpdateProjectSchema.safeParse({
+    name: formData.get('name'),
+    type: types.join(','), // Join array into comma-separated string like create does
+    description: formData.get('description'),
+    status: formData.get('status'),
+  })
+
+  // If form validation fails, return early
+  if (!validatedFields.success) {
+    throw new Error('Invalid form data')
+  }
+
+  const { name, type, description, status } = validatedFields.data
+
+  try {
+    const updateData = {
+      name,
+      type,
+      description: description || '',
+      status,
+      date_modified: new Date().toISOString(),
+    }
+
+    await UpdateProject(id, updateData)
+  } catch (error) {
+    console.error('Failed to update project:', error)
+    throw new Error('Failed to update project')
+  }
+
+  // Revalidate the projects page to show the updated project
   revalidatePath('/my-projects')
   revalidatePath('/dashboard')
   
