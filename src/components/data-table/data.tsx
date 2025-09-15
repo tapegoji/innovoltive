@@ -1,7 +1,4 @@
 import {
-  ArrowDown,
-  ArrowRight,
-  ArrowUp,
   CheckCircle,
   Circle,
   CircleOff,
@@ -56,16 +53,13 @@ export const types = [
   {
     label: "EM",
     value: "em",
-    icon: ArrowDown,
   },
   {
     label: "HT",
     value: "ht",
-    icon: ArrowRight,
   },
   {
     label: "CFD",
     value: "cfd",
-    icon: ArrowUp,
   },
 ]
