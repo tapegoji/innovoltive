@@ -14,6 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { EditProject } from "./edit-project"
+import { ShareProject } from "./share-project"
 import { DeleteProject } from "./delete-project"
 import { Project } from "./schema"
 import { duplicateProject } from "@/lib/actions"
@@ -27,6 +28,7 @@ export function DataTableRowActions<TData>({
   row,
 }: DataTableRowActionsProps<TData>) {
   const [showEditDialog, setShowEditDialog] = useState(false)
+  const [showShareDialog, setShowShareDialog] = useState(false)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [isDuplicating, setIsDuplicating] = useState(false)
   const project = row.original as Project
@@ -68,6 +70,9 @@ export function DataTableRowActions<TData>({
           <DropdownMenuItem onClick={() => setShowEditDialog(true)}>
             Edit
           </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setShowShareDialog(true)}>
+            Share
+          </DropdownMenuItem>
           <DropdownMenuItem 
             onClick={handleDuplicate}
             disabled={isDuplicating}
@@ -95,6 +100,13 @@ export function DataTableRowActions<TData>({
         open={showDeleteDialog}
         onOpenChange={setShowDeleteDialog}
       />
+
+      <ShareProject
+        project={project}
+        open={showShareDialog}
+        onOpenChange={setShowShareDialog}
+      />
+
     </>
   )
 }

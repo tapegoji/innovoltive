@@ -285,3 +285,77 @@ export async function DuplicateProject(projectId: string, allowPublicCopy: boole
     throw new DatabaseError('Failed to duplicate project', error as Error)
   }
 }
+
+// Share a project with users by email
+export async function ShareProject(
+  projectId: string, 
+  emails: string[], 
+  role: 'viewer' | 'owner' = 'viewer'
+): Promise<{success: boolean, sharedWith: string[], notFound: string[]}> {
+  const user = await currentUser()
+  const currentUserId = user?.id
+  if (!currentUserId) {
+    throw new DatabaseError('User ID is required')
+  }
+
+  try {
+    // Check if current user owns this project
+    const ownership = await sql`
+      SELECT 1 FROM user_projects 
+      WHERE user_id = ${currentUserId} AND project_id = ${projectId}
+    `
+    
+    if (ownership.length === 0) {
+      throw new DatabaseError('Project not found or access denied')
+    }
+
+    // Use Clerk API to find users by email
+    const { clerkClient } = await import('@clerk/nextjs/server')
+    const sharedWith: string[] = []
+    const notFound: string[] = []
+
+    for (const email of emails) {
+      try {
+        // Search for user by email in Clerk
+        const users = await clerkClient.users.getUserList({
+          emailAddress: [email.toLowerCase()]
+        })
+
+        if (users.data.length > 0) {
+          const targetUserId = users.data[0].id
+          
+          // Check if user already has access to this project
+          const existingAccess = await sql`
+            SELECT 1 FROM user_projects 
+            WHERE user_id = ${targetUserId} AND project_id = ${projectId}
+          `
+          
+          if (existingAccess.length === 0) {
+            // Add user to the project
+            await sql`
+              INSERT INTO user_projects (user_id, project_id, role)
+              VALUES (${targetUserId}, ${projectId}, ${role})
+              ON CONFLICT (user_id, project_id) DO UPDATE SET role = ${role}
+            `
+          }
+          
+          sharedWith.push(email)
+        } else {
+          notFound.push(email)
+        }
+      } catch (clerkError) {
+        console.error(`Error finding user with email ${email}:`, clerkError)
+        notFound.push(email)
+      }
+    }
+
+    return {
+      success: true,
+      sharedWith,
+      notFound
+    }
+  } catch (error) {
+    console.error('Database error sharing project:', error)
+    throw new DatabaseError('Failed to share project', error as Error)
+  }
+}
