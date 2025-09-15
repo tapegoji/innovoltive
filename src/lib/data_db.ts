@@ -52,3 +52,39 @@ export async function fetchUserProjects(userId: string): Promise<ProjectData[]> 
     throw new DatabaseError('Failed to fetch projects', error as Error)
   }
 }
+
+
+// Create a new project and associate it with a user
+export async function addProject(
+    userId: string, projectData: ProjectData): Promise<ProjectData> {
+  if (!userId) {
+    throw new DatabaseError('User ID is required')
+  }
+
+  try {
+    // Start a transaction
+    const [project] = await sql<ProjectData[]>`
+      INSERT INTO projects (name, type, description, size, status, date_modified)
+      VALUES (
+        ${projectData.name},
+        ${projectData.type},
+        ${projectData.description || null},
+        ${projectData.size || null},
+        ${projectData.status || 'active'},
+        NOW()
+      )
+      RETURNING id, name, type, description, date_modified, size, status
+    `
+
+    // Link the project to the user
+    await sql`
+      INSERT INTO user_projects (user_id, project_id)
+      VALUES (${userId}, ${project.id})
+    `
+
+    return project
+  } catch (error) {
+    console.error('Database error creating project:', error)
+    throw new DatabaseError('Failed to create project', error as Error)
+  }
+}
