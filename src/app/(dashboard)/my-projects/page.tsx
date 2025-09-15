@@ -1,5 +1,5 @@
-import { columns } from "@/components/data-table/columns"
-import { DataTable } from "@/components/data-table/data-table"
+import { columns } from "@/components/projects/columns"
+import { DataTable } from "@/components/projects/data-table"
 import { fetchUserProjects, DatabaseError } from '@/lib/data_db'
 import { ProjectData } from '@/lib/data_db'
 
