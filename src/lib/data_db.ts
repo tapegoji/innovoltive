@@ -393,3 +393,53 @@ export async function ShareProject(
     throw new DatabaseError('Failed to share project', error as Error)
   }
 }
+
+// Fetch public projects
+export async function fetchPublicProjects(): Promise<ProjectData[]> {
+  try {
+    const projects = await sql<ProjectData[]>`
+      SELECT 
+        projects.id, 
+        projects.name, 
+        projects.type, 
+        projects.description, 
+        projects.date_modified, 
+        projects.size, 
+        projects.status,
+        projects.user_id
+      FROM projects
+      JOIN user_projects ON projects.id = user_projects.project_id
+      WHERE user_projects.user_id = 'user_public'
+      ORDER BY projects.date_modified DESC
+    `
+
+    // For public projects, we need to get the actual user name from the original owner
+    const projectsWithUserNames = await Promise.all(
+      projects.map(async (project) => {
+        // Get user info from Clerk for the actual owner
+        try {
+          const { clerkClient } = await import('@clerk/nextjs/server')
+          const client = await clerkClient()
+          const user = await client.users.getUser(project.user_id)
+          const userName = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.username || 'Unknown User'
+          
+          return {
+            ...project,
+            user_name: userName
+          }
+        } catch (error) {
+          console.error(`Error fetching user info for ${project.user_id}:`, error)
+          return {
+            ...project,
+            user_name: 'Unknown User'
+          }
+        }
+      })
+    )
+
+    return projectsWithUserNames
+  } catch (error) {
+    console.error('Database error fetching public projects:', error)
+    throw new DatabaseError('Failed to fetch public projects', error as Error)
+  }
+}
