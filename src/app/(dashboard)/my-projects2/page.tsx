@@ -2,24 +2,8 @@ import { auth, currentUser } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
 import { columns, projects } from "@/components/data-table/columns"
 import { DataTable } from "@/components/data-table/data-table"
-import { fetchUserProjectsForTable, DatabaseError } from '@/lib/data_sql'
+import { fetchUserProjects, DatabaseError } from '@/lib/data_sql2'
 import { ProjectData } from '@/lib/data_sql'
-
-// async function getData(): Promise<projects[]> {
-//   // Fetch data from your API here.
-//   return [
-//     {
-//       name: "PCB",
-//       type: "EM",
-//       status: "active",
-//       size: "0.5 GB",
-//       date_modified: "2023-10-01-12:00:00",
-//       user: "John Doe",
-//       description: "Project for PCB design",
-//     },
-//     // ...
-//   ]
-// }
 
 export default async function Page() {
   
@@ -37,7 +21,7 @@ export default async function Page() {
 
   try {
     // Fetch user projects using direct PostgreSQL formatted for data table
-    projects = await fetchUserProjectsForTable(userId)
+    projects = await fetchUserProjects(userId)
   } catch (err) {
     console.error('Failed to fetch projects:', err)
     if (err instanceof DatabaseError) {
