@@ -3,7 +3,6 @@
 import { Row } from "@tanstack/react-table"
 import { MoreHorizontal } from "lucide-react"
 import { useState } from "react"
-import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -32,15 +31,11 @@ export function PublicProjectRowActions<TData>({
       const result = await duplicateProject(project.id, true) // allowPublicCopy = true
       
       if (result.success) {
-        toast.success('Project copied to your projects successfully')
         // Optionally redirect to my-projects or refresh
         window.location.href = '/my-projects'
-      } else {
-        toast.error(result.error || 'Failed to copy project')
       }
     } catch (error) {
       console.error('Error copying project:', error)
-      toast.error('An error occurred while copying the project')
     } finally {
       setIsCopying(false)
     }
