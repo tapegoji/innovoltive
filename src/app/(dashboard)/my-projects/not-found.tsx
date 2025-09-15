@@ -6,10 +6,10 @@ export const metadata: Metadata = {
 
 export default function NotFound() {
   return (
-    <main className="flex min-h-screen flex-col p-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Projects Dashboard</h1>
-      </div>
+    <main className="flex min-h-screen flex-col p-2">
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-xl font-bold">My Projects</h1>
+      </div>   
       
       <div className="mt-12 text-center">
         <div className="mx-auto h-24 w-24 text-muted-foreground mb-4">
