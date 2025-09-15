@@ -1,5 +1,3 @@
-import { auth, currentUser } from '@clerk/nextjs/server'
-import { redirect } from 'next/navigation'
 import { columns } from "@/components/data-table/columns"
 import { DataTable } from "@/components/data-table/data-table"
 import { fetchUserProjects, DatabaseError } from '@/lib/data_db'
@@ -7,21 +5,12 @@ import { ProjectData } from '@/lib/data_db'
 
 export default async function Page() {
   
-    // Get authenticated user
-  const { userId } = await auth()
-  const user = await currentUser()
-
-  // Redirect if not authenticated
-  if (!userId || !user) {
-    redirect('/sign-in')
-  }
-
   let projects: ProjectData[] = []
   let error: string | null = null
 
   try {
     // Fetch user projects using direct PostgreSQL formatted for data table
-    projects = await fetchUserProjects(userId)
+    projects = await fetchUserProjects()
   } catch (err) {
     console.error('Failed to fetch projects:', err)
     if (err instanceof DatabaseError) {

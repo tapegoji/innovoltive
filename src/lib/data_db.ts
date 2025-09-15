@@ -1,4 +1,5 @@
 import postgres from 'postgres'
+import { currentUser } from '@clerk/nextjs/server'
 
 // Create a single SQL connection instance following Next.js best practices
 const sql = postgres(process.env.DATABASE_URL!, {
@@ -24,7 +25,9 @@ export class DatabaseError extends Error {
   }
 }
 // Fetch user projects with JOIN
-export async function fetchUserProjects(userId: string): Promise<ProjectData[]> {
+export async function fetchUserProjects(): Promise<ProjectData[]> {
+  const user = await currentUser()
+  const userId = user?.id
   if (!userId) {
     throw new DatabaseError('User ID is required')
   }
@@ -53,10 +56,11 @@ export async function fetchUserProjects(userId: string): Promise<ProjectData[]> 
   }
 }
 
-
 // Create a new project and associate it with a user
 export async function addNewProject(
-    userId: string, projectData: ProjectData): Promise<ProjectData> {
+    projectData: ProjectData): Promise<ProjectData> {
+  const user = await currentUser()
+  const userId = user?.id
   if (!userId) {
     throw new DatabaseError('User ID is required')
   }
