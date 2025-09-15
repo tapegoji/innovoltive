@@ -23,7 +23,7 @@ export function DataTableToolbar<TData>({
   return (
     <div className="flex items-center justify-between gap-4 py-2">
       <div className="flex items-center space-x-2 gap-2">
-        <Button variant="outline" size="sm">
+        <Button variant="default" size="sm">
           <IconPlus />
           <span className="hidden lg:inline">Add Project</span>
         </Button>
