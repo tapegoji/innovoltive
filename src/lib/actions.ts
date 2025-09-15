@@ -3,7 +3,7 @@
 import { z } from 'zod'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { CreateNewProject, UpdateProject } from './data_db'
+import { CreateNewProject, UpdateProject, DeleteProjects, DuplicateProject } from './data_db'
 
 // Schema for validating the create project form data
 const CreateProjectSchema = z.object({
@@ -108,4 +108,28 @@ export async function updateProject(id: string, formData: FormData) {
   
   // Redirect to the projects page
   redirect('/my-projects')
+}
+
+export async function deleteProjects(projectIds: string[]) {
+  try {
+    await DeleteProjects(projectIds)
+    
+    // Return success result like your other actions seem to expect
+    return { success: true }
+  } catch (error) {
+    console.error('Failed to delete projects:', error)
+    return { success: false, error: 'Failed to delete projects' }
+  }
+}
+
+export async function duplicateProject(projectId: string, allowPublicCopy: boolean = false) {
+  try {
+    await DuplicateProject(projectId, allowPublicCopy)
+    
+    // Return success result like your other actions expect
+    return { success: true }
+  } catch (error) {
+    console.error('Failed to duplicate project:', error)
+    return { success: false, error: 'Failed to duplicate project' }
+  }
 }
