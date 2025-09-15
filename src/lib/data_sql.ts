@@ -5,7 +5,18 @@ const sql = postgres(process.env.DATABASE_URL!, {
   ssl: 'require',
 })
 
-// Types for our data
+export interface ProjectData {
+  id: string
+  name: string
+  type: string
+  status: string
+  size: string
+  date_modified: string
+  user_id: string
+  description: string
+}
+
+
 export interface ProjectDisplay {
   id: string
   name: string
@@ -55,13 +66,13 @@ export interface UpdateProjectInput {
 }
 
 // Fetch user projects with JOIN
-export async function fetchUserProjects(userId: string): Promise<ProjectDisplay[]> {
+export async function fetchUserProjects(userId: string): Promise<ProjectData[]> {
   if (!userId) {
     throw new DatabaseError('User ID is required')
   }
 
   try {
-    const projects = await sql<ProjectDisplay[]>`
+    const projects = await sql<ProjectData[]>`
       SELECT 
         projects.id, 
         projects.name, 
@@ -69,7 +80,8 @@ export async function fetchUserProjects(userId: string): Promise<ProjectDisplay[
         projects.description, 
         projects.date_modified, 
         projects.size, 
-        projects.status
+        projects.status,
+        projects.user_id
       FROM projects
       JOIN user_projects ON projects.id = user_projects.project_id
       WHERE user_projects.user_id = ${userId}
@@ -98,7 +110,8 @@ export async function fetchUserProjectsForTable(userId: string): Promise<Project
         projects.description, 
         projects.date_modified, 
         projects.size, 
-        projects.status
+        projects.status,
+        projects.user_id
       FROM projects
       JOIN user_projects ON projects.id = user_projects.project_id
       WHERE user_projects.user_id = ${userId}
