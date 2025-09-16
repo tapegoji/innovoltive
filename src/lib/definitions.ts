@@ -62,7 +62,7 @@ export const statuses = [
   {
     value: "running",
     label: "Running",
-    icon: Timer,
+    badge: React.createElement(Badge, { variant: "outline", className: "text-blue-600 border-blue-200" }, "Running")
   },
   {
     value: "archived",
@@ -112,6 +112,8 @@ export const getStatusBadgeClass = (status: string) => {
   switch (status) {
     case 'active':
       return "text-green-600 border-green-200"
+    case 'running':
+      return "text-blue-600 border-blue-200"
     case 'paused':
       return "text-yellow-600 border-yellow-200"
     case 'archived':
