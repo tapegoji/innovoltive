@@ -1,7 +1,7 @@
 "use client"
 
 import { Table } from "@tanstack/react-table"
-import { X, ChevronDown } from "lucide-react"
+import { X } from "lucide-react"
 import { useState } from "react"
 
 import { Button } from "@/components/ui/button"
@@ -25,7 +25,6 @@ export function DataTableToolbar<TData>({
   const pathname = usePathname()
   const isPublic = pathname === '/public-projects'
   const [showBulkDeleteDialog, setShowBulkDeleteDialog] = useState(false)
-  const [showBulkCopyDialog, setShowBulkCopyDialog] = useState(false)
 
   const selectedRows = table.getFilteredSelectedRowModel().rows
   const selectedProjectIds = selectedRows.map(row => (row.original as any).id)
@@ -87,7 +86,7 @@ export function DataTableToolbar<TData>({
       </div>
 
       <DeleteProject
-        project={selectedRows[0]?.original as any}
+        selectedProjectIds={selectedProjectIds}
         open={showBulkDeleteDialog}
         onOpenChange={setShowBulkDeleteDialog}
       />

@@ -16,12 +16,19 @@ import { useFormStatus } from 'react-dom'
 import { Loader2Icon } from 'lucide-react'
 
 interface DeleteProjectProps {
-  project: Project
+  project?: Project
+  selectedProjectIds?: string[]
   open: boolean
   onOpenChange: (open: boolean) => void
 }
 
-export function DeleteProject({ project, open, onOpenChange }: DeleteProjectProps) {
+export function DeleteProject({ project, selectedProjectIds, open, onOpenChange }: DeleteProjectProps) {
+  // Determine if this is a bulk delete or single delete
+  const isBulkDelete = selectedProjectIds && selectedProjectIds.length > 0
+  const projectIds = isBulkDelete ? selectedProjectIds : (project ? [project.id] : [])
+  const projectCount = projectIds.length
+  const projectName = project?.name || `${projectCount} project${projectCount > 1 ? 's' : ''}`
+
   function SubmitButton() {
     const { pending } = useFormStatus()
     return (
@@ -31,20 +38,27 @@ export function DeleteProject({ project, open, onOpenChange }: DeleteProjectProp
         disabled={pending}
       >
         {pending && <Loader2Icon className="animate-spin" />}
-        {pending ? 'Deleting...' : 'Delete Project'}
+        {pending ? 'Deleting...' : `Delete ${isBulkDelete ? `${projectCount} Project${projectCount > 1 ? 's' : ''}` : 'Project'}`}
       </Button>
     )
+  }
+
+  // Don't render if we don't have any projects to delete
+  if (projectIds.length === 0) {
+    return null
   }
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <form action={deleteProjects}>
-          <input type="hidden" name="projectId" value={project.id} />
+          {projectIds.map((id) => (
+            <input key={id} type="hidden" name="projectId" value={id} />
+          ))}
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete project</AlertDialogTitle>
+            <AlertDialogTitle>{isBulkDelete ? 'Delete projects' : 'Delete project'}</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete &quot;{project.name}&quot;
+              This action cannot be undone. This will permanently delete &quot;{projectName}&quot;
               and remove all associated data.
             </AlertDialogDescription>
           </AlertDialogHeader>
