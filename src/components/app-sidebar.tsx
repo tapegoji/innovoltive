@@ -35,8 +35,8 @@ const items = [
     icon: IconFolder,
   }, 
   {
-    title: "Demo Projects",
-    url: "/demo-projects",
+    title: "Public Projects",
+    url: "/public-projects",
     icon: MdPublic,
   },
   {

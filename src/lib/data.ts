@@ -1,15 +1,13 @@
 import postgres from 'postgres'
-import { currentUser } from '@clerk/nextjs/server'
 import { ProjectData, DatabaseError } from './definitions'
 
 // Create a single SQL connection instance following Next.js best practices
 const sql = postgres(process.env.DATABASE_URL!, {
   ssl: 'require',
 })
+
 // Fetch user projects with JOIN
-export async function fetchUserProjects(): Promise<ProjectData[]> {
-  const user = await currentUser()
-  const userId = user?.id
+export async function fetchUserProjects(userId: string, userName: string): Promise<ProjectData[]> {
   if (!userId) {
     throw new DatabaseError('User ID is required')
   }
@@ -32,13 +30,12 @@ export async function fetchUserProjects(): Promise<ProjectData[]> {
     `
 
     // Add user name to each project
-    const userName = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.username || 'Unknown User'
-    const projectsFinal = projects.map(project => ({
+    const projectsWithUserName = projects.map(project => ({
       ...project,
       user_name: userName
     }))
 
-    return projectsFinal
+    return projectsWithUserName
   } catch (error) {
     console.error('Database error fetching user projects:', error)
     throw new DatabaseError('Failed to fetch projects', error as Error)
@@ -47,9 +44,9 @@ export async function fetchUserProjects(): Promise<ProjectData[]> {
 
 // Create a new project and associate it with a user
 export async function CreateNewProject(
-    projectData: ProjectData): Promise<ProjectData> {
-  const user = await currentUser()
-  const userId = user?.id
+    projectData: ProjectData, 
+    userId: string
+): Promise<ProjectData> {
   if (!userId) {
     throw new DatabaseError('User ID is required')
   }
@@ -57,8 +54,8 @@ export async function CreateNewProject(
   try {
     // Generate a UUID for the project
     const projectId = crypto.randomUUID()
-    //log the projectdata
     console.log('Project Data:', projectData)
+    
     // Insert the project
     const [project] = await sql<ProjectData[]>`
       INSERT INTO projects (id, name, type, description, size, user_id, status, date_modified)
@@ -91,9 +88,10 @@ export async function CreateNewProject(
 // Update an existing project
 export async function UpdateProject(
     projectId: string, 
-    projectData: Partial<ProjectData>): Promise<ProjectData> {
-  const user = await currentUser()
-  const userId = user?.id
+    projectData: Partial<ProjectData>,
+    userId: string,
+    userName: string
+): Promise<ProjectData> {
   if (!userId) {
     throw new DatabaseError('User ID is required')
   }
@@ -124,7 +122,6 @@ export async function UpdateProject(
     const updatedDescription = projectData.description !== undefined ? projectData.description : currentProject.description
     const updatedStatus = projectData.status || currentProject.status
     const updatedDateModified = projectData.date_modified || new Date().toISOString()
-    const user_id = userId
 
     const [project] = await sql<ProjectData[]>`
       UPDATE projects 
@@ -134,7 +131,7 @@ export async function UpdateProject(
         description = ${updatedDescription},
         status = ${updatedStatus},
         date_modified = ${updatedDateModified},
-        user_id = ${user_id}
+        user_id = ${userId}
       WHERE id = ${projectId}
       RETURNING id, name, type, description, date_modified, size, status, user_id
     `
@@ -142,9 +139,6 @@ export async function UpdateProject(
     if (!project) {
       throw new DatabaseError('Failed to update project')
     }
-
-    // Add user name to the project
-    const userName = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.username || 'Unknown User'
     
     return {
       ...project,
@@ -157,9 +151,7 @@ export async function UpdateProject(
 }
 
 // Delete projects
-export async function DeleteProjects(projectIds: string[]): Promise<void> {
-  const user = await currentUser()
-  const userId = user?.id
+export async function DeleteProjects(projectIds: string[], userId: string): Promise<void> {
   if (!userId) {
     throw new DatabaseError('User ID is required')
   }
@@ -196,9 +188,12 @@ export async function DeleteProjects(projectIds: string[]): Promise<void> {
 }
 
 // Duplicate a project
-export async function DuplicateProject(projectId: string, allowPublicCopy: boolean = false): Promise<ProjectData> {
-  const user = await currentUser()
-  const userId = user?.id
+export async function DuplicateProject(
+  projectId: string, 
+  allowPublicCopy: boolean = false,
+  userId: string,
+  userName: string
+): Promise<ProjectData> {
   if (!userId) {
     throw new DatabaseError('User ID is required')
   }
@@ -253,9 +248,6 @@ export async function DuplicateProject(projectId: string, allowPublicCopy: boole
       INSERT INTO user_projects (user_id, project_id, role)
       VALUES (${userId}, ${duplicatedProject.id}, 'owner')
     `
-
-    // Add user name to the project
-    const userName = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.username || 'Unknown User'
     
     return {
       ...duplicatedProject,
@@ -267,14 +259,13 @@ export async function DuplicateProject(projectId: string, allowPublicCopy: boole
   }
 }
 
-// Share a project with users by email
+// Share a project with users by userIds
 export async function ShareProject(
   projectId: string, 
-  emails: string[], 
-  role: 'viewer' | 'owner' = 'viewer'
+  userIds: string[], 
+  role: 'viewer' | 'owner' = 'viewer',
+  currentUserId: string
 ): Promise<{success: boolean, sharedWith: string[], notFound: string[]}> {
-  const user = await currentUser()
-  const currentUserId = user?.id
   if (!currentUserId) {
     throw new DatabaseError('User ID is required')
   }
@@ -290,77 +281,36 @@ export async function ShareProject(
       throw new DatabaseError('Project not found or access denied')
     }
 
-    // Use Clerk API to find users by email
-    const { clerkClient } = await import('@clerk/nextjs/server')
-    const client = await clerkClient()
     const sharedWith: string[] = []
     const notFound: string[] = []
 
-    for (const email of emails) {
+    for (const userId of userIds) {
       try {
-        // Handle special case for public sharing
-        if (email === 'user_public') {
-          // Check if public access already exists
-          const existingPublicAccess = await sql`
-            SELECT 1 FROM user_projects 
-            WHERE user_id = 'user_public' AND project_id = ${projectId}
+        // Check if user already has access to this project
+        const existingAccess = await sql`
+          SELECT 1 FROM user_projects 
+          WHERE user_id = ${userId} AND project_id = ${projectId}
+        `
+        
+        if (existingAccess.length === 0) {
+          // Add user to the project
+          await sql`
+            INSERT INTO user_projects (user_id, project_id, role)
+            VALUES (${userId}, ${projectId}, ${role})
           `
-          
-          if (existingPublicAccess.length === 0) {
-            // Add public access
-            await sql`
-              INSERT INTO user_projects (user_id, project_id, role)
-              VALUES ('user_public', ${projectId}, ${role})
-            `
-          } else {
-            // Update existing public access role
-            await sql`
-              UPDATE user_projects 
-              SET role = ${role}
-              WHERE user_id = 'user_public' AND project_id = ${projectId}
-            `
-          }
-          
-          sharedWith.push('public')
-          continue
-        }
-
-        // Regular email sharing - search for user by email in Clerk
-        const users = await client.users.getUserList({
-          emailAddress: [email.toLowerCase()]
-        })
-
-        if (users.data.length > 0) {
-          const targetUserId = users.data[0].id
-          
-          // Check if user already has access to this project
-          const existingAccess = await sql`
-            SELECT 1 FROM user_projects 
-            WHERE user_id = ${targetUserId} AND project_id = ${projectId}
-          `
-          
-          if (existingAccess.length === 0) {
-            // Add user to the project (assuming user_projects table has role column)
-            await sql`
-              INSERT INTO user_projects (user_id, project_id, role)
-              VALUES (${targetUserId}, ${projectId}, ${role})
-            `
-          } else {
-            // Update existing role
-            await sql`
-              UPDATE user_projects 
-              SET role = ${role}
-              WHERE user_id = ${targetUserId} AND project_id = ${projectId}
-            `
-          }
-          
-          sharedWith.push(email)
         } else {
-          notFound.push(email)
+          // Update existing role
+          await sql`
+            UPDATE user_projects 
+            SET role = ${role}
+            WHERE user_id = ${userId} AND project_id = ${projectId}
+          `
         }
-      } catch (clerkError) {
-        console.error(`Error finding user with email ${email}:`, clerkError)
-        notFound.push(email)
+        
+        sharedWith.push(userId)
+      } catch (dbError) {
+        console.error(`Error sharing project with user ${userId}:`, dbError)
+        notFound.push(userId)
       }
     }
 
