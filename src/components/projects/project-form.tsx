@@ -101,7 +101,7 @@ export function ProjectForm({ mode, open, onOpenChange, project, action }: Proje
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-full sm:max-w-[425px] md:w-full">
+      <DialogContent className="w-[80%] sm:max-w-[425px]">
         <form action={action}>
           <input type="hidden" name="clientTime" value={clientTime} />
           <DialogHeader>
@@ -118,7 +118,8 @@ export function ProjectForm({ mode, open, onOpenChange, project, action }: Proje
                 name="name" 
                 placeholder="Project name" 
                 defaultValue={config.getDefaultName(project)}
-                required 
+                required
+                autoFocus={false}
               />
             </div>
             <div className="grid gap-3">
