@@ -36,6 +36,11 @@ export async function fetchUserProjects() {
     const { userId, userName } = await getAuthenticatedUser()
     return await fetchUserProjectsData(userId, userName)
   } catch (error) {
+    // Handle build-time errors gracefully
+    if (error instanceof Error && error.message.includes('Dynamic server usage')) {
+      console.log('Build-time: Skipping user project fetch during static generation')
+      return []
+    }
     console.error('Failed to fetch projects:', error)
     throw error
   }
@@ -51,6 +56,11 @@ export async function fetchPublicProjects() {
     }
     return await fetchUserProjectsData(publicUserId, 'Public')
   } catch (error) {
+    // Handle build-time errors gracefully
+    if (error instanceof Error && error.message.includes('Dynamic server usage')) {
+      console.log('Build-time: Skipping public project fetch during static generation')
+      return []
+    }
     console.error('Failed to fetch projects:', error)
     throw error
   }

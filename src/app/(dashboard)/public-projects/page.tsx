@@ -3,6 +3,9 @@ import { DataTable } from "@/components/projects/data-table"
 import { fetchPublicProjects } from '@/lib/actions'
 import { ProjectData } from '@/lib/definitions'
 
+// Force dynamic rendering for authentication-dependent content
+export const dynamic = 'force-dynamic'
+
 export default async function Page() {
   
   let projects: ProjectData[] = []
