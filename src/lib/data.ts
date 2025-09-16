@@ -223,8 +223,6 @@ export async function CopyProject(
     if (originalProject.length === 0) {
       throw new DatabaseError('Project not found or access denied')
     }
-
-    const original = originalProject[0]
     
     // Generate a new UUID for the copied project
     const newProjectId = crypto.randomUUID()

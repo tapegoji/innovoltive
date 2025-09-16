@@ -19,7 +19,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible"
-import { IconBook, IconFolder, IconRocket, IconSettings, IconShare, IconArchive, IconDevices, IconMenu2, IconX, IconCircleX } from "@tabler/icons-react"
+import { IconBook, IconFolder, IconRocket, IconSettings, IconShare, IconArchive, IconDevices, IconMenu2, IconX } from "@tabler/icons-react"
 import { MdPublic } from "react-icons/md";
 import { Plus, Minus } from "lucide-react"
 import Link from "next/link";

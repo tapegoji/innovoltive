@@ -13,6 +13,7 @@ import { DataTableFacetedFilter } from "./data-table-faceted-filter"
 import { CreateNewProject } from "./create-project"
 import { DeleteProject } from "./delete-project"
 import { usePathname } from "next/navigation"
+import { ProjectData } from "@/lib/definitions"
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>
@@ -28,7 +29,7 @@ export function DataTableToolbar<TData>({
   const [showSearchInput, setShowSearchInput] = useState(false)
 
   const selectedRows = table.getFilteredSelectedRowModel().rows
-  const selectedProjectIds = selectedRows.map(row => (row.original as any).id)
+  const selectedProjectIds = selectedRows.map(row => (row.original as ProjectData).id)
 
   return (
     <>

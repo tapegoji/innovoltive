@@ -1,23 +1,17 @@
 import { columns } from "@/components/projects/columns"
 import { DataTable } from "@/components/projects/data-table"
 import { fetchUserProjects } from '@/lib/actions'
-import { ProjectData, DatabaseError } from '@/lib/definitions'
+import { ProjectData } from '@/lib/definitions'
 
 export default async function Page() {
   
   let projects: ProjectData[] = []
-  let error: string | null = null
 
   try {
     // Fetch user projects using direct PostgreSQL formatted for data table
     projects = await fetchUserProjects()
   } catch (err) {
     console.error('Failed to fetch projects:', err)
-    if (err instanceof DatabaseError) {
-      error = err.message
-    } else {
-      error = 'An unexpected error occurred. Please try again later.'
-    }
   }
 
   return (
