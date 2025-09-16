@@ -146,10 +146,18 @@ export async function editProject(id: string, formData: FormData) {
   redirect('/my-projects')
 }
 
-export async function deleteProjects(projectIds: string[]) {
+export async function deleteProjects(formData: FormData) {
   try {
     const { userId } = await getAuthenticatedUser()
-    await DeleteProjects(projectIds, userId)
+    
+    // Extract project IDs from form data
+    const projectIdsData = formData.getAll('projectId') as string[]
+    
+    if (projectIdsData.length === 0) {
+      throw new Error('No projects specified for deletion')
+    }
+    
+    await DeleteProjects(projectIdsData, userId)
   } catch (error) {
     console.error('Failed to delete projects:', error)
     throw new Error('Failed to delete projects')
