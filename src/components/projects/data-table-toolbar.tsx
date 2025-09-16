@@ -1,7 +1,7 @@
 "use client"
 
 import { Table } from "@tanstack/react-table"
-import { X } from "lucide-react"
+import { X, Trash2 } from "lucide-react"
 import { useState } from "react"
 
 import { Button } from "@/components/ui/button"
@@ -41,7 +41,10 @@ export function DataTableToolbar<TData>({
                 size="sm"
                 onClick={() => setShowBulkDeleteDialog(true)}
               >
-                Delete Selected ({selectedRows.length})
+                <Trash2 className="h-4 w-4" />
+                <span className="hidden lg:inline ml-2">
+                  Delete Selected ({selectedRows.length})
+                </span>
               </Button>
             )}
           </div>
