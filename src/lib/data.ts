@@ -1,10 +1,38 @@
 import postgres from 'postgres'
 import { ProjectData, DatabaseError } from './definitions'
+import { hashPath, storePathMapping } from './path-utils'
+import { promises as fs } from 'fs'
+import path from 'path'
 
 // Create a single SQL connection instance following Next.js best practices
 const sql = postgres(process.env.DATABASE_URL!, {
   ssl: 'require',
 })
+
+// Helper function to create project folder and get hashed path
+async function createProjectFolder(userId: string): Promise<{ projectId: string, hashedPath: string, projectFolder: string }> {
+  const userResult = await sql`SELECT root_path FROM users WHERE user_id = ${userId}`
+
+  if (userResult.length === 0) {
+    throw new DatabaseError('User not found')
+  }
+
+  const userFolderName = userResult[0].root_path
+  if (!userFolderName) {
+    throw new DatabaseError('User root path not configured')
+  }
+
+  const projectId = crypto.randomUUID()
+  const rootPath = path.join('/projects_storage', userFolderName)
+  const projectFolder = path.join(rootPath, projectId)
+
+  await fs.mkdir(projectFolder, { recursive: true })
+
+  const hashedPath = await hashPath(projectFolder)
+  await storePathMapping(hashedPath, projectFolder)
+
+  return { projectId, hashedPath, projectFolder }
+}
 
 // Fetch user projects with JOIN
 export async function fetchUserProjects(userId: string, userName: string): Promise<ProjectData[]> {
@@ -14,28 +42,23 @@ export async function fetchUserProjects(userId: string, userName: string): Promi
 
   try {
     const projects = await sql<ProjectData[]>`
-      SELECT 
-        projects.id, 
-        projects.name, 
-        projects.type, 
-        projects.description, 
-        projects.date_modified, 
-        projects.size, 
+      SELECT
+        projects.id,
+        projects.name,
+        projects.type,
+        projects.description,
+        projects.date_modified,
+        projects.size,
         projects.status,
-        projects.user_id
+        projects.user_id,
+        projects.storage_path_id
       FROM projects
       JOIN user_projects ON projects.id = user_projects.project_id
       WHERE user_projects.user_id = ${userId}
       ORDER BY projects.date_modified DESC
     `
 
-    // Add user name to each project
-    const projectsWithUserName = projects.map(project => ({
-      ...project,
-      user_name: userName
-    }))
-
-    return projectsWithUserName
+    return projects.map(project => ({ ...project, user_name: userName }))
   } catch (error) {
     console.error('Database error fetching user projects:', error)
     throw new DatabaseError('Failed to fetch projects', error as Error)
@@ -44,7 +67,7 @@ export async function fetchUserProjects(userId: string, userName: string): Promi
 
 // Create a new project and associate it with a user
 export async function CreateNewProject(
-    projectData: ProjectData, 
+    projectData: ProjectData,
     userId: string
 ): Promise<ProjectData> {
   if (!userId) {
@@ -52,13 +75,11 @@ export async function CreateNewProject(
   }
 
   try {
-    // Generate a UUID for the project
-    const projectId = crypto.randomUUID()
-    console.log('Project Data:', projectData)
-    
+    const { projectId, hashedPath } = await createProjectFolder(userId)
+
     // Insert the project
     const [project] = await sql<ProjectData[]>`
-      INSERT INTO projects (id, name, type, description, size, user_id, status, date_modified)
+      INSERT INTO projects (id, name, type, description, size, user_id, status, date_modified, storage_path_id)
       VALUES (
         ${projectId},
         ${projectData.name},
@@ -67,7 +88,8 @@ export async function CreateNewProject(
         ${'0 MB'},
         ${userId},
         ${projectData.status || 'active'},
-        ${projectData.date_modified || ''}
+        ${projectData.date_modified || new Date().toISOString()},
+        ${hashedPath}
       )
       RETURNING id, name, type, description, date_modified, size, status
     `
@@ -87,7 +109,7 @@ export async function CreateNewProject(
 
 // Edit an existing project
 export async function EditProject(
-    projectId: string, 
+    projectId: string,
     projectData: Partial<ProjectData>,
     userId: string,
     userName: string
@@ -99,15 +121,15 @@ export async function EditProject(
   try {
     // Check if user owns this project
     const ownership = await sql`
-      SELECT 1 FROM user_projects 
+      SELECT 1 FROM user_projects
       WHERE user_id = ${userId} AND project_id = ${projectId}
     `
-    
+
     if (ownership.length === 0) {
       throw new DatabaseError('Project not found or access denied')
     }
 
-    // Get current project data first
+    // Get current project data
     const [currentProject] = await sql<ProjectData[]>`
       SELECT * FROM projects WHERE id = ${projectId}
     `
@@ -116,34 +138,32 @@ export async function EditProject(
       throw new DatabaseError('Project not found')
     }
 
-    // Update the project with explicit values
-    const updatedName = projectData.name || currentProject.name
-    const updatedType = projectData.type || currentProject.type
-    const updatedDescription = projectData.description !== undefined ? projectData.description : currentProject.description
-    const updatedStatus = projectData.status || currentProject.status
-    const updatedDateModified = projectData.date_modified || new Date().toISOString()
+    // Prepare update data with defaults
+    const updateData = {
+      name: projectData.name ?? currentProject.name,
+      type: projectData.type ?? currentProject.type,
+      description: projectData.description ?? currentProject.description,
+      status: projectData.status ?? currentProject.status,
+      date_modified: projectData.date_modified ?? new Date().toISOString()
+    }
 
     const [project] = await sql<ProjectData[]>`
-      UPDATE projects 
-      SET 
-        name = ${updatedName},
-        type = ${updatedType},
-        description = ${updatedDescription},
-        status = ${updatedStatus},
-        date_modified = ${updatedDateModified},
-        user_id = ${userId}
+      UPDATE projects
+      SET
+        name = ${updateData.name},
+        type = ${updateData.type},
+        description = ${updateData.description},
+        status = ${updateData.status},
+        date_modified = ${updateData.date_modified}
       WHERE id = ${projectId}
-      RETURNING id, name, type, description, date_modified, size, status, user_id
+      RETURNING id, name, type, description, date_modified, size, status, user_id, storage_path_id
     `
 
     if (!project) {
       throw new DatabaseError('Failed to update project')
     }
-    
-    return {
-      ...project,
-      user_name: userName
-    }
+
+    return { ...project, user_name: userName }
   } catch (error) {
     console.error('Database error editing project:', error)
     throw new DatabaseError('Failed to edit project', error as Error)
@@ -159,35 +179,25 @@ export async function DeleteProjects(projectIds: string[], userId: string): Prom
   try {
     // Check if user owns all these projects
     const ownedProjects = await sql`
-      SELECT project_id FROM user_projects 
+      SELECT project_id FROM user_projects
       WHERE user_id = ${userId} AND project_id = ANY(${projectIds})
     `
-    
-    const ownedProjectIds = ownedProjects.map(p => p.project_id)
-    
-    if (ownedProjectIds.length !== projectIds.length) {
+
+    if (ownedProjects.length !== projectIds.length) {
       throw new DatabaseError('Some projects not found or access denied')
     }
 
-    // Delete user-project associations first
-    await sql`
-      DELETE FROM user_projects 
-      WHERE user_id = ${userId} AND project_id = ANY(${projectIds})
-    `
+    // Delete user-project associations and projects
+    await sql`DELETE FROM user_projects WHERE user_id = ${userId} AND project_id = ANY(${projectIds})`
+    await sql`DELETE FROM projects WHERE id = ANY(${projectIds})`
 
-    // Delete the projects
-    await sql`
-      DELETE FROM projects 
-      WHERE id = ANY(${projectIds})
-    `
-    
   } catch (error) {
     console.error('Database error deleting projects:', error)
     throw new DatabaseError('Failed to delete projects', error as Error)
   }
 }
 
-// Copy a project 
+// Copy a project
 export async function CopyProject(
   projectId: string,
   newName: string,
@@ -204,31 +214,22 @@ export async function CopyProject(
 
   try {
     // Get the original project
-    let originalProject: ProjectData[]
-    
-    if (allowPublicCopy) {
-      // For public copy, allow access to any project
-      originalProject = await sql<ProjectData[]>`
-        SELECT * FROM projects WHERE id = ${projectId}
-      `
-    } else {
-      // For regular copy, check ownership
-      originalProject = await sql<ProjectData[]>`
-        SELECT p.* FROM projects p
-        JOIN user_projects up ON p.id = up.project_id
-        WHERE p.id = ${projectId} AND up.user_id = ${userId}
-      `
-    }
-    
+    const originalProject = allowPublicCopy
+      ? await sql<ProjectData[]>`SELECT * FROM projects WHERE id = ${projectId}`
+      : await sql<ProjectData[]>`
+          SELECT p.* FROM projects p
+          JOIN user_projects up ON p.id = up.project_id
+          WHERE p.id = ${projectId} AND up.user_id = ${userId}
+        `
+
     if (originalProject.length === 0) {
       throw new DatabaseError('Project not found or access denied')
     }
-    
-    // Generate a new UUID for the copied project
-    const newProjectId = crypto.randomUUID()
-    
+
+    const { projectId: newProjectId, hashedPath } = await createProjectFolder(userId)
+
     const [copiedProject] = await sql<ProjectData[]>`
-      INSERT INTO projects (id, name, type, description, size, user_id, status, date_modified)
+      INSERT INTO projects (id, name, type, description, size, user_id, status, date_modified, storage_path_id)
       VALUES (
         ${newProjectId},
         ${newName},
@@ -237,9 +238,10 @@ export async function CopyProject(
         ${'0 MB'},
         ${userId},
         ${newStatus},
-        ${new Date().toISOString()}
+        ${new Date().toISOString()},
+        ${hashedPath}
       )
-      RETURNING id, name, type, description, date_modified, size, status, user_id
+      RETURNING id, name, type, description, date_modified, size, status, user_id, storage_path_id
     `
 
     // Link the copied project to the current user as owner
@@ -247,11 +249,8 @@ export async function CopyProject(
       INSERT INTO user_projects (user_id, project_id, role)
       VALUES (${userId}, ${copiedProject.id}, 'owner')
     `
-    
-    return {
-      ...copiedProject,
-      user_name: userName
-    }
+
+    return { ...copiedProject, user_name: userName }
   } catch (error) {
     console.error('Database error copying project:', error)
     throw new DatabaseError('Failed to copy project', error as Error)
@@ -260,8 +259,8 @@ export async function CopyProject(
 
 // Share a project with users by userIds
 export async function ShareProject(
-  projectId: string, 
-  userIds: string[], 
+  projectId: string,
+  userIds: string[],
   role: 'viewer' | 'owner' = 'viewer',
   currentUserId: string
 ): Promise<{success: boolean, sharedWith: string[], notFound: string[]}> {
@@ -272,10 +271,10 @@ export async function ShareProject(
   try {
     // Check if current user owns this project
     const ownership = await sql`
-      SELECT 1 FROM user_projects 
+      SELECT 1 FROM user_projects
       WHERE user_id = ${currentUserId} AND project_id = ${projectId}
     `
-    
+
     if (ownership.length === 0) {
       throw new DatabaseError('Project not found or access denied')
     }
@@ -285,12 +284,12 @@ export async function ShareProject(
 
     for (const userId of userIds) {
       try {
-        // Check if user already has access to this project
+        // Check if user already has access
         const existingAccess = await sql`
-          SELECT 1 FROM user_projects 
+          SELECT 1 FROM user_projects
           WHERE user_id = ${userId} AND project_id = ${projectId}
         `
-        
+
         if (existingAccess.length === 0) {
           // Add user to the project
           await sql`
@@ -300,12 +299,12 @@ export async function ShareProject(
         } else {
           // Update existing role
           await sql`
-            UPDATE user_projects 
+            UPDATE user_projects
             SET role = ${role}
             WHERE user_id = ${userId} AND project_id = ${projectId}
           `
         }
-        
+
         sharedWith.push(userId)
       } catch (dbError) {
         console.error(`Error sharing project with user ${userId}:`, dbError)
@@ -313,11 +312,7 @@ export async function ShareProject(
       }
     }
 
-    return {
-      success: true,
-      sharedWith,
-      notFound
-    }
+    return { success: true, sharedWith, notFound }
   } catch (error) {
     console.error('Database error sharing project:', error)
     throw new DatabaseError('Failed to share project', error as Error)
