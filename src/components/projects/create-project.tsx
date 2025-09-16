@@ -18,6 +18,8 @@ import { IconPlus } from "@tabler/icons-react"
 import { types } from "@/lib/definitions"
 import { useState } from "react"
 import { createProject } from "@/lib/actions"
+import { useFormStatus } from 'react-dom'
+import { Loader2Icon } from 'lucide-react'
 
 export function CreateNewProject() {
   const [selectedTypes, setSelectedTypes] = useState<string[]>([])
@@ -25,6 +27,16 @@ export function CreateNewProject() {
 
   const now = new Date()
   const clientTime = now.toString()
+
+  function SubmitButton() {
+    const { pending } = useFormStatus()
+    return (
+      <Button type="submit" disabled={pending}>
+        {pending && <Loader2Icon className="animate-spin" />}
+        {pending ? 'Creating...' : 'Add Project'}
+      </Button>
+    )
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -80,7 +92,7 @@ export function CreateNewProject() {
             <DialogClose asChild>
               <Button type="button" variant="outline">Cancel</Button>
             </DialogClose>
-            <Button type="submit">Add Project</Button>
+            <SubmitButton />
           </DialogFooter>
         </form>
       </DialogContent>
