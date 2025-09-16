@@ -24,6 +24,8 @@ import { types } from "@/lib/definitions"
 import { useState, useEffect } from "react"
 import { copyProject } from "@/lib/actions"
 import { Project } from "@/lib/definitions"
+import { useFormStatus } from 'react-dom'
+import { Loader2Icon } from 'lucide-react'
 
 interface CopyProjectProps {
   project: Project
@@ -44,6 +46,16 @@ export function CopyProject({ project, open, onOpenChange }: CopyProjectProps) {
 
   const now = new Date()
   const clientTime = now.toString()
+
+  function SubmitButton() {
+    const { pending } = useFormStatus()
+    return (
+      <Button type="submit" disabled={pending}>
+        {pending && <Loader2Icon className="animate-spin" />}
+        {pending ? 'Copying...' : 'Copy Project'}
+      </Button>
+    )
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -117,7 +129,7 @@ export function CopyProject({ project, open, onOpenChange }: CopyProjectProps) {
             <DialogClose asChild>
               <Button type="button" variant="outline">Cancel</Button>
             </DialogClose>
-            <Button type="submit">Copy Project</Button>
+            <SubmitButton />
           </DialogFooter>
         </form>
       </DialogContent>

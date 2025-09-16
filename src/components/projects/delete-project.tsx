@@ -12,6 +12,8 @@ import {
 import { Button } from "@/components/ui/button"
 import { deleteProjects } from "@/lib/actions"
 import { Project } from "@/lib/definitions"
+import { useFormStatus } from 'react-dom'
+import { Loader2Icon } from 'lucide-react'
 
 interface DeleteProjectProps {
   project: Project
@@ -20,6 +22,20 @@ interface DeleteProjectProps {
 }
 
 export function DeleteProject({ project, open, onOpenChange }: DeleteProjectProps) {
+  function SubmitButton() {
+    const { pending } = useFormStatus()
+    return (
+      <Button 
+        type="submit"
+        variant="destructive"
+        disabled={pending}
+      >
+        {pending && <Loader2Icon className="animate-spin" />}
+        {pending ? 'Deleting...' : 'Delete Project'}
+      </Button>
+    )
+  }
+
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
@@ -34,12 +50,7 @@ export function DeleteProject({ project, open, onOpenChange }: DeleteProjectProp
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel type="button">Cancel</AlertDialogCancel>
-            <Button 
-              type="submit"
-              variant="destructive"
-            >
-              Delete Project
-            </Button>
+            <SubmitButton />
           </AlertDialogFooter>
         </form>
       </AlertDialogContent>

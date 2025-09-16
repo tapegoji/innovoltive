@@ -20,10 +20,11 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Globe, Mail } from "lucide-react"
+import { Globe, Mail, Loader2Icon } from "lucide-react"
 import { useState } from "react"
 import { shareProject } from "@/lib/actions"
 import { Project } from "@/lib/definitions"
+import { useFormStatus } from 'react-dom'
 
 interface ShareProjectProps {
   project: Project
@@ -33,6 +34,16 @@ interface ShareProjectProps {
 
 export function ShareProject({ project, open, onOpenChange }: ShareProjectProps) {
   const [shareMode, setShareMode] = useState<'email' | 'public'>('email')
+
+  function SubmitButton() {
+    const { pending } = useFormStatus()
+    return (
+      <Button type="submit" disabled={pending}>
+        {pending && <Loader2Icon className="animate-spin" />}
+        {pending ? 'Sharing...' : (shareMode === 'public' ? 'Make Public' : 'Share Project')}
+      </Button>
+    )
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -129,9 +140,7 @@ export function ShareProject({ project, open, onOpenChange }: ShareProjectProps)
                 Cancel
               </Button>
             </DialogClose>
-            <Button type="submit">
-              {shareMode === 'public' ? 'Make Public' : 'Share Project'}
-            </Button>
+            <SubmitButton />
           </DialogFooter>
         </form>
       </DialogContent>
