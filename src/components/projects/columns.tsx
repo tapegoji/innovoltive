@@ -40,7 +40,7 @@ export const columns: ColumnDef<Project>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Name" />
     ),
-    cell: ({ row }) => <div className="w-[80px]">{row.getValue("name")}</div>,
+    cell: ({ row }) => <div className="min-w-[80px] max-w-[200px] whitespace-normal break-words">{row.getValue("name")}</div>,
     enableSorting: true,
     enableHiding: false,
   },
@@ -110,6 +110,7 @@ export const columns: ColumnDef<Project>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Description" />
     ),
+    cell: ({ row }) => <div className="whitespace-normal break-words">{row.getValue("description")}</div>,
   },
   { accessorKey: "size",
     header: ({ column }) => (
