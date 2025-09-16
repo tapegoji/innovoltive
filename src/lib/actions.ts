@@ -224,23 +224,18 @@ export async function shareProject(projectId: string, formData: FormData) {
     // Find user by email using Clerk
     const targetUserId = await findUserByEmail(email)
     
-    if (!targetUserId) {
-      const isPublicEmail = email === 'info@innovoltive.com'
-      return { 
-        success: false, 
-        error: isPublicEmail 
-          ? 'Public demo account (info@innovoltive.com) not found. Please contact support.'
-          : `User with email ${email} not found. They need to create an account first.`
-      }
+    if (targetUserId) {
+      // User exists, proceed with sharing
+      await ShareProject(projectId, [targetUserId], role, userId)
     }
-
-    const result = await ShareProject(projectId, [targetUserId], role, userId)
+    // If user doesn't exist, we silently do nothing to prevent email enumeration
     
-    // Return appropriate success message
+    // Always return success message regardless of whether user exists
+    // This prevents email enumeration attacks
     const isPublicEmail = email === 'info@innovoltive.com'
     const message = isPublicEmail 
       ? 'Project made public successfully. It will now appear in the demo projects section.'
-      : `Project shared with ${email}`
+      : `Project sharing request sent. If a user with this email exists, they now have access to the project.`
     
     return { success: true, message }
   } catch (error) {
