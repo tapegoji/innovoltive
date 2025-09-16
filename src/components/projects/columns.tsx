@@ -3,8 +3,9 @@
 import { ColumnDef } from "@tanstack/react-table"
 
 import { Checkbox } from "@/components/ui/checkbox"
+import { Badge } from "@/components/ui/badge"
 
-import { types, statuses } from "@/lib/definitions"
+import { types, statuses, getTypeBadgeClass, getStatusBadgeClass } from "@/lib/definitions"
 import { Project } from "@/lib/definitions"
 import { DataTableColumnHeader } from "./data-table-column-header"
 import { DataTableRowActions } from "./data-table-row-actions"
@@ -55,26 +56,16 @@ export const columns: ColumnDef<Project>[] = [
         return null
       }
 
-      // Split comma-separated values and find individual matches
-      const typeValues = typeValue.split(',').map(t => t.trim())
-      const matchedTypes = typeValues
-        .map(val => types.find(type => type.value.toLowerCase() === val.toLowerCase()))
-        .filter(Boolean)
-
-      if (matchedTypes.length === 0) {
-        return <div className="text-red-500 text-sm">Unknown type</div>
-      }
-
+      // Split comma-separated values
+      const typeValues = typeValue.split(',').map(t => t.trim()).filter(Boolean)
+      
       return (
-        <div className="flex w-[100px] items-center gap-1 flex-wrap">
-          {matchedTypes.map((type, index) => {
-            return (
-              <div key={index} className="flex items-center gap-1">
-                <span className="text-xs">{type!.label}</span>
-                {index < matchedTypes.length - 1 && <span className="text-xs">,</span>}
-              </div>
-            )
-          })}
+        <div className="flex w-[120px] items-center gap-1 flex-wrap">
+          {typeValues.map(type => (
+            <Badge key={type} variant="outline" className={getTypeBadgeClass(type)}>
+              {type.toUpperCase()}
+            </Badge>
+          ))}
         </div>
       )
     },
@@ -93,16 +84,20 @@ export const columns: ColumnDef<Project>[] = [
       <DataTableColumnHeader column={column} title="Status" />
     ),
     cell: ({ row }) => {
-      const status = statuses.find(
-        (status) => status.value === row.getValue("status")
-      )
-      if (!status) {
+      const statusValue = row.getValue("status") as string
+      
+      if (!statusValue) {
         return null
       }
 
+      const statusConfig = statuses.find(s => s.value === statusValue)
+      const label = statusConfig ? statusConfig.label : statusValue
+
       return (
-        <div className="flex w-[100px] items-center gap-2">
-          <span>{status.label}</span>
+        <div className="flex w-[100px] items-center">
+          <Badge variant="outline" className={getStatusBadgeClass(statusValue)}>
+            {label}
+          </Badge>
         </div>
       )
     },

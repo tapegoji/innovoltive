@@ -1,11 +1,6 @@
 import { z } from 'zod'
-import {
-  CheckCircle,
-  Circle,
-  CircleOff,
-  HelpCircle,
-  Timer,
-} from "lucide-react"
+import { Badge } from "@/components/ui/badge"
+import React from "react"
 
 export interface ProjectData {
   id: string
@@ -62,27 +57,17 @@ export const statuses = [
   {
     value: "active",
     label: "Active",
-    icon: HelpCircle,
+    badge: React.createElement(Badge, { variant: "outline", className: "text-green-600 border-green-200" }, "Active")
   },
   {
     value: "archived",
     label: "Archived",
-    icon: Circle,
+    badge: React.createElement(Badge, { variant: "outline", className: "text-gray-600 border-gray-200" }, "Archived")
   },
   {
-    value: "in progress",
-    label: "In Progress",
-    icon: Timer,
-  },
-  {
-    value: "done",
-    label: "Done",
-    icon: CheckCircle,
-  },
-  {
-    value: "canceled",
-    label: "Canceled",
-    icon: CircleOff,
+    value: "paused",
+    label: "Paused",
+    badge: React.createElement(Badge, { variant: "outline", className: "text-yellow-600 border-yellow-200" }, "Paused")
   },
 ]
 
@@ -90,16 +75,43 @@ export const types = [
   {
     value: "EM",
     label: "EM",
-    icon: Circle,
+    badge: React.createElement(Badge, { variant: "outline", className: "text-blue-600 border-blue-200" }, "EM")
   },
   {
     value: "HT",
     label: "HT",
-    icon: Circle,
+    badge: React.createElement(Badge, { variant: "outline", className: "text-red-600 border-red-200" }, "HT")
   },
   {
     value: "CFD",
     label: "CFD",
-    icon: Circle,
+    badge: React.createElement(Badge, { variant: "outline", className: "text-green-600 border-green-200" }, "CFD")
   }
 ]
+
+// Simple utility functions to get badge classes
+export const getTypeBadgeClass = (type: string) => {
+  switch (type.toUpperCase()) {
+    case 'EM':
+      return "text-blue-600 border-blue-200"
+    case 'HT':
+      return "text-red-600 border-red-200"
+    case 'CFD':
+      return "text-green-600 border-green-200"
+    default:
+      return "text-gray-600 border-gray-200"
+  }
+}
+
+export const getStatusBadgeClass = (status: string) => {
+  switch (status) {
+    case 'active':
+      return "text-green-600 border-green-200"
+    case 'paused':
+      return "text-yellow-600 border-yellow-200"
+    case 'archived':
+      return "text-gray-600 border-gray-200"
+    default:
+      return "text-gray-600 border-gray-200"
+  }
+}

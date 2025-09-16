@@ -20,6 +20,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { Separator } from "@/components/ui/separator"
+import { getTypeBadgeClass, getStatusBadgeClass } from "@/lib/definitions"
 
 interface DataTableFacetedFilterProps<TData, TValue> {
   column?: Column<TData, TValue>
@@ -27,7 +28,8 @@ interface DataTableFacetedFilterProps<TData, TValue> {
   options: {
     label: string
     value: string
-    icon?: React.ComponentType<{ className?: string }>
+    badge?: React.ReactElement
+    badgeClass?: string
   }[]
 }
 
@@ -38,6 +40,15 @@ export function DataTableFacetedFilter<TData, TValue>({
 }: DataTableFacetedFilterProps<TData, TValue>) {
   const facets = column?.getFacetedUniqueValues()
   const selectedValues = new Set(column?.getFilterValue() as string[])
+
+  const getBadgeClass = (option: any) => {
+    if (title === "Type") {
+      return getTypeBadgeClass(option.value)
+    } else if (title === "Status") {
+      return getStatusBadgeClass(option.value)
+    }
+    return "text-gray-600 border-gray-200"
+  }
 
   return (
     <Popover>
@@ -67,9 +78,9 @@ export function DataTableFacetedFilter<TData, TValue>({
                     .filter((option) => selectedValues.has(option.value))
                     .map((option) => (
                       <Badge
-                        variant="secondary"
+                        variant="outline"
                         key={option.value}
-                        className="rounded-sm px-1 font-normal"
+                        className={cn("rounded-sm px-1 font-normal", getBadgeClass(option))}
                       >
                         {option.label}
                       </Badge>
@@ -113,10 +124,12 @@ export function DataTableFacetedFilter<TData, TValue>({
                     >
                       <Check className="text-primary-foreground size-3.5" />
                     </div>
-                    {option.icon && (
-                      <option.icon className="text-muted-foreground size-4" />
-                    )}
-                    <span>{option.label}</span>
+                    <Badge 
+                      variant="outline" 
+                      className={cn("text-xs", getBadgeClass(option))}
+                    >
+                      {option.label}
+                    </Badge>
                     {facets?.get(option.value) && (
                       <span className="text-muted-foreground ml-auto flex size-4 items-center justify-center font-mono text-xs">
                         {facets.get(option.value)}
