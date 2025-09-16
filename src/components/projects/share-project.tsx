@@ -27,13 +27,20 @@ import { Project } from "@/lib/definitions"
 import { useFormStatus } from 'react-dom'
 
 interface ShareProjectProps {
-  project: Project
+  project?: Project
+  selectedProjectIds?: string[]
   open: boolean
   onOpenChange: (open: boolean) => void
 }
 
-export function ShareProject({ project, open, onOpenChange }: ShareProjectProps) {
+export function ShareProject({ project, selectedProjectIds, open, onOpenChange }: ShareProjectProps) {
   const [shareMode, setShareMode] = useState<'email' | 'public'>('email')
+
+  // Determine if this is a bulk share or single share
+  const isBulkShare = selectedProjectIds && selectedProjectIds.length > 0
+  const projectIds = isBulkShare ? selectedProjectIds : (project ? [project.id] : [])
+  const projectCount = projectIds.length
+  const projectName = project?.name || `${projectCount} project${projectCount > 1 ? 's' : ''}`
 
   function SubmitButton() {
     const { pending } = useFormStatus()
@@ -45,14 +52,25 @@ export function ShareProject({ project, open, onOpenChange }: ShareProjectProps)
     )
   }
 
+  // Don't render if we don't have any projects to share
+  if (projectIds.length === 0) {
+    return null
+  }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="w-[80vw] sm:max-w-[425px]">
-        <form action={shareProject.bind(null, project.id)}>
+        <form action={shareProject}>
+          {projectIds.map((id) => (
+            <input key={id} type="hidden" name="projectId" value={id} />
+          ))}
           <DialogHeader>
-            <DialogTitle>Share project</DialogTitle>
+            <DialogTitle>{isBulkShare ? 'Share projects' : 'Share project'}</DialogTitle>
             <DialogDescription>
-              Share this project with specific users or make it publicly accessible.
+              {isBulkShare 
+                ? `Share these ${projectCount} projects with specific users or make them publicly accessible.`
+                : 'Share this project with specific users or make it publicly accessible.'
+              }
             </DialogDescription>
           </DialogHeader>
           

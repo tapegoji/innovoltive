@@ -1,7 +1,7 @@
 "use client"
 
 import { Table } from "@tanstack/react-table"
-import { X, Trash2, Search } from "lucide-react"
+import { X, Trash2, Search, Share2 } from "lucide-react"
 import { useState } from "react"
 
 import { Button } from "@/components/ui/button"
@@ -12,6 +12,7 @@ import { types, statuses } from "@/lib/definitions"
 import { DataTableFacetedFilter } from "./data-table-faceted-filter"
 import { CreateNewProject } from "./create-project"
 import { DeleteProject } from "./delete-project"
+import { ShareProject } from "./share-project"
 import { usePathname } from "next/navigation"
 import { ProjectData } from "@/lib/definitions"
 
@@ -26,6 +27,7 @@ export function DataTableToolbar<TData>({
   const pathname = usePathname()
   const isPublic = pathname === '/public-projects'
   const [showBulkDeleteDialog, setShowBulkDeleteDialog] = useState(false)
+  const [showBulkShareDialog, setShowBulkShareDialog] = useState(false)
   const [showSearchInput, setShowSearchInput] = useState(false)
 
   const selectedRows = table.getFilteredSelectedRowModel().rows
@@ -46,6 +48,18 @@ export function DataTableToolbar<TData>({
                 <Trash2 className="h-4 w-4" />
                 <span className="hidden lg:inline ml-2">
                   Delete Selected ({selectedRows.length})
+                </span>
+              </Button>
+            )}
+            {selectedRows.length > 0 && (
+              <Button
+                variant="default"
+                size="sm"
+                onClick={() => setShowBulkShareDialog(true)}
+              >
+                <Share2 className="h-4 w-4" />
+                <span className="hidden lg:inline ml-2">
+                  Share Selected ({selectedRows.length})
                 </span>
               </Button>
             )}
@@ -107,6 +121,12 @@ export function DataTableToolbar<TData>({
         selectedProjectIds={selectedProjectIds}
         open={showBulkDeleteDialog}
         onOpenChange={setShowBulkDeleteDialog}
+      />
+
+      <ShareProject
+        selectedProjectIds={selectedProjectIds}
+        open={showBulkShareDialog}
+        onOpenChange={setShowBulkShareDialog}
       />
     </>
   )

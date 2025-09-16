@@ -223,9 +223,16 @@ export async function copyProject(projectId: string, formData: FormData) {
   redirect('/my-projects')
 }
 
-export async function shareProject(projectId: string, formData: FormData) {
+export async function shareProject(formData: FormData) {
   try {
     const { userId } = await getAuthenticatedUser()
+    
+    // Extract project IDs from form data
+    const projectIdsData = formData.getAll('projectId') as string[]
+    
+    if (projectIdsData.length === 0) {
+      throw new Error('No projects specified for sharing')
+    }
     
     const email = formData.get('email') as string
     const role = formData.get('role') as 'viewer' | 'owner'
@@ -244,7 +251,9 @@ export async function shareProject(projectId: string, formData: FormData) {
     
     if (targetUserId) {
       // User exists, proceed with sharing
-      await ShareProject(projectId, [targetUserId], role, userId)
+      for (const projectId of projectIdsData) {
+        await ShareProject(projectId, [targetUserId], role, userId)
+      }
     }
     // If user doesn't exist, we silently do nothing to prevent email enumeration
     
