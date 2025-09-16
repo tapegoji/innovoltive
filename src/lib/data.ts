@@ -3,6 +3,8 @@ import { ProjectData, DatabaseError } from './definitions'
 import { hashPath, storePathMapping, getRealPath, removePathMapping } from './path-utils'
 import { promises as fs } from 'fs'
 import path from 'path'
+import { currentUser } from '@clerk/nextjs/server'
+import crypto from 'crypto'
 
 // Create a single SQL connection instance following Next.js best practices
 const sql = postgres(process.env.DATABASE_URL!, {
@@ -11,15 +13,34 @@ const sql = postgres(process.env.DATABASE_URL!, {
 
 // Helper function to create project folder and get hashed path
 async function createProjectFolder(userId: string): Promise<{ projectId: string, hashedPath: string, projectFolder: string }> {
-  const userResult = await sql`SELECT root_path FROM users WHERE user_id = ${userId}`
-
-  if (userResult.length === 0) {
-    throw new DatabaseError('User not found')
+  // Get user from Clerk to access metadata
+  const user = await currentUser()
+  if (!user) {
+    throw new DatabaseError('User not authenticated')
   }
 
-  const userFolderName = userResult[0].root_path
+  let userFolderName = user.privateMetadata?.root_path as string
+
   if (!userFolderName) {
-    throw new DatabaseError('User root path not configured')
+    // Generate unique hash for root_path
+    const salt = process.env.PATH_HASH_SALT || 'default_salt'
+    const userEmail = user.primaryEmailAddress?.emailAddress
+    if (userEmail) {
+      userFolderName = crypto.createHash('sha256').update(userEmail + salt).digest('hex')
+    } else {
+      // Fallback if no email
+      userFolderName = crypto.randomUUID()
+    }
+
+    // Update user's private metadata
+    const { clerkClient } = await import('@clerk/nextjs/server')
+    const client = await clerkClient()
+    await client.users.updateUserMetadata(userId, {
+      privateMetadata: {
+        ...user.privateMetadata,
+        root_path: userFolderName
+      }
+    })
   }
 
   const projectId = crypto.randomUUID()

@@ -3,15 +3,8 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { currentUser, clerkClient } from '@clerk/nextjs/server'
-import postgres from 'postgres'
-import crypto from 'crypto'
 import { CreateNewProject, EditProject, DeleteProjects, CopyProject, ShareProject, fetchUserProjects as fetchUserProjectsData } from './data'
 import { CreateProjectSchema, UpdateProjectSchema } from './definitions'
-
-// Create a single SQL connection instance following Next.js best practices
-const sql = postgres(process.env.DATABASE_URL!, {
-  ssl: 'require',
-})
 
 // Helper function to get authenticated user
 async function getAuthenticatedUser() {
@@ -21,26 +14,6 @@ async function getAuthenticatedUser() {
   }
   
   const userName = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.username || 'Unknown User'
-  
-  // Ensure user exists in our database with root_path
-  const userEmail = user.primaryEmailAddress?.emailAddress
-  if (userEmail) {
-    const salt = process.env.PATH_HASH_SALT || 'default_salt'
-    const rootPath = crypto.createHash('sha256').update(userEmail + salt).digest('hex')
-    
-    try {
-      // Check if user exists
-      const existingUser = await sql`SELECT user_id FROM users WHERE user_id = ${user.id}`
-      
-      if (existingUser.length === 0) {
-        // Insert new user
-        await sql`INSERT INTO users (user_id, root_path) VALUES (${user.id}, ${rootPath})`
-      }
-    } catch (error) {
-      console.error('Error ensuring user in database:', error)
-      // Continue without throwing to avoid blocking login
-    }
-  }
   
   return { userId: user.id, userName }
 }
