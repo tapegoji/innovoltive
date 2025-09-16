@@ -23,6 +23,14 @@ export class DatabaseError extends Error {
   }
 }
 
+// Custom error class for quota exceeded scenarios
+export class QuotaExceededError extends Error {
+  constructor(message: string = "You don't have enough storage") {
+    super(message)
+    this.name = 'QuotaExceededError'
+  }
+}
+
 // Schema for validating the create project form data
 export const CreateProjectSchema = z.object({
   name: z.string().min(1, 'Project name is required'),

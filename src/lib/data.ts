@@ -1,5 +1,5 @@
 import postgres from 'postgres'
-import { ProjectData, DatabaseError } from './definitions'
+import { ProjectData, DatabaseError, QuotaExceededError } from './definitions'
 import { hashPath, storePathMapping, getRealPath, removePathMapping } from './path-utils'
 import { promises as fs } from 'fs'
 import path from 'path'
@@ -10,6 +10,37 @@ import crypto from 'crypto'
 const sql = postgres(process.env.DATABASE_URL!, {
   ssl: 'require',
 })
+
+// Helper function to check user quota before creating/copying projects
+async function checkUserQuota(userId: string): Promise<void> {
+  try {
+    const [userQuota] = await sql`
+      SELECT quota, used_quota
+      FROM users
+      WHERE user_id = ${userId}
+    `
+
+    if (!userQuota) {
+      // If user doesn't exist in users table, create them with default quota of 0
+      await sql`
+        INSERT INTO users (user_id, quota, used_quota)
+        VALUES (${userId}, 0, 0)
+        ON CONFLICT (user_id) DO NOTHING
+      `
+      throw new QuotaExceededError()
+    }
+
+    if (userQuota.used_quota >= userQuota.quota) {
+      throw new QuotaExceededError()
+    }
+  } catch (error) {
+    if (error instanceof QuotaExceededError) {
+      throw error
+    }
+    console.error('Error checking user quota:', error)
+    throw new DatabaseError('Failed to check user quota', error as Error)
+  }
+}
 
 // Helper function to create project folder and get hashed path
 async function createProjectFolder(userId: string): Promise<{ projectId: string, hashedPath: string, projectFolder: string }> {
@@ -113,6 +144,9 @@ export async function CreateNewProject(
   }
 
   try {
+    // Check user quota before creating the project
+    await checkUserQuota(userId)
+
     const { projectId, hashedPath } = await createProjectFolder(userId)
 
     // Insert the project
@@ -276,6 +310,9 @@ export async function CopyProject(
   }
 
   try {
+    // Check user quota before copying the project
+    await checkUserQuota(userId)
+
     // Get the original project
     const originalProject = allowPublicCopy
       ? await sql<ProjectData[]>`SELECT * FROM projects WHERE id = ${projectId}`
