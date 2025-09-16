@@ -1,7 +1,7 @@
 "use client"
 
 import { Table } from "@tanstack/react-table"
-import { X, Trash2 } from "lucide-react"
+import { X, Trash2, Search } from "lucide-react"
 import { useState } from "react"
 
 import { Button } from "@/components/ui/button"
@@ -25,6 +25,7 @@ export function DataTableToolbar<TData>({
   const pathname = usePathname()
   const isPublic = pathname === '/public-projects'
   const [showBulkDeleteDialog, setShowBulkDeleteDialog] = useState(false)
+  const [showSearchInput, setShowSearchInput] = useState(false)
 
   const selectedRows = table.getFilteredSelectedRowModel().rows
   const selectedProjectIds = selectedRows.map(row => (row.original as any).id)
@@ -50,14 +51,29 @@ export function DataTableToolbar<TData>({
           </div>
         )}
         <div className="flex items-center gap-2">
-          <Input
-            placeholder="Filter by name..."
-            value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-            onChange={(event) =>
-              table.getColumn("name")?.setFilterValue(event.target.value)
-            }
-            className="h-8 w-[150px] lg:w-[250px]"
-          />
+          {/* Mobile Search Button */}
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8 lg:hidden"
+            onClick={() => setShowSearchInput(!showSearchInput)}
+          >
+            <Search className="h-4 w-4" />
+          </Button>
+
+          {/* Search Input - Single component for both desktop and mobile */}
+          <div className={showSearchInput ? "block" : "hidden lg:block"}>
+            <Input
+              placeholder="Filter by name..."
+              value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+              onChange={(event) =>
+                table.getColumn("name")?.setFilterValue(event.target.value)
+              }
+              className={showSearchInput ? "h-8 w-[200px]" : "h-8 w-[250px]"}
+              autoFocus={showSearchInput}
+            />
+          </div>
+
           {table.getColumn("type") && (
             <DataTableFacetedFilter
               column={table.getColumn("type")}
