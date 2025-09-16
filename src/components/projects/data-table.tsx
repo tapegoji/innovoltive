@@ -70,7 +70,7 @@ export function DataTable<TData, TValue>({
       <DataTableToolbar table={table} />
       <div className="overflow-hidden rounded-md border">
         <Table>
-          <TableHeader className="bg-sidebar">
+          <TableHeader className="bg-muted sticky top-0 z-10">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
