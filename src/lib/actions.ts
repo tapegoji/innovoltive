@@ -49,7 +49,7 @@ export async function fetchPublicProjects() {
       console.warn('Public demo account (info@innovoltive.com) not found')
       return []
     }
-    return await fetchUserProjectsData(publicUserId, 'Innovoltive Demo')
+    return await fetchUserProjectsData(publicUserId, 'Public')
   } catch (error) {
     console.error('Failed to fetch projects:', error)
     throw error
