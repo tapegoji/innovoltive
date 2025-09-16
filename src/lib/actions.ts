@@ -43,7 +43,13 @@ export async function fetchUserProjects() {
 
 export async function fetchPublicProjects() {
   try {
-    return await fetchUserProjectsData('user_public', 'public')
+    // Get projects shared with info@innovoltive.com (public demo projects)
+    const publicUserId = await findUserByEmail('info@innovoltive.com')
+    if (!publicUserId) {
+      console.warn('Public demo account (info@innovoltive.com) not found')
+      return []
+    }
+    return await fetchUserProjectsData(publicUserId, 'Innovoltive Demo')
   } catch (error) {
     console.error('Failed to fetch projects:', error)
     throw error
@@ -210,16 +216,7 @@ export async function shareProject(projectId: string, formData: FormData) {
       return { success: false, error: 'Email is required' }
     }
 
-    // Handle public sharing
-    if (email === 'user_public') {
-      const result = await ShareProject(projectId, ['user_public'], role, userId)
-      return { 
-        success: true, 
-        message: 'Project made public successfully. It will now appear in the demo projects section.' 
-      }
-    }
-
-    // Handle regular email sharing
+    // Validate email format
     if (!email.includes('@')) {
       return { success: false, error: 'Valid email is required' }
     }
@@ -228,15 +225,24 @@ export async function shareProject(projectId: string, formData: FormData) {
     const targetUserId = await findUserByEmail(email)
     
     if (!targetUserId) {
+      const isPublicEmail = email === 'info@innovoltive.com'
       return { 
         success: false, 
-        error: `User with email ${email} not found. They need to create an account first.` 
+        error: isPublicEmail 
+          ? 'Public demo account (info@innovoltive.com) not found. Please contact support.'
+          : `User with email ${email} not found. They need to create an account first.`
       }
     }
 
     const result = await ShareProject(projectId, [targetUserId], role, userId)
     
-    return { success: true, message: `Project shared with ${email}` }
+    // Return appropriate success message
+    const isPublicEmail = email === 'info@innovoltive.com'
+    const message = isPublicEmail 
+      ? 'Project made public successfully. It will now appear in the demo projects section.'
+      : `Project shared with ${email}`
+    
+    return { success: true, message }
   } catch (error) {
     console.error('Failed to share project:', error)
     return { success: false, error: 'Failed to share project' }

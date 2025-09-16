@@ -47,8 +47,8 @@ export function ShareProject({ project, open, onOpenChange }: ShareProjectProps)
       formData.set('email', email)
       formData.set('role', role)
     } else {
-      // For public sharing, use a special identifier and always set role to viewer
-      formData.set('email', 'user_public')
+      // For public sharing, use the dedicated public demo account
+      formData.set('email', 'info@innovoltive.com')
       formData.set('role', 'viewer')
     }
 
