@@ -16,7 +16,7 @@ import {
 import { EditProject } from "./edit-project"
 import { ShareProject } from "./share-project"
 import { DeleteProject } from "./delete-project"
-import { Project } from "./schema"
+import { Project } from "@/lib/definitions"
 import { duplicateProject } from "@/lib/actions"
 
 

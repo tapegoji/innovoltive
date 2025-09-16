@@ -4,8 +4,8 @@ import { ColumnDef } from "@tanstack/react-table"
 
 import { Checkbox } from "@/components/ui/checkbox"
 
-import { types, statuses } from "./data"
-import { Project } from "./schema"
+import { types, statuses } from "@/lib/definitions"
+import { Project } from "@/lib/definitions"
 import { DataTableColumnHeader } from "./data-table-column-header"
 import { DataTableRowActions } from "./data-table-row-actions"
 

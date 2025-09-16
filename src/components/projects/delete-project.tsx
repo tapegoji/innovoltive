@@ -13,7 +13,7 @@ import {
 import { useState } from "react"
 import { toast } from "sonner"
 import { deleteProjects } from "@/lib/actions"
-import { Project } from "./schema"
+import { Project } from "@/lib/definitions"
 
 interface DeleteProjectProps {
   project: Project

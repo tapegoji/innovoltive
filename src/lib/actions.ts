@@ -1,25 +1,9 @@
 'use server'
 
-import { z } from 'zod'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { CreateNewProject, UpdateProject, DeleteProjects, DuplicateProject, ShareProject } from './data'
-
-// Schema for validating the create project form data
-const CreateProjectSchema = z.object({
-  name: z.string().min(1, 'Project name is required'),
-  type: z.array(z.enum(['EM', 'HT', 'CFD'])).min(1, 'At least one type must be selected'),
-  description: z.string().optional(),
-  clientTime: z.string().optional(),
-})
-
-// Schema for validating the update project form data
-const UpdateProjectSchema = z.object({
-  name: z.string().min(1, 'Project name is required'),
-  type: z.string().min(1, 'At least one type must be selected'),
-  description: z.string().optional(),
-  status: z.enum(['active', 'paused', 'archived']),
-})
+import { CreateProjectSchema, UpdateProjectSchema } from './definitions'
 
 export async function createProject(formData: FormData) {
   // Extract and validate form data

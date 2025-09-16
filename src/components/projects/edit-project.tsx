@@ -20,10 +20,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { types } from "./data"
+import { types } from "@/lib/definitions"
 import { useState, useEffect } from "react"
 import { updateProject } from "@/lib/actions"
-import { Project } from "./schema"
+import { Project } from "@/lib/definitions"
 
 interface EditProjectProps {
   project: Project

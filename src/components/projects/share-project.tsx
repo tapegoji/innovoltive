@@ -24,7 +24,7 @@ import { Globe, Mail } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 import { shareProject } from "@/lib/actions"
-import { Project } from "./schema"
+import { Project } from "@/lib/definitions"
 
 interface ShareProjectProps {
   project: Project

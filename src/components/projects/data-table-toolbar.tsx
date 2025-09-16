@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { DataTableViewOptions } from "./data-table-view-options"
 
-import { types, statuses } from "./data"
+import { types, statuses } from "@/lib/definitions"
 import { DataTableFacetedFilter } from "./data-table-faceted-filter"
 import { CreateNewProject } from "./create-project"
 
