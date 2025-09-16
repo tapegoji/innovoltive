@@ -221,12 +221,12 @@ export async function shareProject(projectId: string, formData: FormData) {
     const role = formData.get('role') as 'viewer' | 'owner'
     
     if (!email) {
-      return { success: false, error: 'Email is required' }
+      throw new Error('Email is required')
     }
 
     // Validate email format
     if (!email.includes('@')) {
-      return { success: false, error: 'Valid email is required' }
+      throw new Error('Valid email is required')
     }
 
     // Find user by email using Clerk
@@ -238,16 +238,14 @@ export async function shareProject(projectId: string, formData: FormData) {
     }
     // If user doesn't exist, we silently do nothing to prevent email enumeration
     
-    // Always return success message regardless of whether user exists
-    // This prevents email enumeration attacks
-    const isPublicEmail = email === 'info@innovoltive.com'
-    const message = isPublicEmail 
-      ? 'Project made public successfully. It will now appear in the demo projects section.'
-      : `Project sharing request sent. If a user with this email exists, they now have access to the project.`
-    
-    return { success: true, message }
   } catch (error) {
     console.error('Failed to share project:', error)
-    return { success: false, error: 'Failed to share project' }
+    throw new Error('Failed to share project')
   }
+
+  // Revalidate the projects page to show updated sharing status
+  revalidatePath('/my-projects')
+  
+  // Redirect to the projects page
+  redirect('/my-projects')
 }

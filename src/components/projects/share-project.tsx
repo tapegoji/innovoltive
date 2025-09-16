@@ -22,7 +22,6 @@ import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Globe, Mail } from "lucide-react"
 import { useState } from "react"
-import { toast } from "sonner"
 import { shareProject } from "@/lib/actions"
 import { Project } from "@/lib/definitions"
 
@@ -34,53 +33,13 @@ interface ShareProjectProps {
 
 export function ShareProject({ project, open, onOpenChange }: ShareProjectProps) {
   const [shareMode, setShareMode] = useState<'email' | 'public'>('email')
-  const [email, setEmail] = useState('')
-  const [role, setRole] = useState<'viewer' | 'owner'>('viewer')
-  const [isSharing, setIsSharing] = useState(false)
-
-  const handleSubmit = async (formData: FormData) => {
-    if (shareMode === 'email') {
-      if (!email || !email.includes('@')) {
-        toast.error('Please enter a valid email address')
-        return
-      }
-      formData.set('email', email)
-      formData.set('role', role)
-    } else {
-      // For public sharing, use the dedicated public demo account
-      formData.set('email', 'info@innovoltive.com')
-      formData.set('role', 'viewer')
-    }
-
-    setIsSharing(true)
-    try {
-      const result = await shareProject(project.id, formData)
-      
-      if (result.success) {
-        const message = shareMode === 'public' 
-          ? 'Project made public successfully' 
-          : result.message || 'Project shared successfully'
-        toast.success(message)
-        setEmail('')
-        setRole('viewer')
-        onOpenChange(false)
-      } else {
-        toast.error(result.error || 'Failed to share project')
-      }
-    } catch (error) {
-      console.error('Error sharing project:', error)
-      toast.error('An error occurred while sharing the project')
-    } finally {
-      setIsSharing(false)
-    }
-  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
-        <form action={handleSubmit}>
+        <form action={shareProject.bind(null, project.id)}>
           <DialogHeader>
-            <DialogTitle>Share "{project.name}"</DialogTitle>
+            <DialogTitle>Share project</DialogTitle>
             <DialogDescription>
               Share this project with specific users or make it publicly accessible.
             </DialogDescription>
@@ -107,10 +66,7 @@ export function ShareProject({ project, open, onOpenChange }: ShareProjectProps)
                     name="email"
                     type="email"
                     placeholder="user@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
                     required={shareMode === 'email'}
-                    disabled={isSharing}
                   />
                   <p className="text-xs text-muted-foreground">
                     The user must have an account on the platform.
@@ -132,15 +88,19 @@ export function ShareProject({ project, open, onOpenChange }: ShareProjectProps)
               </TabsContent>
             </Tabs>
             
-            {/* Only show role selection for email sharing */}
+            {/* Hidden inputs for public sharing */}
+            {shareMode === 'public' && (
+              <>
+                <input type="hidden" name="email" value="info@innovoltive.com" />
+                <input type="hidden" name="role" value="viewer" />
+              </>
+            )}
+            
+            {/* Role selection - only show for email sharing */}
             {shareMode === 'email' && (
               <div className="grid gap-2">
                 <Label htmlFor="role">Access Level</Label>
-                <Select 
-                  value={role} 
-                  onValueChange={(value: 'viewer' | 'owner') => setRole(value)}
-                  disabled={isSharing}
-                >
+                <Select name="role" defaultValue="viewer">
                   <SelectTrigger>
                     <SelectValue placeholder="Select access level" />
                   </SelectTrigger>
@@ -165,15 +125,12 @@ export function ShareProject({ project, open, onOpenChange }: ShareProjectProps)
           
           <DialogFooter>
             <DialogClose asChild>
-              <Button type="button" variant="outline" disabled={isSharing}>
+              <Button type="button" variant="outline">
                 Cancel
               </Button>
             </DialogClose>
-            <Button 
-              type="submit" 
-              disabled={isSharing || (shareMode === 'email' && !email.trim())}
-            >
-              {isSharing ? 'Sharing...' : shareMode === 'public' ? 'Make Public' : 'Share Project'}
+            <Button type="submit">
+              {shareMode === 'public' ? 'Make Public' : 'Share Project'}
             </Button>
           </DialogFooter>
         </form>
