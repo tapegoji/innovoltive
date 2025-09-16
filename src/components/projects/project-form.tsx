@@ -101,7 +101,7 @@ export function ProjectForm({ mode, open, onOpenChange, project, action }: Proje
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="w-full sm:max-w-[425px] md:w-full">
         <form action={action}>
           <input type="hidden" name="clientTime" value={clientTime} />
           <DialogHeader>
@@ -169,7 +169,7 @@ export function ProjectForm({ mode, open, onOpenChange, project, action }: Proje
               />
             </div>
           </div>
-          <DialogFooter>
+          <DialogFooter className="mt-4">
             <DialogClose asChild>
               <Button type="button" variant="outline">Cancel</Button>
             </DialogClose>
