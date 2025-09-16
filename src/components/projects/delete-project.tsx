@@ -50,7 +50,7 @@ export function DeleteProject({ project, selectedProjectIds, open, onOpenChange 
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent className="w-[80%] sm:max-w-[425px]">
+      <AlertDialogContent className="w-[80vw] sm:max-w-[425px]">
         <form action={deleteProjects}>
           {projectIds.map((id) => (
             <input key={id} type="hidden" name="projectId" value={id} />

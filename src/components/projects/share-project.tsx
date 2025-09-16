@@ -47,7 +47,7 @@ export function ShareProject({ project, open, onOpenChange }: ShareProjectProps)
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[80%] sm:max-w-[425px]">
+      <DialogContent className="w-[80vw] sm:max-w-[425px]">
         <form action={shareProject.bind(null, project.id)}>
           <DialogHeader>
             <DialogTitle>Share project</DialogTitle>
