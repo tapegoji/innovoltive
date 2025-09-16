@@ -18,6 +18,7 @@ import { ShareProject } from "./share-project"
 import { DeleteProject } from "./delete-project"
 import { Project } from "@/lib/definitions"
 import { duplicateProject } from "@/lib/actions"
+import { usePathname } from "next/navigation"
 
 
 interface DataTableRowActionsProps<TData> {
@@ -32,6 +33,8 @@ export function DataTableRowActions<TData>({
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [isDuplicating, setIsDuplicating] = useState(false)
   const project = row.original as Project
+  const pathname = usePathname()
+  const isPublic = pathname === '/public-projects'
 
   const handleDuplicate = async () => {
     setIsDuplicating(true)
@@ -67,25 +70,33 @@ export function DataTableRowActions<TData>({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-[160px]">
-          <DropdownMenuItem onClick={() => setShowEditDialog(true)}>
-            Edit
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setShowShareDialog(true)}>
-            Share
-          </DropdownMenuItem>
-          <DropdownMenuItem 
-            onClick={handleDuplicate}
-            disabled={isDuplicating}
-          >
-            {isDuplicating ? 'Copying...' : 'Make a copy'}
-          </DropdownMenuItem>
-          <DropdownMenuItem 
-            variant="destructive"
-            onClick={() => setShowDeleteDialog(true)}
-          >
-            Delete
-            <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
-          </DropdownMenuItem>
+          {!isPublic && (
+            <DropdownMenuItem onClick={() => setShowEditDialog(true)}>
+              Edit
+            </DropdownMenuItem>
+          )}
+          {!isPublic && (
+            <DropdownMenuItem onClick={() => setShowShareDialog(true)}>
+              Share
+            </DropdownMenuItem>
+          )}
+          {isPublic && (
+            <DropdownMenuItem 
+              onClick={handleDuplicate}
+              disabled={isDuplicating}
+            >
+              {isDuplicating ? 'Copying...' : 'Make a copy'}
+            </DropdownMenuItem>
+          )}
+          {!isPublic && (
+            <DropdownMenuItem 
+              variant="destructive"
+              onClick={() => setShowDeleteDialog(true)}
+            >
+              Delete
+              <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
+            </DropdownMenuItem>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
 

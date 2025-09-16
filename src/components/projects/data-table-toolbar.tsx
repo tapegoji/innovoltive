@@ -10,6 +10,7 @@ import { DataTableViewOptions } from "./data-table-view-options"
 import { types, statuses } from "@/lib/definitions"
 import { DataTableFacetedFilter } from "./data-table-faceted-filter"
 import { CreateNewProject } from "./create-project"
+import { usePathname } from "next/navigation"
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>
@@ -19,12 +20,16 @@ export function DataTableToolbar<TData>({
   table,
 }: DataTableToolbarProps<TData>) {
   const isFiltered = table.getState().columnFilters.length > 0
+  const pathname = usePathname()
+  const isPublic = pathname === '/public-projects'
 
   return (
     <div className="flex items-center justify-between gap-4 py-2">
-      <div className="flex items-center space-x-2 gap-2">
-        <CreateNewProject />
-      </div>
+      {!isPublic && (
+        <div className="flex items-center space-x-2 gap-2">
+          <CreateNewProject />
+        </div>
+      )}
       <div className="flex flex-1 items-center gap-2">
         <Input
           placeholder="Filter by name..."
