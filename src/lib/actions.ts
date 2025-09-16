@@ -27,7 +27,6 @@ async function getAuthenticatedUser() {
   if (userEmail) {
     const salt = process.env.PATH_HASH_SALT || 'default_salt'
     const rootPath = crypto.createHash('sha256').update(userEmail + salt).digest('hex')
-    const now = new Date().toISOString()
     
     try {
       // Check if user exists
@@ -35,10 +34,7 @@ async function getAuthenticatedUser() {
       
       if (existingUser.length === 0) {
         // Insert new user
-        await sql`INSERT INTO users (user_id, root_path, last_signedin) VALUES (${user.id}, ${rootPath}, ${now})`
-      } else {
-        // Only update last_signedin for existing users
-        await sql`UPDATE users SET last_signedin = ${now} WHERE user_id = ${user.id}`
+        await sql`INSERT INTO users (user_id, root_path) VALUES (${user.id}, ${rootPath})`
       }
     } catch (error) {
       console.error('Error ensuring user in database:', error)
