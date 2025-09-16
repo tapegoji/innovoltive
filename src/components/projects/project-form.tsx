@@ -101,7 +101,7 @@ export function ProjectForm({ mode, open, onOpenChange, project, action }: Proje
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[80vw] sm:max-w-[425px]">
+      <DialogContent className="w-full sm:max-w-[425px]">
         <form action={action}>
           <input type="hidden" name="clientTime" value={clientTime} />
           <DialogHeader>
