@@ -31,7 +31,7 @@ export function DataTableToolbar<TData>({
 
   return (
     <>
-      <div className="flex items-center justify-between gap-4 py-2">
+      <div className="flex items-center gap-4 py-2">
         {!isPublic && (
           <div className="flex items-center space-x-2 gap-2">
             <CreateNewProject />
@@ -49,7 +49,7 @@ export function DataTableToolbar<TData>({
             )}
           </div>
         )}
-        <div className="flex flex-1 items-center gap-2">
+        <div className="flex items-center gap-2">
           <Input
             placeholder="Filter by name..."
             value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
@@ -72,6 +72,7 @@ export function DataTableToolbar<TData>({
               options={statuses}
             />
           )}
+          <DataTableViewOptions table={table} />
           {isFiltered && (
             <Button
               variant="ghost"
@@ -82,9 +83,6 @@ export function DataTableToolbar<TData>({
               <X />
             </Button>
           )}
-        </div>
-        <div className="flex items-center gap-2">
-          <DataTableViewOptions table={table} />
         </div>
       </div>
 
