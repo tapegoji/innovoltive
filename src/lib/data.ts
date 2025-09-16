@@ -1,30 +1,11 @@
 import postgres from 'postgres'
 import { currentUser } from '@clerk/nextjs/server'
+import { ProjectData, DatabaseError } from './definitions'
 
 // Create a single SQL connection instance following Next.js best practices
 const sql = postgres(process.env.DATABASE_URL!, {
   ssl: 'require',
 })
-
-export interface ProjectData {
-  id: string
-  name: string
-  type: string // Support comma-separated combinations like "EM,HT" or "CFD" or "EM,HT,CFD"
-  status: "active" | "paused" | "archived"
-  size: string
-  date_modified: string
-  user_id: string
-  user_name: string
-  description: string
-}
-
-// Custom error class for database operations
-export class DatabaseError extends Error {
-  constructor(message: string, public cause?: Error) {
-    super(message)
-    this.name = 'DatabaseError'
-  }
-}
 // Fetch user projects with JOIN
 export async function fetchUserProjects(): Promise<ProjectData[]> {
   const user = await currentUser()

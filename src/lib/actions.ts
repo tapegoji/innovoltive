@@ -3,7 +3,7 @@
 import { z } from 'zod'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { CreateNewProject, UpdateProject, DeleteProjects, DuplicateProject, ShareProject } from './data_db'
+import { CreateNewProject, UpdateProject, DeleteProjects, DuplicateProject, ShareProject } from './data'
 
 // Schema for validating the create project form data
 const CreateProjectSchema = z.object({
