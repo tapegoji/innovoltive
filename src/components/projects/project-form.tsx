@@ -154,6 +154,7 @@ export function ProjectForm({ mode, open, onOpenChange, project, action }: Proje
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="active">Active</SelectItem>
+                    <SelectItem value="running">Running</SelectItem>
                     <SelectItem value="paused">Paused</SelectItem>
                     <SelectItem value="archived">Archived</SelectItem>
                   </SelectContent>

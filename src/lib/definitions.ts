@@ -6,7 +6,7 @@ export interface ProjectData {
   id: string
   name: string
   type: string // Support comma-separated combinations like "EM,HT" or "CFD" or "EM,HT,CFD"
-  status: "active" | "paused" | "archived"
+  status: "active" | "paused" | "archived" | "running"
   size: string
   date_modified: string
   user_id: string
@@ -35,7 +35,7 @@ export const UpdateProjectSchema = z.object({
   name: z.string().min(1, 'Project name is required'),
   type: z.string().min(1, 'At least one type must be selected'),
   description: z.string().optional(),
-  status: z.enum(['active', 'paused', 'archived']),
+  status: z.enum(['active', 'paused', 'archived', 'running']),
 })
 
 // Schema matching the ProjectData interface from the backend
@@ -58,6 +58,11 @@ export const statuses = [
     value: "active",
     label: "Active",
     badge: React.createElement(Badge, { variant: "outline", className: "text-green-600 border-green-200" }, "Active")
+  },
+  {
+    value: "running",
+    label: "Running",
+    icon: Timer,
   },
   {
     value: "archived",
