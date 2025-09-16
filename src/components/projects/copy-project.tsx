@@ -22,16 +22,16 @@ import {
 } from "@/components/ui/select"
 import { types } from "@/lib/definitions"
 import { useState, useEffect } from "react"
-import { editProject } from "@/lib/actions"
+import { copyProject } from "@/lib/actions"
 import { Project } from "@/lib/definitions"
 
-interface EditProjectProps {
+interface CopyProjectProps {
   project: Project
   open: boolean
   onOpenChange: (open: boolean) => void
 }
 
-export function EditProject({ project, open, onOpenChange }: EditProjectProps) {
+export function CopyProject({ project, open, onOpenChange }: CopyProjectProps) {
   const [selectedTypes, setSelectedTypes] = useState<string[]>([])
 
   // Initialize selected types when project changes
@@ -48,12 +48,12 @@ export function EditProject({ project, open, onOpenChange }: EditProjectProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
-        <form action={editProject.bind(null, project.id)}>
+        <form action={copyProject.bind(null, project.id)}>
           <input type="hidden" name="clientTime" value={clientTime} />
           <DialogHeader>
-            <DialogTitle>Update project</DialogTitle>
+            <DialogTitle>Copy project</DialogTitle>
             <DialogDescription>
-              Update your project details here. Click save when you&apos;re done.
+              Copy your project details here. Click copy when you&apos;re done.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4">
@@ -63,7 +63,7 @@ export function EditProject({ project, open, onOpenChange }: EditProjectProps) {
                 id="name" 
                 name="name" 
                 placeholder="Project name" 
-                defaultValue={project.name}
+                defaultValue={`${project.name} (Copy)`}
                 required 
               />
             </div>
@@ -117,7 +117,7 @@ export function EditProject({ project, open, onOpenChange }: EditProjectProps) {
             <DialogClose asChild>
               <Button type="button" variant="outline">Cancel</Button>
             </DialogClose>
-            <Button type="submit">Save</Button>
+            <Button type="submit">Copy Project</Button>
           </DialogFooter>
         </form>
       </DialogContent>

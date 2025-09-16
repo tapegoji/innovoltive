@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { currentUser, clerkClient } from '@clerk/nextjs/server'
-import { CreateNewProject, UpdateProject, DeleteProjects, DuplicateProject, ShareProject, fetchUserProjects as fetchUserProjectsData } from './data'
+import { CreateNewProject, EditProject, DeleteProjects, CopyProject, ShareProject, fetchUserProjects as fetchUserProjectsData } from './data'
 import { CreateProjectSchema, UpdateProjectSchema } from './definitions'
 
 // Helper function to get authenticated user
@@ -98,7 +98,7 @@ export async function createProject(formData: FormData) {
   redirect('/my-projects')
 }
 
-export async function updateProject(id: string, formData: FormData) {
+export async function editProject(id: string, formData: FormData) {
   // Extract and validate form data
   const types = formData.getAll('type') as string[]
   
@@ -127,10 +127,10 @@ export async function updateProject(id: string, formData: FormData) {
       date_modified: new Date().toISOString(),
     }
 
-    await UpdateProject(id, updateData, userId, userName)
+    await EditProject(id, updateData, userId, userName)
   } catch (error) {
-    console.error('Failed to update project:', error)
-    throw new Error('Failed to update project')
+    console.error('Failed to edit project:', error)
+    throw new Error('Failed to edit project')
   }
 
   // Revalidate the projects page to show the updated project
@@ -156,18 +156,45 @@ export async function deleteProjects(projectIds: string[]) {
   redirect('/my-projects')
 }
 
-export async function duplicateProject(projectId: string, allowPublicCopy: boolean = false) {
-  try {
-    const { userId, userName } = await getAuthenticatedUser()
-    await DuplicateProject(projectId, allowPublicCopy, userId, userName)
-  } catch (error) {
-    console.error('Failed to duplicate project:', error)
-    throw new Error('Failed to duplicate project')
+export async function copyProject(projectId: string, formData: FormData) {
+  // Extract and validate form data
+  const types = formData.getAll('type') as string[]
+  
+  const validatedFields = UpdateProjectSchema.safeParse({
+    name: formData.get('name'),
+    type: types.join(','), // Join array into comma-separated string
+    description: formData.get('description'),
+    status: formData.get('status'),
+  })
+
+  // If form validation fails, return early
+  if (!validatedFields.success) {
+    throw new Error('Invalid form data')
   }
 
-  // Revalidate the projects page to show the new duplicated project
+  const { name, type, description, status } = validatedFields.data
+
+  try {
+    const { userId, userName } = await getAuthenticatedUser()
+    
+    await CopyProject(
+      projectId,
+      name,
+      type,
+      description || '',
+      status,
+      false, // allowPublicCopy
+      userId,
+      userName
+    )
+  } catch (error) {
+    console.error('Failed to copy project:', error)
+    throw new Error('Failed to copy project')
+  }
+
+  // Revalidate the projects page to show the new copied project
   revalidatePath('/my-projects')
-  
+
   // Redirect to the projects page
   redirect('/my-projects')
 }

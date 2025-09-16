@@ -3,7 +3,6 @@
 import { Row } from "@tanstack/react-table"
 import { MoreHorizontal } from "lucide-react"
 import { useState } from "react"
-import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -13,11 +12,13 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+
 import { EditProject } from "./edit-project"
+import { CopyProject } from "./copy-project"
 import { ShareProject } from "./share-project"
 import { DeleteProject } from "./delete-project"
+
 import { Project } from "@/lib/definitions"
-import { duplicateProject } from "@/lib/actions"
 import { usePathname } from "next/navigation"
 
 
@@ -29,32 +30,12 @@ export function DataTableRowActions<TData>({
   row,
 }: DataTableRowActionsProps<TData>) {
   const [showEditDialog, setShowEditDialog] = useState(false)
+  const [showCopyDialog, setShowCopyDialog] = useState(false)
   const [showShareDialog, setShowShareDialog] = useState(false)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
-  const [isDuplicating, setIsDuplicating] = useState(false)
   const project = row.original as Project
   const pathname = usePathname()
   const isPublic = pathname === '/public-projects'
-
-  const handleDuplicate = async () => {
-    setIsDuplicating(true)
-    try {
-      const result = await duplicateProject(project.id)
-      
-      if (result.success) {
-        toast.success('Project copied successfully')
-        // Refresh the page to show the new project
-        window.location.reload()
-      } else {
-        toast.error(result.error || 'Failed to copy project')
-      }
-    } catch (error) {
-      console.error('Error copying project:', error)
-      toast.error('An error occurred while copying the project')
-    } finally {
-      setIsDuplicating(false)
-    }
-  }
 
   return (
     <>
@@ -80,14 +61,9 @@ export function DataTableRowActions<TData>({
               Share
             </DropdownMenuItem>
           )}
-          {isPublic && (
-            <DropdownMenuItem 
-              onClick={handleDuplicate}
-              disabled={isDuplicating}
-            >
-              {isDuplicating ? 'Copying...' : 'Make a copy'}
-            </DropdownMenuItem>
-          )}
+          <DropdownMenuItem onClick={() => setShowCopyDialog(true)}>
+            Copy
+          </DropdownMenuItem>
           {!isPublic && (
             <DropdownMenuItem 
               variant="destructive"
@@ -104,6 +80,12 @@ export function DataTableRowActions<TData>({
         project={project}
         open={showEditDialog}
         onOpenChange={setShowEditDialog}
+      />
+
+      <CopyProject
+        project={project}
+        open={showCopyDialog}
+        onOpenChange={setShowCopyDialog}
       />
 
       <DeleteProject

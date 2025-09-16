@@ -85,8 +85,8 @@ export async function CreateNewProject(
   }
 }
 
-// Update an existing project
-export async function UpdateProject(
+// Edit an existing project
+export async function EditProject(
     projectId: string, 
     projectData: Partial<ProjectData>,
     userId: string,
@@ -145,8 +145,8 @@ export async function UpdateProject(
       user_name: userName
     }
   } catch (error) {
-    console.error('Database error updating project:', error)
-    throw new DatabaseError('Failed to update project', error as Error)
+    console.error('Database error editing project:', error)
+    throw new DatabaseError('Failed to edit project', error as Error)
   }
 }
 
@@ -187,9 +187,13 @@ export async function DeleteProjects(projectIds: string[], userId: string): Prom
   }
 }
 
-// Duplicate a project
-export async function DuplicateProject(
-  projectId: string, 
+// Copy a project 
+export async function CopyProject(
+  projectId: string,
+  newName: string,
+  newType: string,
+  newDescription: string,
+  newStatus: string,
   allowPublicCopy: boolean = false,
   userId: string,
   userName: string
@@ -208,7 +212,7 @@ export async function DuplicateProject(
         SELECT * FROM projects WHERE id = ${projectId}
       `
     } else {
-      // For regular duplicate, check ownership
+      // For regular copy, check ownership
       originalProject = await sql<ProjectData[]>`
         SELECT p.* FROM projects p
         JOIN user_projects up ON p.id = up.project_id
@@ -222,40 +226,37 @@ export async function DuplicateProject(
 
     const original = originalProject[0]
     
-    // Generate a new UUID for the duplicated project
+    // Generate a new UUID for the copied project
     const newProjectId = crypto.randomUUID()
     
-    // Create the duplicated project with a new name
-    const copyName = `${original.name} (Copy)`
-    
-    const [duplicatedProject] = await sql<ProjectData[]>`
+    const [copiedProject] = await sql<ProjectData[]>`
       INSERT INTO projects (id, name, type, description, size, user_id, status, date_modified)
       VALUES (
         ${newProjectId},
-        ${copyName},
-        ${original.type},
-        ${original.description},
+        ${newName},
+        ${newType},
+        ${newDescription},
         ${'0 MB'},
         ${userId},
-        ${'active'},
+        ${newStatus},
         ${new Date().toISOString()}
       )
       RETURNING id, name, type, description, date_modified, size, status, user_id
     `
 
-    // Link the duplicated project to the current user as owner
+    // Link the copied project to the current user as owner
     await sql`
       INSERT INTO user_projects (user_id, project_id, role)
-      VALUES (${userId}, ${duplicatedProject.id}, 'owner')
+      VALUES (${userId}, ${copiedProject.id}, 'owner')
     `
     
     return {
-      ...duplicatedProject,
+      ...copiedProject,
       user_name: userName
     }
   } catch (error) {
-    console.error('Database error duplicating project:', error)
-    throw new DatabaseError('Failed to duplicate project', error as Error)
+    console.error('Database error copying project:', error)
+    throw new DatabaseError('Failed to copy project', error as Error)
   }
 }
 
