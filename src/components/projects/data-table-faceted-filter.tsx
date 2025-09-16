@@ -33,6 +33,13 @@ interface DataTableFacetedFilterProps<TData, TValue> {
   }[]
 }
 
+type OptionType = {
+  label: string
+  value: string
+  badge?: React.ReactElement
+  badgeClass?: string
+}
+
 export function DataTableFacetedFilter<TData, TValue>({
   column,
   title,
@@ -41,7 +48,7 @@ export function DataTableFacetedFilter<TData, TValue>({
   const facets = column?.getFacetedUniqueValues()
   const selectedValues = new Set(column?.getFilterValue() as string[])
 
-  const getBadgeClass = (option: any) => {
+  const getBadgeClass = (option: OptionType) => {
     if (title === "Type") {
       return getTypeBadgeClass(option.value)
     } else if (title === "Status") {

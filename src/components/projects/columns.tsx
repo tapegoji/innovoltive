@@ -5,7 +5,7 @@ import { ColumnDef } from "@tanstack/react-table"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
 
-import { types, statuses, getTypeBadgeClass, getStatusBadgeClass } from "@/lib/definitions"
+import { statuses, getTypeBadgeClass, getStatusBadgeClass } from "@/lib/definitions"
 import { Project } from "@/lib/definitions"
 import { DataTableColumnHeader } from "./data-table-column-header"
 import { DataTableRowActions } from "./data-table-row-actions"

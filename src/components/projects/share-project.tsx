@@ -40,7 +40,6 @@ export function ShareProject({ project, selectedProjectIds, open, onOpenChange }
   const isBulkShare = selectedProjectIds && selectedProjectIds.length > 0
   const projectIds = isBulkShare ? selectedProjectIds : (project ? [project.id] : [])
   const projectCount = projectIds.length
-  const projectName = project?.name || `${projectCount} project${projectCount > 1 ? 's' : ''}`
 
   function SubmitButton() {
     const { pending } = useFormStatus()
