@@ -1,6 +1,6 @@
 import postgres from 'postgres'
 import { ProjectData, DatabaseError } from './definitions'
-import { hashPath, storePathMapping } from './path-utils'
+import { hashPath, storePathMapping, getRealPath, removePathMapping } from './path-utils'
 import { promises as fs } from 'fs'
 import path from 'path'
 
@@ -32,6 +32,23 @@ async function createProjectFolder(userId: string): Promise<{ projectId: string,
   await storePathMapping(hashedPath, projectFolder)
 
   return { projectId, hashedPath, projectFolder }
+}
+
+// Helper function to recursively copy a directory
+async function copyDirectory(src: string, dest: string): Promise<void> {
+  const entries = await fs.readdir(src, { withFileTypes: true })
+
+  for (const entry of entries) {
+    const srcPath = path.join(src, entry.name)
+    const destPath = path.join(dest, entry.name)
+
+    if (entry.isDirectory()) {
+      await fs.mkdir(destPath, { recursive: true })
+      await copyDirectory(srcPath, destPath)
+    } else {
+      await fs.copyFile(srcPath, destPath)
+    }
+  }
 }
 
 // Fetch user projects with JOIN
@@ -187,6 +204,31 @@ export async function DeleteProjects(projectIds: string[], userId: string): Prom
       throw new DatabaseError('Some projects not found or access denied')
     }
 
+    // Get project storage paths before deleting
+    const projects = await sql`
+      SELECT id, storage_path_id FROM projects
+      WHERE id = ANY(${projectIds})
+    `
+
+    // Clean up file system and path mappings
+    for (const project of projects) {
+      if (project.storage_path_id) {
+        try {
+          // Get the real path from mapping
+          const realPath = await getRealPath(project.storage_path_id)
+          if (realPath) {
+            // Delete the project folder
+            await fs.rm(realPath, { recursive: true, force: true })
+            // Remove the path mapping
+            await removePathMapping(project.storage_path_id)
+          }
+        } catch (cleanupError) {
+          console.error(`Error cleaning up project ${project.id}:`, cleanupError)
+          // Continue with other projects even if one fails
+        }
+      }
+    }
+
     // Delete user-project associations and projects
     await sql`DELETE FROM user_projects WHERE user_id = ${userId} AND project_id = ANY(${projectIds})`
     await sql`DELETE FROM projects WHERE id = ANY(${projectIds})`
@@ -226,7 +268,21 @@ export async function CopyProject(
       throw new DatabaseError('Project not found or access denied')
     }
 
-    const { projectId: newProjectId, hashedPath } = await createProjectFolder(userId)
+    const { projectId: newProjectId, hashedPath, projectFolder } = await createProjectFolder(userId)
+
+    // Copy files from original project if it exists
+    if (originalProject[0].storage_path_id) {
+      try {
+        const originalPath = await getRealPath(originalProject[0].storage_path_id)
+        if (originalPath && await fs.stat(originalPath).catch(() => null)) {
+          // Copy all files from original project to new project
+          await copyDirectory(originalPath, projectFolder)
+        }
+      } catch (copyError) {
+        console.error('Error copying project files:', copyError)
+        // Continue with project creation even if file copy fails
+      }
+    }
 
     const [copiedProject] = await sql<ProjectData[]>`
       INSERT INTO projects (id, name, type, description, size, user_id, status, date_modified, storage_path_id)
