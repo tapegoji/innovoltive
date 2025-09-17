@@ -1,7 +1,7 @@
 "use client"
 
 import { Table } from "@tanstack/react-table"
-import { X, Trash2, Search, Share2 } from "lucide-react"
+import { X, Trash2, Search, Share2, Edit, Copy } from "lucide-react"
 import { useState } from "react"
 
 import { Button } from "@/components/ui/button"
@@ -13,6 +13,8 @@ import { DataTableFacetedFilter } from "./data-table-faceted-filter"
 import { CreateNewProject } from "./create-project"
 import { DeleteProject } from "./delete-project"
 import { ShareProject } from "./share-project"
+import { EditProject } from "./edit-project"
+import { CopyProject } from "./copy-project"
 import { usePathname } from "next/navigation"
 import { ProjectData } from "@/lib/definitions"
 
@@ -28,6 +30,8 @@ export function DataTableToolbar<TData>({
   const isPublic = pathname === '/public-projects'
   const [showBulkDeleteDialog, setShowBulkDeleteDialog] = useState(false)
   const [showBulkShareDialog, setShowBulkShareDialog] = useState(false)
+  const [showEditDialog, setShowEditDialog] = useState(false)
+  const [showCopyDialog, setShowCopyDialog] = useState(false)
   const [showSearchInput, setShowSearchInput] = useState(false)
 
   const selectedRows = table.getFilteredSelectedRowModel().rows
@@ -47,11 +51,35 @@ export function DataTableToolbar<TData>({
               >
                 <Trash2 className="h-4 w-4" />
                 <span className="hidden lg:inline ml-2">
-                  Delete Selected ({selectedRows.length})
+                  Delete ({selectedRows.length})
                 </span>
               </Button>
             )}
-            {selectedRows.length > 0 && (
+            {selectedRows.length === 1 && (
+              <Button
+                variant="default"
+                size="sm"
+                onClick={() => setShowEditDialog(true)}
+              >
+                <Edit className="h-4 w-4" />
+                <span className="hidden lg:inline ml-2">
+                  Edit
+                </span>
+              </Button>
+            )}
+            {selectedRows.length === 1 && (
+              <Button
+                variant="default"
+                size="sm"
+                onClick={() => setShowCopyDialog(true)}
+              >
+                <Copy className="h-4 w-4" />
+                <span className="hidden lg:inline ml-2">
+                  Copy
+                </span>
+              </Button>
+            )}
+            {selectedRows.length === 1 && (
               <Button
                 variant="default"
                 size="sm"
@@ -59,7 +87,7 @@ export function DataTableToolbar<TData>({
               >
                 <Share2 className="h-4 w-4" />
                 <span className="hidden lg:inline ml-2">
-                  Share Selected ({selectedRows.length})
+                  Share
                 </span>
               </Button>
             )}
@@ -123,11 +151,29 @@ export function DataTableToolbar<TData>({
         onOpenChange={setShowBulkDeleteDialog}
       />
 
-      <ShareProject
-        selectedProjectIds={selectedProjectIds}
-        open={showBulkShareDialog}
-        onOpenChange={setShowBulkShareDialog}
-      />
+      {selectedRows.length === 1 && (
+        <ShareProject
+          project={selectedRows[0].original as ProjectData}
+          open={showBulkShareDialog}
+          onOpenChange={setShowBulkShareDialog}
+        />
+      )}
+
+      {selectedRows.length === 1 && (
+        <EditProject
+          project={selectedRows[0].original as ProjectData}
+          open={showEditDialog}
+          onOpenChange={setShowEditDialog}
+        />
+      )}
+
+      {selectedRows.length === 1 && (
+        <CopyProject
+          project={selectedRows[0].original as ProjectData}
+          open={showCopyDialog}
+          onOpenChange={setShowCopyDialog}
+        />
+      )}
     </>
   )
 }

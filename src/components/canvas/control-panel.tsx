@@ -101,10 +101,10 @@ export function ControlPanel({ projectName, projectHash }: ControlPanelProps) {
     return (
       <button
         onClick={() => setIsVisible(true)}
-        className="fixed top-9 left-1 z-[100] w-8 h-8 bg-sidebar text-sidebar-foreground rounded shadow-lg hover:bg-sidebar-accent transition-colors flex items-center justify-center border border-sidebar-border"
+        className="fixed top-9 left-1 z-[100] w-10 h-10 bg-sidebar text-sidebar-foreground rounded-full shadow-lg  flex items-center justify-center border border-sidebar-border"
         title="Open Control Panel"
       >
-        <IconMenu2 size={20} />
+        <IconMenu2 size={25} />
       </button>
     );
   }
@@ -114,12 +114,12 @@ export function ControlPanel({ projectName, projectHash }: ControlPanelProps) {
       default={{
         x: 4,
         y: 4,
-        width: isMobile ? 160 : 250,
-        height: isMobile ? 250 : 400
+        width: isMobile ? 250 : 350,
+        height: isMobile ? 250 : 600
       }}
       minWidth={160}
-      minHeight={120}
-      maxHeight={400}
+      minHeight={160}
+      maxHeight= {isMobile ? 400 : 800}
       bounds="parent"
       className="z-[100]"
       dragHandleClassName="drag-handle"
