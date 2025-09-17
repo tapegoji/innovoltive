@@ -47,15 +47,10 @@ export function ControlPanel({ projectData }: ControlPanelProps) {
 
   const { getRootProps, getInputProps, isDragActive, isDragReject } = useDropzone({
     onDrop,
-    accept: {
-      'model/obj': ['.obj'],
-      'model/stl': ['.stl'],
-      'model/gltf-binary': ['.glb'],
-      'model/gltf+json': ['.gltf'],
-      'model/ply': ['.ply'],
-      'model/step': ['.step', '.stp'],
-      'model/pcb': ['.pcb', '.brd', '.sch'],
+    accept: simType === 'PCB' ? {
       'application/octet-stream': ['.kicad_pcb']
+    } : {
+      'model/step': ['.step', '.stp']
     },
     multiple: true,
     maxSize: 50 * 1024 * 1024, // 50MB
@@ -191,7 +186,7 @@ export function ControlPanel({ projectData }: ControlPanelProps) {
                           Import Geometry Files
                         </DialogTitle>
                         <DialogDescription>
-                          Drag and drop geometry files here, or click to browse. Supports OBJ, STL, GLTF, GLB, PLY, STEP, STP, and KiCad PCB formats.
+                          Drag and drop {simType === 'PCB' ? 'KiCad PCB' : 'geometry'} files here, or click to browse. Supports {simType === 'PCB' ? 'KiCad PCB' : 'STEP and STP'} formats.
                         </DialogDescription>
                       </DialogHeader>
                       
@@ -217,7 +212,7 @@ export function ControlPanel({ projectData }: ControlPanelProps) {
                             </p>
                           )}
                           <p className="text-xs text-muted-foreground mt-1">
-                            Supports: OBJ, STL, GLTF, GLB, PLY, STEP, STP, KiCad PCB (max 50MB each)
+                            Supports: {simType === 'PCB' ? 'KiCad PCB' : 'STEP, STP'} (max 50MB each)
                           </p>
                         </div>
 
