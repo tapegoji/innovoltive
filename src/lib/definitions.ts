@@ -13,6 +13,7 @@ export interface ProjectData {
   user_name: string
   description: string
   storage_path_id?: string
+  shared?: boolean
 }
 
 // Custom error class for database operations
@@ -59,6 +60,7 @@ export const projectSchema = z.object({
   user_name: z.string(),
   description: z.string(),
   storage_path_id: z.string().optional(),
+  shared: z.boolean().optional(),
 })
 
 export type Project = z.infer<typeof projectSchema>

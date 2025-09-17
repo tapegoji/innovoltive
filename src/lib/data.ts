@@ -120,7 +120,8 @@ export async function fetchUserProjects(userId: string, userName: string): Promi
         projects.size,
         projects.status,
         projects.user_id,
-        projects.storage_path_id
+        projects.storage_path_id,
+        CASE WHEN (SELECT COUNT(*) FROM user_projects up WHERE up.project_id = projects.id) > 1 THEN true ELSE false END as shared
       FROM projects
       JOIN user_projects ON projects.id = user_projects.project_id
       WHERE user_projects.user_id = ${userId}

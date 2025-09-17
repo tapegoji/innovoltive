@@ -9,6 +9,7 @@ import { statuses, getTypeBadgeClass, getStatusBadgeClass } from "@/lib/definiti
 import { Project } from "@/lib/definitions"
 import { DataTableColumnHeader } from "./data-table-column-header"
 import { DataTableRowActions } from "./data-table-row-actions"
+import { Share2 } from "lucide-react"
 
 export const columns: ColumnDef<Project>[] = [
   {
@@ -40,7 +41,17 @@ export const columns: ColumnDef<Project>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Name" />
     ),
-    cell: ({ row }) => <div className="min-w-[80px] max-w-[200px] whitespace-normal break-words">{row.getValue("name")}</div>,
+    cell: ({ row }) => {
+      const name = row.getValue("name") as string
+      const isShared = row.original.shared
+      
+      return (
+        <div className="min-w-[80px] max-w-[200px] whitespace-normal break-words flex items-center gap-2">
+          {isShared && <Share2 className="h-4 w-4 text-blue-500 flex-shrink-0" />}
+          <span>{name}</span>
+        </div>
+      )
+    },
     enableSorting: true,
     enableHiding: false,
   },
