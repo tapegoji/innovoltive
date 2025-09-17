@@ -17,12 +17,16 @@ import { Upload, File, X } from 'lucide-react';
 import { uploadGeometryFiles } from '@/lib/actions';
 
 interface ControlPanelProps {
-  projectName?: string
-  projectHash?: string
+    projectData: {
+        projectName?: string
+        projectHash?: string
+        simType?: string
+    }
 }
 
-export function ControlPanel({ projectName, projectHash }: ControlPanelProps) {
+export function ControlPanel({ projectData }: ControlPanelProps) {
   const isMobile = useIsMobile();
+  const { projectName, projectHash, simType } = projectData;
   
   // Separate states for mobile and desktop
   const [isVisibleMobile, setIsVisibleMobile] = useState(false)
@@ -174,7 +178,7 @@ export function ControlPanel({ projectName, projectHash }: ControlPanelProps) {
                     <DialogTrigger asChild>
                       <button className="text-left hover:text-sidebar-foreground cursor-pointer flex items-center gap-1">
                         <Upload className="h-3 w-3" />
-                        Import geometry
+                        Import {simType === 'PCB' ? 'PCB Files' : 'CAD'}
                       </button>
                     </DialogTrigger>
                     <DialogContent className="sm:max-w-[500px]">

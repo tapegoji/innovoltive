@@ -16,10 +16,8 @@ export default async function CanvasPage() {
   
   // Use the actual project name from the database, not extracted from path
   return (
-    <Canvas 
-      projectName={projectData.projectName}
-      projectHash={projectData.storagePathId}
-      simType={projectData.simtype}
-    />
+      <Canvas 
+        projectData={projectData}
+      />
   )
 }

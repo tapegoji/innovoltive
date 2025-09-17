@@ -1,26 +1,32 @@
 'use client'
 
 import { ControlPanel } from '@/components/canvas/control-panel'
-import Three from './three'
+import ThreeCanvas from './three-canvas'
+import { Header } from '@/components/Header'
+import CanvasHeaderIcons from '@/components/canvas/canvas-header-icons'
+import KiCanvas from './ki-canvas'
 
 interface CanvasProps {
-  projectName?: string
-  projectHash?: string
-  simType?: string
+  projectData: {
+    projectName?: string
+    projectHash?: string
+    simType?: string
+  }
 }
 
-export default function Canvas({ projectName, projectHash, simType }: CanvasProps) {
-  const showControlsAndCanvas = simType === 'CFD' || simType === 'FEA'
-  console.log('SimType:', simType)
+export default function Canvas({ projectData }: CanvasProps) {
+  const showThree = projectData.simType === 'CFD' || projectData.simType === 'FEA'
+  const showPCB = projectData.simType === 'PCB'
+  console.log('simType:', projectData.simType)
 
   return (
     <div className="w-full h-[calc(100vh-2rem-1px)]">
-      {showControlsAndCanvas && (
-        <>
-          <ControlPanel projectName={projectName} projectHash={projectHash} />
-          <Three />
-        </>
-      )}
+      <Header compact className='border-b'>
+        {showThree && <CanvasHeaderIcons />}
+      </Header>
+      <ControlPanel projectData={projectData} />
+      {showThree && <ThreeCanvas />}
+      {showPCB && <KiCanvas />}
     </div>
   )
 }

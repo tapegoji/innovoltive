@@ -1,6 +1,6 @@
 'use client'
 
-import { Canvas as HTreeCanvas } from '@react-three/fiber'
+import { Canvas } from '@react-three/fiber'
 import { Edges, GizmoHelper, GizmoViewport, OrbitControls } from '@react-three/drei'
 import { useIsMobile } from '@/hooks/use-mobile'
 
@@ -14,14 +14,14 @@ function Box() {
   )
 }
 
-export default function Three() {
+export default function ThreeCanvas() {
   const isMobile = useIsMobile()
   const zoom = isMobile ? 50 : 75
   const gizmoScale: [number, number, number] = isMobile ? [30, 30, 30] : [40, 40, 40]
   const gizmoMargin: [number, number] = isMobile ? [40, 60] : [60, 80]
 
   return (
-    <HTreeCanvas
+    <Canvas
       orthographic
       camera={{ position: [10, 10, 10], zoom }}
     >
@@ -32,6 +32,6 @@ export default function Three() {
         <GizmoViewport axisColors={['red', 'green', 'blue']} labelColor="white" scale={gizmoScale} />
       </GizmoHelper>
       <OrbitControls enableDamping={false} makeDefault />
-    </HTreeCanvas>
+    </Canvas>
   )
 }
