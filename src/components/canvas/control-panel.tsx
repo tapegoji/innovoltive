@@ -8,7 +8,12 @@ import { IconMenu2, IconX } from '@tabler/icons-react';
 import { useState } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 
-export function ControlPanel() {
+interface ControlPanelProps {
+  projectHash?: string
+  projectName?: string
+}
+
+export function ControlPanel({projectName }: ControlPanelProps) {
   const isMobile = useIsMobile();
   
   // Separate states for mobile and desktop (like sidebar pattern)
@@ -49,8 +54,8 @@ export function ControlPanel() {
       dragHandleClassName="drag-handle"
     >
       <div className="h-full flex flex-col bg-sidebar border rounded-lg overflow-hidden">
-        <Card className="flex-1 p-1 mb-0 border-0 shadow-none bg-sidebar">
-          <CardHeader className="p-1 max-h-8 border-b border-sidebar-border">
+        <div className="flex-1">
+          <div className="p-1 border-b border-sidebar-border">
             <div className="flex text-sm justify-between items-center text-sidebar-foreground">
                 <div className="flex-1">
                 {isMobile ? 'CP' : 'Control Panel'}
@@ -66,15 +71,18 @@ export function ControlPanel() {
                 />
               </div>
             </div>
-          </CardHeader>
-          <CardContent className="p-1 h-full">
-            <div className="space-y-2 pt-0 text-sm text-sidebar-foreground">
-              <div>Geometry</div>
-              <div>Mesh</div>
-              <div>Simulation</div>
-            </div>
-          </CardContent>
-        </Card>
+          </div>
+          <div className="space-y-2 text-sm text-sidebar-foreground p-1">
+            {projectName && (
+              <div className="text-xs font-bold text-sidebar-foreground/80 break-all">
+                Project: {projectName}
+              </div>
+            )}
+            <div>Geometry</div>
+            <div>Mesh</div>
+            <div>Simulation</div>
+          </div>
+        </div>
         <div className="px-2 py-1 border-t border-sidebar-border bg-sidebar-accent/50">
           <Link
             href="/dashboard"

@@ -1,6 +1,7 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
+import { selectProject } from "@/lib/actions"
 
 import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
@@ -44,11 +45,38 @@ export const columns: ColumnDef<Project>[] = [
     cell: ({ row }) => {
       const name = row.getValue("name") as string
       const isShared = row.original.shared
+      const storagePathId = row.original.storage_path_id
+      const projectId = row.original.id
+      
+      // Component to handle navigation using server action
+      const ProjectNameButton = () => {
+        const handleClick = async () => {
+          if (storagePathId && projectId) {
+            try {
+              await selectProject(projectId, storagePathId, name)
+            } catch (error) {
+              console.error('Failed to select project:', error)
+            }
+          }
+        }
+        
+        return (
+          <form action={handleClick}>
+            <button 
+              type="submit"
+              className="text-left hover:underline hover:text-blue-600 transition-colors cursor-pointer"
+              disabled={!storagePathId || !projectId}
+            >
+              {name}
+            </button>
+          </form>
+        )
+      }
       
       return (
         <div className="min-w-[80px] max-w-[200px] whitespace-normal break-words flex items-center gap-2">
           {isShared && <Share2 className="h-4 w-4 text-blue-500 flex-shrink-0" />}
-          <span>{name}</span>
+          <ProjectNameButton />
         </div>
       )
     },
