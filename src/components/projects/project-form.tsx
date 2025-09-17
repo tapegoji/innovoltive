@@ -74,9 +74,10 @@ const formConfigs: Record<ProjectFormMode, FormConfig> = {
 
 export function ProjectForm({ mode, open, onOpenChange, project, action }: ProjectFormProps) {
   const [selectedTypes, setSelectedTypes] = useState<string[]>([])
+  const [name, setName] = useState<string>('')
   const config = formConfigs[mode]
 
-  // Initialize selected types when project changes
+  // Initialize selected types and name when project changes
   useEffect(() => {
     if (project && project.type) {
       const projectTypes = project.type.split(',').map(t => t.trim())
@@ -84,20 +85,23 @@ export function ProjectForm({ mode, open, onOpenChange, project, action }: Proje
     } else if (mode === 'create') {
       setSelectedTypes([])
     }
-  }, [project, mode])
+    setName(config.getDefaultName(project))
+  }, [project, mode, config])
 
   const now = new Date()
   const clientTime = now.toString()
 
-  function SubmitButton() {
+  function SubmitButton({ disabled }: { disabled: boolean }) {
     const { pending } = useFormStatus()
     return (
-      <Button type="submit" disabled={pending}>
+      <Button type="submit" disabled={disabled || pending}>
         {pending && <Loader2Icon className="animate-spin" />}
         {pending ? config.loadingText : config.submitText}
       </Button>
     )
   }
+
+  const isValid = selectedTypes.length > 0 && name.trim() !== ''
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -117,13 +121,14 @@ export function ProjectForm({ mode, open, onOpenChange, project, action }: Proje
                 id="name" 
                 name="name" 
                 placeholder="Project name" 
-                defaultValue={config.getDefaultName(project)}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
                 required
                 autoFocus={false}
               />
             </div>
             <div className="grid gap-3">
-              <Label>Type (select multiple)</Label>
+              <Label>Simulation Type</Label>
               <div className="flex flex-col gap-2">
                 {types.map((type) => (
                   <div key={type.value} className="flex items-center space-x-2">
@@ -140,7 +145,7 @@ export function ProjectForm({ mode, open, onOpenChange, project, action }: Proje
                         }
                       }}
                     />
-                    <Label htmlFor={type.value}>{type.label}</Label>
+                    <Label htmlFor={type.value}>{type.label} ({type.value})</Label>
                   </div>
                 ))}
               </div>
@@ -175,7 +180,7 @@ export function ProjectForm({ mode, open, onOpenChange, project, action }: Proje
             <DialogClose asChild>
               <Button type="button" variant="outline">Cancel</Button>
             </DialogClose>
-            <SubmitButton />
+            <SubmitButton disabled={!isValid} />
           </DialogFooter>
         </form>
       </DialogContent>
