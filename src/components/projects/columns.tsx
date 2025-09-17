@@ -2,6 +2,7 @@
 
 import { ColumnDef } from "@tanstack/react-table"
 import { selectProject } from "@/lib/actions"
+import { usePathname } from "next/navigation"
 
 import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
@@ -50,6 +51,9 @@ export const columns: ColumnDef<Project>[] = [
       
       // Component to handle navigation using server action
       const ProjectNameButton = () => {
+        const pathname = usePathname()
+        const isPublic = pathname === '/public-projects'
+        
         const handleClick = async () => {
           if (storagePathId && projectId) {
             try {
@@ -64,8 +68,8 @@ export const columns: ColumnDef<Project>[] = [
           <form action={handleClick}>
             <button 
               type="submit"
-              className="text-left hover:underline hover:text-blue-600 transition-colors cursor-pointer"
-              disabled={!storagePathId || !projectId}
+              className={`text-left transition-colors ${isPublic ? 'cursor-default' : 'hover:underline hover:text-blue-600 cursor-pointer'}`}
+              disabled={isPublic || !storagePathId || !projectId}
             >
               {name}
             </button>

@@ -143,7 +143,7 @@ export function ControlPanel({ projectName, projectHash }: ControlPanelProps) {
             <Collapsible className="group/collapsible">
               <CollapsibleTrigger asChild>
                 <div className="flex items-center justify-between text-xs font-bold text-sidebar-foreground/80 hover:text-sidebar-foreground cursor-pointer py-1">
-                  <span>Files</span>
+                  <span>Project Files</span>
                   <Plus className="h-3 w-3 group-data-[state=open]/collapsible:hidden" />
                   <Minus className="h-3 w-3 group-data-[state=closed]/collapsible:hidden" />
                 </div>
