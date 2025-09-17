@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
 
-import { statuses, getTypeBadgeClass, getStatusBadgeClass } from "@/lib/definitions"
+import { statuses, getTypeClass, getStatusClass } from "@/lib/definitions"
 import { Project } from "@/lib/definitions"
 import { DataTableColumnHeader } from "./data-table-column-header"
 import { DataTableRowActions } from "./data-table-row-actions"
@@ -105,7 +105,7 @@ export const columns: ColumnDef<Project>[] = [
       return (
         <div className="flex w-[120px] items-center gap-1 flex-wrap">
           {typeValues.map(type => (
-            <Badge key={type} variant="outline" className={getTypeBadgeClass(type)}>
+            <Badge key={type} variant="outline" className={getTypeClass(type)}>
               {type.toUpperCase()}
             </Badge>
           ))}
@@ -138,7 +138,7 @@ export const columns: ColumnDef<Project>[] = [
 
       return (
         <div className="flex w-[100px] items-center">
-          <Badge variant="outline" className={getStatusBadgeClass(statusValue)}>
+          <Badge variant="outline" className={getStatusClass(statusValue)}>
             {label}
           </Badge>
         </div>

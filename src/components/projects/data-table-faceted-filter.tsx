@@ -20,7 +20,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { Separator } from "@/components/ui/separator"
-import { getTypeBadgeClass, getStatusBadgeClass } from "@/lib/definitions"
+import { getTypeClass, getStatusClass } from "@/lib/definitions"
 
 interface DataTableFacetedFilterProps<TData, TValue> {
   column?: Column<TData, TValue>
@@ -50,9 +50,9 @@ export function DataTableFacetedFilter<TData, TValue>({
 
   const getBadgeClass = (option: OptionType) => {
     if (title === "Type") {
-      return getTypeBadgeClass(option.value)
+      return getTypeClass(option.value)
     } else if (title === "Status") {
-      return getStatusBadgeClass(option.value)
+      return getStatusClass(option.value)
     }
     return "text-gray-600 border-gray-200"
   }

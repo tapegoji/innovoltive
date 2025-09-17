@@ -1,6 +1,4 @@
 import { z } from 'zod'
-import { Badge } from "@/components/ui/badge"
-import React from "react"
 
 export interface ProjectData {
   id: string
@@ -35,7 +33,7 @@ export class QuotaExceededError extends Error {
 // Schema for validating the create project form data
 export const CreateProjectSchema = z.object({
   name: z.string().min(1, 'Project name is required'),
-  type: z.array(z.enum(['EM', 'HT', 'CFD'])).min(1, 'At least one type must be selected'),
+  type: z.array(z.enum(['EM', 'HT', 'CFD', 'MAG', 'PCB'])).min(1, 'At least one type must be selected'),
   description: z.string().optional(),
   clientTime: z.string().optional(),
 })
@@ -69,22 +67,22 @@ export const statuses = [
   {
     value: "active",
     label: "Active",
-    badge: React.createElement(Badge, { variant: "outline", className: "text-green-600 border-green-200" }, "Active")
+    className: "text-green-600 border-green-200"
   },
   {
     value: "running",
     label: "Running",
-    badge: React.createElement(Badge, { variant: "outline", className: "text-blue-600 border-blue-200" }, "Running")
+    className: "text-blue-600 border-blue-200"
   },
   {
     value: "archived",
     label: "Archived",
-    badge: React.createElement(Badge, { variant: "outline", className: "text-gray-600 border-gray-200" }, "Archived")
+    className: "text-gray-600 border-gray-200"
   },
   {
     value: "paused",
     label: "Paused",
-    badge: React.createElement(Badge, { variant: "outline", className: "text-yellow-600 border-yellow-200" }, "Paused")
+    className: "text-yellow-600 border-yellow-200"
   },
 ]
 
@@ -92,45 +90,35 @@ export const types = [
   {
     value: "EM",
     label: "EM",
-    badge: React.createElement(Badge, { variant: "outline", className: "text-blue-600 border-blue-200" }, "EM")
+    className: "text-blue-600 border-blue-200"
   },
   {
     value: "HT",
     label: "HT",
-    badge: React.createElement(Badge, { variant: "outline", className: "text-red-600 border-red-200" }, "HT")
+    className: "text-red-600 border-red-200"
   },
   {
     value: "CFD",
     label: "CFD",
-    badge: React.createElement(Badge, { variant: "outline", className: "text-green-600 border-green-200" }, "CFD")
+    className: "text-green-600 border-green-200"
+  },
+  {
+    value: "MAG",
+    label: "MAG",
+    className: "text-purple-600 border-purple-200"
+  },
+  {
+    value: "PCB",
+    label: "PCB",
+    className: "text-orange-600 border-orange-200"
   }
 ]
 
-// Simple utility functions to get badge classes
-export const getTypeBadgeClass = (type: string) => {
-  switch (type.toUpperCase()) {
-    case 'EM':
-      return "text-blue-600 border-blue-200"
-    case 'HT':
-      return "text-red-600 border-red-200"
-    case 'CFD':
-      return "text-green-600 border-green-200"
-    default:
-      return "text-gray-600 border-gray-200"
-  }
+// Helper functions to get className from arrays
+export const getStatusClass = (status: string) => {
+  return statuses.find(s => s.value === status)?.className || "text-gray-600 border-gray-200"
 }
 
-export const getStatusBadgeClass = (status: string) => {
-  switch (status) {
-    case 'active':
-      return "text-green-600 border-green-200"
-    case 'running':
-      return "text-blue-600 border-blue-200"
-    case 'paused':
-      return "text-yellow-600 border-yellow-200"
-    case 'archived':
-      return "text-gray-600 border-gray-200"
-    default:
-      return "text-gray-600 border-gray-200"
-  }
+export const getTypeClass = (type: string) => {
+  return types.find(t => t.value.toUpperCase() === type.toUpperCase())?.className || "text-gray-600 border-gray-200"
 }
