@@ -114,7 +114,7 @@ export function ControlPanel({ projectName, projectHash }: ControlPanelProps) {
       default={{
         x: 4,
         y: 4,
-        width: isMobile ? 250 : 350,
+        width: isMobile ? 250 : 250,
         height: isMobile ? 250 : 600
       }}
       minWidth={160}
