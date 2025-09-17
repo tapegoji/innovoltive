@@ -94,7 +94,7 @@ const features = [
         {/* Call to Action Section */}
         <div className="mt-20 max-w-4xl mx-auto text-center">
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/sign-in">
+            <Link href="/dashboard">
               <Button className="text-secondary">Get Started</Button>
             </Link>
             <Link href="/sign-up">
