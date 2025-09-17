@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { getSelectedProject } from '@/lib/actions'
-import CanvasPageClient from './client-page'
+import Canvas from './canvas'
 
 // Force dynamic rendering for session-dependent content
 export const dynamic = 'force-dynamic'
@@ -16,7 +16,7 @@ export default async function CanvasPage() {
   
   // Use the actual project name from the database, not extracted from path
   return (
-    <CanvasPageClient 
+    <Canvas 
       projectName={projectData.projectName}
       projectHash={projectData.storagePathId}
     />

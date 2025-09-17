@@ -45,6 +45,7 @@ export const columns: ColumnDef<Project>[] = [
 		),
 		cell: ({ row }) => {
 			const name = row.getValue("name") as string
+			const simtype = row.getValue("simtype") as string
 			const isShared = row.original.shared
 			const storagePathId = row.original.storage_path_id
 			const projectId = row.original.id
@@ -57,7 +58,7 @@ export const columns: ColumnDef<Project>[] = [
 				const handleClick = async () => {
 					if (storagePathId && projectId) {
 						try {
-							await selectProject(projectId, storagePathId, name)
+							await selectProject(projectId, storagePathId, name, simtype)
 						} catch (error) {
 							console.error('Failed to select project:', error)
 						}

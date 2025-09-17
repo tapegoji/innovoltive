@@ -283,7 +283,7 @@ export async function shareProject(formData: FormData) {
 }
 
 // Secure project selection action
-export async function selectProject(projectId: string, storagePathId: string, projectName: string) {
+export async function selectProject(projectId: string, storagePathId: string, projectName: string, simtype?: string) {
   try {
     const { userId } = await getAuthenticatedUser()
     
@@ -303,6 +303,7 @@ export async function selectProject(projectId: string, storagePathId: string, pr
       storagePathId,
       realPath,
       projectName,
+      simtype,
       userId,
       timestamp: Date.now()
     }

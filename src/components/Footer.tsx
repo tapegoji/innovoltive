@@ -16,7 +16,7 @@ const Footer: React.FC<FooterProps> = ({ compact = false, className, children })
     )}>
       <div className="flex-1 flex items-center">
         <p className="text-sm text-sidebar-foreground">
-          © 2025 Innovoltive. All rights reserved.
+          © 2025 Innovoltive.
         </p>
       </div>
       {children && (
