@@ -119,7 +119,6 @@ export function ControlPanel({ projectName, projectHash }: ControlPanelProps) {
       }}
       minWidth={160}
       minHeight={120}
-      maxWidth={250}
       maxHeight={400}
       bounds="parent"
       className="z-[100]"
