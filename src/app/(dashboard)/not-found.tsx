@@ -6,7 +6,7 @@ export default function NotFound() {
     <main className="min-h-screen flex flex-col items-center justify-center gap-4">
       <h2 className="text-xl font-semibold">404 Not Found</h2>
       <p className="text-muted-foreground">
-        The resource you're looking for doesn't exist.
+        The resource you&apos;re looking for doesn&apos;t exist.
       </p>
       <Link href="/">
         <Button>Go to Homepage</Button>
