@@ -79,7 +79,7 @@ export const columns: ColumnDef<Project>[] = [
 			}
 
 			return (
-				<div className="min-w-[80px] max-w-[200px] whitespace-normal break-words flex items-center gap-2">
+				<div className="min-w-[80px] max-w-[200px] whitespace-normal break-words flex items-center gap-2 pl-4">
 					{isShared && <Share2 className="h-4 w-4 text-blue-500 flex-shrink-0" />}
 					<ProjectNameButton />
 				</div>
@@ -104,7 +104,7 @@ export const columns: ColumnDef<Project>[] = [
 			const simtypeValues = simtypeValue.split(',').map(t => t.trim()).filter(Boolean)
 
 			return (
-				<div className="flex w-[120px] items-center gap-1 flex-wrap">
+				<div className="flex w-fit items-center gap-1 flex-wrap">
 					{simtypeValues.map(simtype => (
 						<Badge key={simtype} variant="outline" className={getSimtypeClass(simtype)}>
 							{simtype.toUpperCase()}
@@ -138,7 +138,7 @@ export const columns: ColumnDef<Project>[] = [
 			const label = statusConfig ? statusConfig.label : statusValue
 
 			return (
-				<div className="flex w-[100px] items-center">
+				<div className="flex w-fit items-center">
 					<Badge variant="outline" className={getStatusClass(statusValue)}>
 						{label}
 					</Badge>
