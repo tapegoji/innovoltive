@@ -164,7 +164,7 @@ export async function CreateNewProject(
         ${projectData.date_modified || new Date().toISOString()},
         ${hashedPath}
       )
-      RETURNING id, name, simtype, description, date_modified, size, status
+      RETURNING id, name, simtype, description, date_modified, size, status, user_id, storage_path_id
     `
 
     // Link the project to the user as owner

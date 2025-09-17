@@ -114,7 +114,11 @@ export async function createProject(formData: FormData) {
       description: description || '',
     }
 
-    await CreateNewProject(projectData, userId)
+    const createdProject = await CreateNewProject(projectData, userId)
+
+    // Set project session for the newly created project
+    await setProjectSession(createdProject.id, createdProject.storage_path_id!, createdProject.name, createdProject.simtype, userId)
+
   } catch (error) {
     console.error('Failed to create project:', error)
     throw new Error('Failed to create project')
@@ -123,8 +127,8 @@ export async function createProject(formData: FormData) {
   // Revalidate the projects page to show the new project
   revalidatePath('/my-projects')
 
-  // Redirect to the projects page
-  redirect('/my-projects')
+  // Redirect to canvas
+  redirect('/canvas')
 }
 
 export async function editProject(id: string, formData: FormData) {
@@ -282,40 +286,45 @@ export async function shareProject(formData: FormData) {
   redirect('/my-projects')
 }
 
+// Helper function to set project session cookie
+async function setProjectSession(projectId: string, storagePathId: string, projectName: string, simtype: string | undefined, userId: string) {
+  // Validate that the storage path ID exists and user has access
+  const realPath = await getRealPath(storagePathId)
+  if (!realPath) {
+    throw new Error('Invalid project path')
+  }
+
+  // Additional security: verify the user owns this project
+  // You could add a database query here to verify ownership
+  // For now, we'll trust that the storage path validation is sufficient
+
+  // Store project information in secure HTTP-only cookie
+  const projectData = {
+    projectId,
+    storagePathId,
+    realPath,
+    projectName,
+    simtype,
+    userId,
+    timestamp: Date.now()
+  }
+
+  const cookieStore = await cookies()
+  cookieStore.set('selected-project', JSON.stringify(projectData), {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+    maxAge: 60 * 60 * 2, // 2 hours
+    path: '/'
+  })
+}
+
 // Secure project selection action
 export async function selectProject(projectId: string, storagePathId: string, projectName: string, simtype?: string) {
   try {
     const { userId } = await getAuthenticatedUser()
     
-    // Validate that the storage path ID exists and user has access
-    const realPath = await getRealPath(storagePathId)
-    if (!realPath) {
-      throw new Error('Invalid project path')
-    }
-    
-    // Additional security: verify the user owns this project
-    // You could add a database query here to verify ownership
-    // For now, we'll trust that the storage path validation is sufficient
-    
-    // Store project information in secure HTTP-only cookie
-    const projectData = {
-      projectId,
-      storagePathId,
-      realPath,
-      projectName,
-      simtype,
-      userId,
-      timestamp: Date.now()
-    }
-    
-    const cookieStore = await cookies()
-    cookieStore.set('selected-project', JSON.stringify(projectData), {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 60 * 60 * 2, // 2 hours
-      path: '/'
-    })
+    await setProjectSession(projectId, storagePathId, projectName, simtype, userId)
     
   } catch (error) {
     console.error('Failed to select project:', error)
