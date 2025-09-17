@@ -97,8 +97,7 @@ export function ControlPanel({ projectName, projectHash }: ControlPanelProps) {
               <CollapsibleContent>
                 <div className="pl-2 py-1 text-xs text-sidebar-foreground/70">
                   {/* Geometry tools will go here */}
-                  <div>Create shapes</div>
-                  <div>Edit geometry</div>
+                  <div>Import geometry</div>
                 </div>
               </CollapsibleContent>
             </Collapsible>
