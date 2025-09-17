@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Checkbox } from "@/components/ui/checkbox"
 import {
   Select,
   SelectContent,
@@ -20,6 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { types } from "@/lib/definitions"
 import { useState, useEffect } from "react"
 import { Project } from "@/lib/definitions"
@@ -73,17 +73,16 @@ const formConfigs: Record<ProjectFormMode, FormConfig> = {
 }
 
 export function ProjectForm({ mode, open, onOpenChange, project, action }: ProjectFormProps) {
-  const [selectedTypes, setSelectedTypes] = useState<string[]>([])
+  const [selectedType, setSelectedType] = useState<string>('')
   const [name, setName] = useState<string>('')
   const config = formConfigs[mode]
 
-  // Initialize selected types and name when project changes
+  // Initialize selected type and name when project changes
   useEffect(() => {
     if (project && project.simtype) {
-      const projectSimtypes = project.simtype.split(',').map(t => t.trim())
-      setSelectedTypes(projectSimtypes)
+      setSelectedType(project.simtype)
     } else if (mode === 'create') {
-      setSelectedTypes([])
+      setSelectedType('')
     }
     setName(config.getDefaultName(project))
   }, [project, mode, config])
@@ -101,13 +100,14 @@ export function ProjectForm({ mode, open, onOpenChange, project, action }: Proje
     )
   }
 
-  const isValid = selectedTypes.length > 0 && name.trim() !== ''
+  const isValid = selectedType !== '' && name.trim() !== ''
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="w-full sm:max-w-[425px]">
         <form action={action}>
           <input type="hidden" name="clientTime" value={clientTime} />
+          <input type="hidden" name="simtype" value={selectedType} />
           <DialogHeader>
             <DialogTitle>{config.title}</DialogTitle>
             <DialogDescription>
@@ -129,26 +129,14 @@ export function ProjectForm({ mode, open, onOpenChange, project, action }: Proje
             </div>
             <div className="grid gap-3">
               <Label>Simulation Type</Label>
-              <div className="flex flex-col gap-2">
+              <RadioGroup value={selectedType} onValueChange={setSelectedType}>
                 {types.map((type) => (
                   <div key={type.value} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={type.value}
-                      name="simtype"
-                      value={type.value}
-                      checked={selectedTypes.includes(type.value)}
-                      onCheckedChange={(checked) => {
-                        if (checked) {
-                          setSelectedTypes([...selectedTypes, type.value])
-                        } else {
-                          setSelectedTypes(selectedTypes.filter(t => t !== type.value))
-                        }
-                      }}
-                    />
+                    <RadioGroupItem value={type.value} id={type.value} />
                     <Label htmlFor={type.value}>{type.label} ({type.value})</Label>
                   </div>
                 ))}
-              </div>
+              </RadioGroup>
             </div>
             {config.showStatusField && (
               <div className="grid gap-3">
