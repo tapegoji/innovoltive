@@ -35,16 +35,14 @@ export function ControlPanel({ projectData }: ControlPanelProps) {
   const [importDialogOpen, setImportDialogOpen] = useState(false);
 
   // Configure upload settings based on simType
-  const uploadConfig = simType === 'PCB' ? {
-    acceptedTypes: { 'application/octet-stream': ['.kicad_pcb'] } as Record<string, string[]>,
-    dialogTitle: 'Import PCB Files',
-    dialogDescription: 'Drag and drop KiCad PCB files here, or click to browse. Supports KiCad PCB formats.',
-    supportedFormatsText: 'KiCad PCB'
-  } : {
-    acceptedTypes: { 'model/step': ['.step', '.stp'] } as Record<string, string[]>,
+  const uploadConfig = {
+    acceptedTypes: { 
+      'model/step': ['.step', '.stp'],
+      'application/octet-stream': ['.kicad_pcb']
+    } as Record<string, string[]>,
     dialogTitle: 'Import Geometry Files', 
-    dialogDescription: 'Drag and drop geometry files here, or click to browse. Supports STEP and STP formats.',
-    supportedFormatsText: 'STEP, STP'
+    dialogDescription: 'Drag and drop geometry files here, or click to browse. Supports STEP formats and KiCad PCB files.',
+    supportedFormatsText: 'STEP, STP, KICAD_PCB'
   };
 
   const handleFileClick = (node: FileNode) => {
@@ -101,7 +99,7 @@ export function ControlPanel({ projectData }: ControlPanelProps) {
             </div>
           </div>
           <div className="space-y-2 text-sm text-sidebar-foreground p-1">
-            {projectName && (
+            {projectName && simType && (
               <div className="text-xs font-bold text-sidebar-foreground/80 break-all">
                 Project: {projectName}
               </div>
@@ -123,7 +121,7 @@ export function ControlPanel({ projectData }: ControlPanelProps) {
                     className="text-left hover:text-sidebar-foreground cursor-pointer flex items-center gap-1"
                   >
                     <Upload className="h-3 w-3" />
-                    Import {simType === 'PCB' ? 'PCB Files' : 'CAD'}
+                    Import Model
                   </button>
                   
                   <UploadDialog
