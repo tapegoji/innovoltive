@@ -7,50 +7,46 @@ import Footer from "@/components/Footer";
 export default function Home() {
 const features = [
   {
-    title: "Web-Based Convenience",
-    description: "No license servers, no IT setup — just upload and simulate. Built on open source, your designs stay secure."
-  },
-  {
-    title: "Magnetics Analysis",
+    title: "Magnetics Design Analysis",
     description: [
+      "Design inductors, transformers, common mode chokes, and custom magnetics",
       "Define circuits — cores, windings, excitation patterns",
-      "Run validated Maxwell solvers with adaptive meshing",
-      "Extract 1D/2D/3D results — losses, flux, thermal coupling", 
-      "Validate designs before prototype builds"
+      "Run Finite Element Analysis (FEA) (2D and 3D) for precise field solutions",
+      "Optimize designs using advanced optimization algorithms"
     ]
   },
   {
     title: "PCB Simulation",
     description: [
-      "Import Gerbers/ODB++ — automatic stackup recognition",
-      "Full-wave EM analysis with accurate material models",
-      "SI/PI analysis — impedance, crosstalk, PDN integrity",
-      "Predict EMI compliance before layout completion"
+      "Import PCB design from EDA tools KiCad and or ODB++",
+      "Trace resistance, inductance, capacitance, and coupling",
+      "DC, AC, and transient analysis",
+      "EMI/EMC simulation, harmonic or transient analysis",
+      "Thermal simulation with 3D FEA. Solve the full physics problem"
     ]
   },
   {
     title: "Predictive Thermal Engineering",
     description: [
-      "Import STEP files — auto mesh generation",
-      "Conjugate heat transfer with all physics modes",
-      "Transient analysis for power cycling evaluation",
-      "Optimize cooling before first power-on"
+      "Import CAD files and generate mesh automatically or refine mesh manually",
+      "Steady-State and Transient analysis for power cycling evaluation",
+      "Optimize cooling before first power-on",
+      "Fans and heatsink optimization for efficient thermal management"
     ]
   },
   {
-    title: "Accurate Parasitic Extraction",
-    description: "Frequency-dependent R/L/C from field solutions. Open source algorithms you can inspect and verify."
-  },
-  {
-    title: "Production CFD",
+    title: "CFD Simulation",
     description: [
-      "Auto fluid domain extraction from complex assemblies", 
-      "Navier-Stokes with turbulence at real Reynolds numbers",
-      "Coupled thermal-fluid for true conjugate analysis",
+      "Optimize cooling for electronic components and PCBs",
+      "Simulate forced and natural convection for heat dissipation",
       "Size cooling systems right the first time"
     ]
   },
-    {
+  {
+    title: "Web-Based Convenience",
+    description: "No license servers, no IT setup — just upload and simulate. Built on open source, your designs stay secure."
+  },
+  {
     title: "Standing on the Shoulders of Giants",
     description: "Using decades of battle-tested open source engineering tools. We support these proven solutions and provide assistance for open source development through our platform—complete transparency, no vendor lock-in."
   },
@@ -61,10 +57,10 @@ const features = [
       <main className="container mx-auto px-4 pt-16 pb-16">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-4xl md:text-4xl font-bold mb-6">
-            Electrify Your Imagination
+            Welcome to InFEM
           </h1>
-          <p className="text-xl text-muted-foreground mb-8">
-            Welcome to InFEM - A Product Of InnoVoltive
+          <p className="text-xl font-bold mb-8">
+            A Multi Physics Simulation Built By Engineers to Accelerate Design Process.
           </p>        
         </div>        
         <div className="mt-16 max-w-4xl mx-auto">
