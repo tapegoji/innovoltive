@@ -7,6 +7,8 @@ import { currentUser, clerkClient } from '@clerk/nextjs/server'
 import { CreateNewProject, EditProject, DeleteProjects, CopyProject, ShareProject, fetchUserProjects as fetchUserProjectsData } from './data'
 import { CreateProjectSchema, UpdateProjectSchema } from './definitions'
 import { getRealPath } from './path-utils'
+import { promises as fs } from 'fs'
+import path from 'path'
 
 // Type definitions
 interface TreeNode {
@@ -454,6 +456,74 @@ export async function getProjectMetadata(projectHash: string) {
     return {
       success: false,
       error: 'Failed to get project metadata'
+    }
+  }
+}
+
+// Server action to upload geometry files to project
+export async function uploadGeometryFiles(projectHash: string, formData: FormData) {
+  try {
+    await getAuthenticatedUser() // Ensure user is authenticated
+    
+    // Validate that the project hash matches current session
+    const projectData = await getSelectedProject()
+    if (!projectData || projectData.storagePathId !== projectHash) {
+      throw new Error('Invalid project access')
+    }
+
+    // Get real path from hash
+    const realPath = await getRealPath(projectHash)
+    if (!realPath) {
+      throw new Error('Project not found')
+    }
+
+    // Create geometry folder if it doesn't exist
+    const geometryPath = path.join(realPath, 'geometry')
+    try {
+      await fs.mkdir(geometryPath, { recursive: true })
+    } catch (error) {
+      console.error('Error creating geometry directory:', error)
+      throw new Error('Failed to create geometry directory')
+    }
+
+    // Process uploaded files
+    const uploadedFiles: string[] = []
+    const fsPromises = await import('fs/promises')
+
+    for (const [key, value] of formData.entries()) {
+      if (value instanceof File) {
+        const fileName = value.name
+        const filePath = path.join(geometryPath, fileName)
+
+        // Convert file to buffer and save
+        const arrayBuffer = await value.arrayBuffer()
+        const buffer = Buffer.from(arrayBuffer)
+
+        try {
+          await fsPromises.writeFile(filePath, buffer)
+          uploadedFiles.push(fileName)
+        } catch (error) {
+          console.error(`Error saving file ${fileName}:`, error)
+          throw new Error(`Failed to save file: ${fileName}`)
+        }
+      }
+    }
+
+    if (uploadedFiles.length === 0) {
+      throw new Error('No files were uploaded')
+    }
+
+    return {
+      success: true,
+      message: `Successfully uploaded ${uploadedFiles.length} geometry file(s)`,
+      files: uploadedFiles
+    }
+
+  } catch (error) {
+    console.error('Failed to upload geometry files:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to upload geometry files'
     }
   }
 }
