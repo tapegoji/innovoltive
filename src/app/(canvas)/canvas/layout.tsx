@@ -1,6 +1,7 @@
 'use client'
 
 import { Header } from '@/components/Header'
+import Footer from '@/components/Footer'
 import React, { ReactNode } from 'react'
 import { Box, EyeOff, Grid3X3, Scan, SquareMousePointer, Trash2, MoreHorizontal } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
@@ -88,6 +89,7 @@ export default function CanvasLayout({
         <CanvasHeaderIcons />
       </Header>
       {children}
+      <Footer />
     </div>
   )
 }

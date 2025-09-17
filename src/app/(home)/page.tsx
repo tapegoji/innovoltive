@@ -1,46 +1,98 @@
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { CheckCircle } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import Footer from "@/components/Footer";
 
 export default function Home() {
+const features = [
+  {
+    title: "Web-Based Convenience",
+    description: "No license servers, no IT setup — just upload and simulate. Built on open source, your designs stay secure."
+  },
+  {
+    title: "Magnetics Analysis",
+    description: [
+      "Define circuits — cores, windings, excitation patterns",
+      "Run validated Maxwell solvers with adaptive meshing",
+      "Extract 1D/2D/3D results — losses, flux, thermal coupling", 
+      "Validate designs before prototype builds"
+    ]
+  },
+  {
+    title: "PCB Simulation",
+    description: [
+      "Import Gerbers/ODB++ — automatic stackup recognition",
+      "Full-wave EM analysis with accurate material models",
+      "SI/PI analysis — impedance, crosstalk, PDN integrity",
+      "Predict EMI compliance before layout completion"
+    ]
+  },
+  {
+    title: "Predictive Thermal Engineering",
+    description: [
+      "Import STEP files — auto mesh generation",
+      "Conjugate heat transfer with all physics modes",
+      "Transient analysis for power cycling evaluation",
+      "Optimize cooling before first power-on"
+    ]
+  },
+  {
+    title: "Accurate Parasitic Extraction",
+    description: "Frequency-dependent R/L/C from field solutions. Open source algorithms you can inspect and verify."
+  },
+  {
+    title: "Production CFD",
+    description: [
+      "Auto fluid domain extraction from complex assemblies", 
+      "Navier-Stokes with turbulence at real Reynolds numbers",
+      "Coupled thermal-fluid for true conjugate analysis",
+      "Size cooling systems right the first time"
+    ]
+  },
+    {
+    title: "Standing on the Shoulders of Giants",
+    description: "Using decades of battle-tested open source engineering tools. We support these proven solutions and provide assistance for open source development through our platform—complete transparency, no vendor lock-in."
+  },
+];
+
   return (
     <div className="min-h-screen">
-      <main className="container mx-auto px-4 py-16">
+      <main className="container mx-auto px-4 pt-16 pb-16">
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-4xl md:text-6xl font-bold mb-6">
+          <h1 className="text-4xl md:text-4xl font-bold mb-6">
             Electrify Your Imagination
           </h1>
           <p className="text-xl text-muted-foreground mb-8">
-            Welcome to InFEM - where innovation meets creativity
+            Welcome to InFEM - A Product Of InnoVoltive
           </p>        
         </div>        
         <div className="mt-16 max-w-4xl mx-auto">
-          <div className="text-lg text-muted-foreground space-y-6">
-            <ul className="space-y-3 text-left max-w-4xl mx-auto">
-              <li className="flex items-start">
-                <span className="mr-2">•</span>
-                <span><span className="font-bold text-foreground">Design and Simulate Magnetics in 1D, 2D, and 3D</span> — from core losses to complex field interactions</span>
-              </li>
-              <li className="flex items-start">
-                <span className="mr-2">•</span>
-                <span><span className="font-bold text-foreground">PCB Trace Simulation</span> — analyze current flow, predict temperature rise, and optimize layouts</span>
-              </li>
-              <li className="flex items-start">
-                <span className="mr-2">•</span>
-                <span><span className="font-bold text-foreground">Thermal Prediction</span> — forecast heating effects across your design before prototyping</span>
-              </li>
-              <li className="flex items-start">
-                <span className="mr-2">•</span>
-                <span><span className="font-bold text-foreground">Extract Parasitics</span> — get accurate inductance, capacitance, and resistance values directly from your geometry</span>
-              </li>
-              <li className="flex items-start">
-                <span className="mr-2">•</span>
-                <span><span className="font-bold text-foreground">Cloud-Based</span> — no heavy installs, just upload your design and start simulating</span>
-              </li>
-              <li className="flex items-start">
-                <span className="mr-2">•</span>
-                <span><span className="font-bold text-foreground">For Engineers, by Engineers</span> — tools built to accelerate innovation and cut down trial-and-error</span>
-              </li>
-            </ul>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {features.map((feature, index) => (
+              <Card key={index}>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <CheckCircle className="w-6 h-6 text-blue-600" />
+                    {feature.title}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {Array.isArray(feature.description) ? (
+                    <ul className="text-muted-foreground space-y-1">
+                      {feature.description.map((item, idx) => (
+                        <li key={idx} className="flex items-start gap-2">
+                          <span className="text-blue-600">•</span>
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-muted-foreground">{feature.description}</p>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>        
         {/* Call to Action Section */}
@@ -61,31 +113,8 @@ export default function Home() {
             </Link> */}
           </div>
         </div>
-
-        {/* Features Grid Section */}
-        <div className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          <div className="text-center p-6 rounded-lg border">
-            <h3 className="text-xl font-semibold mb-3">Innovation</h3>
-            <p className="text-muted-foreground">
-              Cutting-edge solutions for modern challenges
-            </p>
-          </div>
-          
-          <div className="text-center p-6 rounded-lg border">
-            <h3 className="text-xl font-semibold mb-3">Creativity</h3>
-            <p className="text-muted-foreground">
-              Unleash your creative potential with our tools
-            </p>
-          </div>
-          
-          <div className="text-center p-6 rounded-lg border">
-            <h3 className="text-xl font-semibold mb-3">Excellence</h3>
-            <p className="text-muted-foreground">
-              Delivering quality results every time
-            </p>
-          </div>
-        </div>
       </main>
+      <Footer />
     </div>
   );
 }
