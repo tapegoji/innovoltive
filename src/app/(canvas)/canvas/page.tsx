@@ -19,6 +19,7 @@ export default async function CanvasPage() {
     <Canvas 
       projectName={projectData.projectName}
       projectHash={projectData.storagePathId}
+      simType={projectData.simtype}
     />
   )
 }

@@ -304,7 +304,7 @@ async function setProjectSession(projectId: string, storagePathId: string, proje
     storagePathId,
     realPath,
     projectName,
-    simtype,
+    simtype: simtype, // Keep as simtype for database consistency
     userId,
     timestamp: Date.now()
   }
