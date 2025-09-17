@@ -121,7 +121,8 @@ export function ControlPanel({ projectName, projectHash }: ControlPanelProps) {
       minHeight={160}
       maxHeight= {isMobile ? 400 : 800}
       bounds="parent"
-      className="z-[100]"
+      // Lower z-index so global dialogs (z-50) can overlay it
+      className="z-40"
       dragHandleClassName="drag-handle"
     >
       <div className="h-full flex flex-col bg-sidebar border rounded-lg overflow-hidden">
