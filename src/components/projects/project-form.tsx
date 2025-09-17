@@ -79,9 +79,9 @@ export function ProjectForm({ mode, open, onOpenChange, project, action }: Proje
 
   // Initialize selected types and name when project changes
   useEffect(() => {
-    if (project && project.type) {
-      const projectTypes = project.type.split(',').map(t => t.trim())
-      setSelectedTypes(projectTypes)
+    if (project && project.simtype) {
+      const projectSimtypes = project.simtype.split(',').map(t => t.trim())
+      setSelectedTypes(projectSimtypes)
     } else if (mode === 'create') {
       setSelectedTypes([])
     }
@@ -134,7 +134,7 @@ export function ProjectForm({ mode, open, onOpenChange, project, action }: Proje
                   <div key={type.value} className="flex items-center space-x-2">
                     <Checkbox
                       id={type.value}
-                      name="type"
+                      name="simtype"
                       value={type.value}
                       checked={selectedTypes.includes(type.value)}
                       onCheckedChange={(checked) => {

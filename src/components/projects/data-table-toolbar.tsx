@@ -117,10 +117,10 @@ export function DataTableToolbar<TData>({
             />
           </div>
 
-          {table.getColumn("type") && (
+          {table.getColumn("simtype") && (
             <DataTableFacetedFilter
-              column={table.getColumn("type")}
-              title="Type"
+              column={table.getColumn("simtype")}
+              title="Simtype"
               options={types}
             />
           )}

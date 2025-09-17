@@ -80,11 +80,11 @@ export async function fetchPublicProjects() {
 }
 export async function createProject(formData: FormData) {
   // Extract and validate form data
-  const types = formData.getAll('type') as string[]
+  const simtypes = formData.getAll('simtype') as string[]
   
   const validatedFields = CreateProjectSchema.safeParse({
     name: formData.get('name'),
-    type: types,
+    simtype: simtypes,
     description: formData.get('description'),
     clientTime: formData.get('clientTime'),
   })
@@ -94,18 +94,18 @@ export async function createProject(formData: FormData) {
     throw new Error('Invalid form data')
   }
 
-  const { name, type, description, clientTime } = validatedFields.data
+  const { name, simtype, description, clientTime } = validatedFields.data
 
   try {
     const { userId } = await getAuthenticatedUser()
     
-    // Join multiple types with comma separator to support combinations
-    const typeString = type.join(',')
+    // Join multiple simtypes with comma separator to support combinations
+    const simtypeString = simtype.join(',')
     
     const projectData = {
       id: '', // Will be generated in CreateNewProject
       name,
-      type: typeString,
+      simtype: simtypeString,
       status: 'active' as const,
       size: '0 MB',
       date_modified: clientTime || '',
@@ -129,11 +129,11 @@ export async function createProject(formData: FormData) {
 
 export async function editProject(id: string, formData: FormData) {
   // Extract and validate form data
-  const types = formData.getAll('type') as string[]
+  const simtypes = formData.getAll('simtype') as string[]
   
   const validatedFields = UpdateProjectSchema.safeParse({
     name: formData.get('name'),
-    type: types.join(','), // Join array into comma-separated string like create does
+    simtype: simtypes.join(','), // Join array into comma-separated string like create does
     description: formData.get('description'),
     status: formData.get('status'),
   })
@@ -143,14 +143,14 @@ export async function editProject(id: string, formData: FormData) {
     throw new Error('Invalid form data')
   }
 
-  const { name, type, description, status } = validatedFields.data
+  const { name, simtype, description, status } = validatedFields.data
 
   try {
     const { userId, userName } = await getAuthenticatedUser()
     
     const updateData = {
       name,
-      type,
+      simtype,
       description: description || '',
       status,
       date_modified: new Date().toISOString(),
@@ -195,11 +195,11 @@ export async function deleteProjects(formData: FormData) {
 
 export async function copyProject(projectId: string, formData: FormData) {
   // Extract and validate form data
-  const types = formData.getAll('type') as string[]
+  const simtypes = formData.getAll('simtype') as string[]
   
   const validatedFields = UpdateProjectSchema.safeParse({
     name: formData.get('name'),
-    type: types.join(','), // Join array into comma-separated string
+    simtype: simtypes.join(','), // Join array into comma-separated string
     description: formData.get('description'),
     status: formData.get('status'),
   })
@@ -209,7 +209,7 @@ export async function copyProject(projectId: string, formData: FormData) {
     throw new Error('Invalid form data')
   }
 
-  const { name, type, description, status } = validatedFields.data
+  const { name, simtype, description, status } = validatedFields.data
 
   try {
     const { userId, userName } = await getAuthenticatedUser()
@@ -217,7 +217,7 @@ export async function copyProject(projectId: string, formData: FormData) {
     await CopyProject(
       projectId,
       name,
-      type,
+      simtype,
       description || '',
       status,
       false, // allowPublicCopy

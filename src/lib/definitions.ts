@@ -3,7 +3,7 @@ import { z } from 'zod'
 export interface ProjectData {
   id: string
   name: string
-  type: string // Support comma-separated combinations like "EM,HT" or "CFD" or "EM,HT,CFD"
+  simtype: string // Support comma-separated combinations like "EM,HT" or "CFD" or "EM,HT,CFD"
   status: "active" | "paused" | "archived" | "running"
   size: string
   date_modified: string
@@ -33,7 +33,7 @@ export class QuotaExceededError extends Error {
 // Schema for validating the create project form data
 export const CreateProjectSchema = z.object({
   name: z.string().min(1, 'Project name is required'),
-  type: z.array(z.enum(['EM', 'HT', 'CFD', 'MAG', 'PCB'])).min(1, 'At least one type must be selected'),
+  simtype: z.array(z.enum(['MAG', 'PCB', 'FEA', 'CFD', ])).min(1, 'At least one simtype must be selected'),
   description: z.string().optional(),
   clientTime: z.string().optional(),
 })
@@ -41,7 +41,7 @@ export const CreateProjectSchema = z.object({
 // Schema for validating the update project form data
 export const UpdateProjectSchema = z.object({
   name: z.string().min(1, 'Project name is required'),
-  type: z.string().min(1, 'At least one type must be selected'),
+  simtype: z.string().min(1, 'At least one simtype must be selected'),
   description: z.string().optional(),
   status: z.enum(['active', 'paused', 'archived', 'running']),
 })
@@ -50,7 +50,7 @@ export const UpdateProjectSchema = z.object({
 export const projectSchema = z.object({
   id: z.string(),
   name: z.string(),
-  type: z.string(),
+  simtype: z.string(),
   status: z.string(),
   size: z.string(),
   date_modified: z.string(),
@@ -98,14 +98,9 @@ export const types = [
     className: "text-orange-600 border-orange-200"
   },
   {
-    value: "EM",
-    label: "Eelectromagnetics",
+    value: "FEA",
+    label: "Finite Element Analysis",
     className: "text-blue-600 border-blue-200"
-  },
-  {
-    value: "HT",
-    label: "Heat Transfer",
-    className: "text-red-600 border-red-200"
   },
   {
     value: "CFD",
@@ -119,6 +114,6 @@ export const getStatusClass = (status: string) => {
   return statuses.find(s => s.value === status)?.className || "text-gray-600 border-gray-200"
 }
 
-export const getTypeClass = (type: string) => {
-  return types.find(t => t.value.toUpperCase() === type.toUpperCase())?.className || "text-gray-600 border-gray-200"
+export const getSimtypeClass = (simtype: string) => {
+  return types.find(t => t.value.toUpperCase() === simtype.toUpperCase())?.className || "text-gray-600 border-gray-200"
 }

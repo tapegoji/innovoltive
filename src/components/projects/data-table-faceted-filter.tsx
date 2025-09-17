@@ -20,7 +20,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { Separator } from "@/components/ui/separator"
-import { getTypeClass, getStatusClass } from "@/lib/definitions"
+import { getSimtypeClass, getStatusClass } from "@/lib/definitions"
 
 interface DataTableFacetedFilterProps<TData, TValue> {
   column?: Column<TData, TValue>
@@ -49,8 +49,8 @@ export function DataTableFacetedFilter<TData, TValue>({
   const selectedValues = new Set(column?.getFilterValue() as string[])
 
   const getBadgeClass = (option: OptionType) => {
-    if (title === "Type") {
-      return getTypeClass(option.value)
+    if (title === "Simtype") {
+      return getSimtypeClass(option.value)
     } else if (title === "Status") {
       return getStatusClass(option.value)
     }
