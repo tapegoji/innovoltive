@@ -4,7 +4,6 @@ import { ControlPanel } from '@/components/canvas/control-panel'
 import ThreeCanvas from './three-canvas'
 import { Header } from '@/components/Header'
 import CanvasHeaderIcons from '@/components/canvas/canvas-header-icons'
-import KiCanvas from './ki-canvas'
 import MagneticCanvas from './magnetic-canvas'
 
 interface CanvasProps {
@@ -24,9 +23,13 @@ export default function Canvas({ projectData }: CanvasProps) {
       <Header compact className='border-b'>
         {showThree && <CanvasHeaderIcons />}
       </Header>
-      <ControlPanel projectData={projectData} />
-      {showThree && <ThreeCanvas />}
-      {showMagnetic && <MagneticCanvas />}
+      {showThree && (
+        <>
+        <ControlPanel projectData={projectData} />
+        <ThreeCanvas />
+        </>
+      )}
+      {showMagnetic && (<MagneticCanvas />)}
 
     </div>
   )
