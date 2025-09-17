@@ -39,7 +39,7 @@ export function DataTableToolbar<TData>({
 
   return (
     <>
-      <div className="flex items-center gap-4 py-2">
+      <div className="flex items-center gap-4 py-2 overflow-x-auto">
         {!isPublic && (
           <div className="flex items-center space-x-2 gap-2">
             <CreateNewProject />
