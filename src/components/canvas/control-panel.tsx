@@ -5,22 +5,30 @@ import { Rnd } from 'react-rnd'
 import Link from 'next/link'
 import { IconMenu2, IconX } from '@tabler/icons-react';
 import { useState } from 'react';
+import { Plus, Minus } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { FileTree, type FileNode } from '@/components/ui/file-tree';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 interface ControlPanelProps {
   projectName?: string
+  projectHash?: string
 }
 
-export function ControlPanel({ projectName }: ControlPanelProps) {
+export function ControlPanel({ projectName, projectHash }: ControlPanelProps) {
   const isMobile = useIsMobile();
   
-  // Separate states for mobile and desktop (like sidebar pattern)
-  const [isVisibleMobile, setIsVisibleMobile] = useState(false); // Always start hidden on mobile
-  const [isVisibleDesktop, setIsVisibleDesktop] = useState(true); // Start visible on desktop
+  // Separate states for mobile and desktop
+  const [isVisibleMobile, setIsVisibleMobile] = useState(false)
+  const [isVisibleDesktop, setIsVisibleDesktop] = useState(true)
   
-  // Helper to get current visibility and setter based on device type
   const isVisible = isMobile ? isVisibleMobile : isVisibleDesktop;
   const setIsVisible = isMobile ? setIsVisibleMobile : setIsVisibleDesktop;
+
+  const handleFileClick = (node: FileNode) => {
+    console.log('File clicked:', node)
+    // Add your file handling logic here
+  }
 
   // Show menu button when panel is hidden
   if (!isVisible) {
@@ -76,9 +84,80 @@ export function ControlPanel({ projectName }: ControlPanelProps) {
                 Project: {projectName}
               </div>
             )}
-            <div>Geometry</div>
-            <div>Mesh</div>
-            <div>Simulation</div>
+            
+            {/* Geometry Section */}
+            <Collapsible className="group/collapsible">
+              <CollapsibleTrigger asChild>
+                <div className="flex items-center justify-between text-xs font-bold text-sidebar-foreground/80 hover:text-sidebar-foreground cursor-pointer py-1">
+                  <span>Geometry</span>
+                  <Plus className="h-3 w-3 group-data-[state=open]/collapsible:hidden" />
+                  <Minus className="h-3 w-3 group-data-[state=closed]/collapsible:hidden" />
+                </div>
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <div className="pl-2 py-1 text-xs text-sidebar-foreground/70">
+                  {/* Geometry tools will go here */}
+                  <div>Create shapes</div>
+                  <div>Edit geometry</div>
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
+            
+            {/* Mesh Section */}
+            <Collapsible className="group/collapsible">
+              <CollapsibleTrigger asChild>
+                <div className="flex items-center justify-between text-xs font-bold text-sidebar-foreground/80 hover:text-sidebar-foreground cursor-pointer py-1">
+                  <span>Mesh</span>
+                  <Plus className="h-3 w-3 group-data-[state=open]/collapsible:hidden" />
+                  <Minus className="h-3 w-3 group-data-[state=closed]/collapsible:hidden" />
+                </div>
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <div className="pl-2 py-1 text-xs text-sidebar-foreground/70">
+                  {/* Mesh tools will go here */}
+                  <div>Generate mesh</div>
+                  <div>Refine mesh</div>
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
+            
+            {/* Simulation Section */}
+            <Collapsible className="group/collapsible">
+              <CollapsibleTrigger asChild>
+                <div className="flex items-center justify-between text-xs font-bold text-sidebar-foreground/80 hover:text-sidebar-foreground cursor-pointer py-1">
+                  <span>Simulation</span>
+                  <Plus className="h-3 w-3 group-data-[state=open]/collapsible:hidden" />
+                  <Minus className="h-3 w-3 group-data-[state=closed]/collapsible:hidden" />
+                </div>
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <div className="pl-2 py-1 text-xs text-sidebar-foreground/70">
+                  {/* Simulation tools will go here */}
+                  <div>Run simulation</div>
+                  <div>View results</div>
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
+            
+            {/* Files Section */}
+            <Collapsible className="group/collapsible">
+              <CollapsibleTrigger asChild>
+                <div className="flex items-center justify-between text-xs font-bold text-sidebar-foreground/80 hover:text-sidebar-foreground cursor-pointer py-1">
+                  <span>Files</span>
+                  <Plus className="h-3 w-3 group-data-[state=open]/collapsible:hidden" />
+                  <Minus className="h-3 w-3 group-data-[state=closed]/collapsible:hidden" />
+                </div>
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <FileTree
+                  projectHash={projectHash}
+                  onFileClick={handleFileClick}
+                  maxHeight="max-h-40"
+                  loadingText="Loading files..."
+                  emptyText="No files found"
+                />
+              </CollapsibleContent>
+            </Collapsible>
           </div>
         </div>
         <div className="px-2 py-1 border-t border-sidebar-border bg-sidebar-accent/50">

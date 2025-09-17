@@ -15,14 +15,14 @@ function Box() {
 }
 
 interface CanvasPageProps {
-  projectHash?: string
   projectName?: string
+  projectHash?: string
 }
 
-export default function CanvasPage({ projectName }: CanvasPageProps) {
+export default function CanvasPage({ projectName, projectHash }: CanvasPageProps) {
   return (
     <div className="w-full h-[calc(100vh-2rem-1px)]">
-      <ControlPanel projectName={projectName} />
+      <ControlPanel projectName={projectName} projectHash={projectHash} />
       <Canvas
         orthographic
         camera={{ position: [10, 10, 10], zoom: 75 }}

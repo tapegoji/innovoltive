@@ -18,6 +18,7 @@ export default async function CanvasPage() {
   return (
     <CanvasPageClient 
       projectName={projectData.projectName}
+      projectHash={projectData.storagePathId}
     />
   )
 }

@@ -8,6 +8,14 @@ import { CreateNewProject, EditProject, DeleteProjects, CopyProject, ShareProjec
 import { CreateProjectSchema, UpdateProjectSchema } from './definitions'
 import { getRealPath } from './path-utils'
 
+// Type definitions
+interface TreeNode {
+  id: string
+  name: string
+  isFolder: boolean
+  children?: TreeNode[]
+}
+
 // Helper function to get authenticated user
 async function getAuthenticatedUser() {
   const user = await currentUser()
@@ -349,7 +357,7 @@ export async function getSelectedProject() {
 }
 
 // Server action for file operations using project hash
-export async function getProjectFiles(projectHash: string, relativePath: string = '') {
+export async function getProjectFiles(projectHash: string) {
   try {
     await getAuthenticatedUser() // Ensure user is authenticated
     
@@ -358,23 +366,54 @@ export async function getProjectFiles(projectHash: string, relativePath: string 
     if (!projectData || projectData.storagePathId !== projectHash) {
       throw new Error('Invalid project access')
     }
-    
+
     // Get real path from hash
     const realPath = await getRealPath(projectHash)
     if (!realPath) {
       throw new Error('Project not found')
     }
     
-    // Here you would implement file system operations
-    // For now, return a placeholder
-    return {
-      success: true,
-      path: relativePath,
-      realPath: realPath, // Include real path in response for debugging
-      message: `File operation on project ${projectHash.slice(0, 8)}... at ${relativePath || 'root'}`
+    // Function to recursively build tree structure
+    const buildFileTree = async (dirPath: string, basePath: string = ''): Promise<TreeNode[]> => {
+      const fs = await import('fs/promises')
+      const path = await import('path')
+      
+      try {
+        const entries = await fs.readdir(dirPath, { withFileTypes: true })
+        const tree: TreeNode[] = []
+        
+        for (const entry of entries) {
+          const itemPath = basePath ? `${basePath}/${entry.name}` : entry.name
+          const fullPath = path.join(dirPath, entry.name)
+          
+          const node: TreeNode = {
+            id: itemPath,
+            name: entry.name,
+            isFolder: entry.isDirectory(),
+            children: entry.isDirectory() ? await buildFileTree(fullPath, itemPath) : undefined
+          }
+          
+          tree.push(node)
+        }
+        
+        return tree.sort((a, b) => {
+          // Folders first, then files, both alphabetically
+          if (a.isFolder && !b.isFolder) return -1
+          if (!a.isFolder && b.isFolder) return 1
+          return a.name.localeCompare(b.name)
+        })
+      } catch (error) {
+        console.error('Error reading directory:', error)
+        return []
+      }
     }
     
-  } catch (error) {
+    const tree = await buildFileTree(realPath)
+    
+    return {
+      success: true,
+      tree: tree
+    }  } catch (error) {
     console.error('Failed to access project files:', error)
     return {
       success: false,
