@@ -490,7 +490,7 @@ export async function uploadGeometryFiles(projectHash: string, formData: FormDat
     const uploadedFiles: string[] = []
     const fsPromises = await import('fs/promises')
 
-    for (const [key, value] of formData.entries()) {
+    for (const [, value] of formData.entries()) {
       if (value instanceof File) {
         const fileName = value.name
         const filePath = path.join(geometryPath, fileName)
