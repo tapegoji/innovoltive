@@ -1,6 +1,5 @@
 'use client'
 
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { RxDragHandleDots2 } from "react-icons/rx";
 import { Rnd } from 'react-rnd'
 import Link from 'next/link'
@@ -9,11 +8,10 @@ import { useState } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 interface ControlPanelProps {
-  projectHash?: string
   projectName?: string
 }
 
-export function ControlPanel({projectName }: ControlPanelProps) {
+export function ControlPanel({ projectName }: ControlPanelProps) {
   const isMobile = useIsMobile();
   
   // Separate states for mobile and desktop (like sidebar pattern)

@@ -3,7 +3,6 @@
 import { Canvas } from '@react-three/fiber'
 import { Edges, GizmoHelper, GizmoViewport, OrbitControls } from '@react-three/drei'
 import { ControlPanel } from '@/components/canvas/control-panel'
-import { useEffect, useState } from 'react'
 
 function Box() {
   return (
@@ -20,7 +19,7 @@ interface CanvasPageProps {
   projectName?: string
 }
 
-export default function CanvasPage({ projectHash, projectName }: CanvasPageProps) {
+export default function CanvasPage({ projectName }: CanvasPageProps) {
   return (
     <div className="w-full h-[calc(100vh-2rem-1px)]">
       <ControlPanel projectName={projectName} />

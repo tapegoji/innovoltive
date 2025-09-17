@@ -351,7 +351,7 @@ export async function getSelectedProject() {
 // Server action for file operations using project hash
 export async function getProjectFiles(projectHash: string, relativePath: string = '') {
   try {
-    const { userId } = await getAuthenticatedUser()
+    await getAuthenticatedUser() // Ensure user is authenticated
     
     // Validate that the project hash matches current session
     const projectData = await getSelectedProject()
@@ -365,14 +365,12 @@ export async function getProjectFiles(projectHash: string, relativePath: string 
       throw new Error('Project not found')
     }
     
-    // Construct full path for file operation
-    const fullPath = relativePath ? `${realPath}/${relativePath}` : realPath
-    
     // Here you would implement file system operations
     // For now, return a placeholder
     return {
       success: true,
       path: relativePath,
+      realPath: realPath, // Include real path in response for debugging
       message: `File operation on project ${projectHash.slice(0, 8)}... at ${relativePath || 'root'}`
     }
     
@@ -388,7 +386,7 @@ export async function getProjectFiles(projectHash: string, relativePath: string 
 // Server action to get project metadata using hash
 export async function getProjectMetadata(projectHash: string) {
   try {
-    const { userId } = await getAuthenticatedUser()
+    await getAuthenticatedUser() // Ensure user is authenticated
     
     // Validate that the project hash matches current session
     const projectData = await getSelectedProject()
