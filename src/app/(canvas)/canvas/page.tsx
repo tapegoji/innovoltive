@@ -14,10 +14,16 @@ export default async function CanvasPage() {
     redirect('/my-projects')
   }
   
-  // Use the actual project name from the database, not extracted from path
+  // Map the project data to the expected format
+  const canvasProjectData = {
+    projectName: projectData.projectName,
+    projectHash: projectData.storagePathId, // Map storagePathId to projectHash
+    simType: projectData.simType
+  }
+  
   return (
       <Canvas 
-        projectData={projectData}
+        projectData={canvasProjectData}
       />
   )
 }
