@@ -80,11 +80,11 @@ export async function fetchPublicProjects() {
 }
 export async function createProject(formData: FormData) {
   // Extract and validate form data
-  const simtypes = formData.getAll('simtype') as string[]
+  const simTypes = formData.getAll('simType') as string[]
   
   const validatedFields = CreateProjectSchema.safeParse({
     name: formData.get('name'),
-    simtype: simtypes,
+    simType: simTypes,
     description: formData.get('description'),
     clientTime: formData.get('clientTime'),
   })
@@ -94,18 +94,18 @@ export async function createProject(formData: FormData) {
     throw new Error('Invalid form data')
   }
 
-  const { name, simtype, description, clientTime } = validatedFields.data
+  const { name, simType, description, clientTime } = validatedFields.data
 
   try {
     const { userId } = await getAuthenticatedUser()
     
-    // Join multiple simtypes with comma separator to support combinations
-    const simtypeString = simtype.join(',')
+    // Join multiple simTypes with comma separator to support combinations
+    const simTypeString = simType.join(',')
     
     const projectData = {
       id: '', // Will be generated in CreateNewProject
       name,
-      simtype: simtypeString,
+      simType: simTypeString,
       status: 'active' as const,
       size: '0 MB',
       date_modified: clientTime || '',
@@ -117,7 +117,7 @@ export async function createProject(formData: FormData) {
     const createdProject = await CreateNewProject(projectData, userId)
 
     // Set project session for the newly created project
-    await setProjectSession(createdProject.id, createdProject.storage_path_id!, createdProject.name, createdProject.simtype, userId)
+    await setProjectSession(createdProject.id, createdProject.storage_path_id!, createdProject.name, createdProject.simType, userId)
 
   } catch (error) {
     console.error('Failed to create project:', error)
@@ -133,11 +133,11 @@ export async function createProject(formData: FormData) {
 
 export async function editProject(id: string, formData: FormData) {
   // Extract and validate form data
-  const simtypes = formData.getAll('simtype') as string[]
+  const simTypes = formData.getAll('simType') as string[]
   
   const validatedFields = UpdateProjectSchema.safeParse({
     name: formData.get('name'),
-    simtype: simtypes.join(','), // Join array into comma-separated string like create does
+    simType: simTypes.join(','), // Join array into comma-separated string like create does
     description: formData.get('description'),
     status: formData.get('status'),
   })
@@ -147,14 +147,14 @@ export async function editProject(id: string, formData: FormData) {
     throw new Error('Invalid form data')
   }
 
-  const { name, simtype, description, status } = validatedFields.data
+  const { name, simType, description, status } = validatedFields.data
 
   try {
     const { userId, userName } = await getAuthenticatedUser()
     
     const updateData = {
       name,
-      simtype,
+      simType,
       description: description || '',
       status,
       date_modified: new Date().toISOString(),
@@ -199,11 +199,11 @@ export async function deleteProjects(formData: FormData) {
 
 export async function copyProject(projectId: string, formData: FormData) {
   // Extract and validate form data
-  const simtypes = formData.getAll('simtype') as string[]
+  const simTypes = formData.getAll('simType') as string[]
   
   const validatedFields = UpdateProjectSchema.safeParse({
     name: formData.get('name'),
-    simtype: simtypes.join(','), // Join array into comma-separated string
+    simType: simTypes.join(','), // Join array into comma-separated string
     description: formData.get('description'),
     status: formData.get('status'),
   })
@@ -213,7 +213,7 @@ export async function copyProject(projectId: string, formData: FormData) {
     throw new Error('Invalid form data')
   }
 
-  const { name, simtype, description, status } = validatedFields.data
+  const { name, simType, description, status } = validatedFields.data
 
   try {
     const { userId, userName } = await getAuthenticatedUser()
@@ -221,7 +221,7 @@ export async function copyProject(projectId: string, formData: FormData) {
     await CopyProject(
       projectId,
       name,
-      simtype,
+      simType,
       description || '',
       status,
       false, // allowPublicCopy
@@ -287,7 +287,7 @@ export async function shareProject(formData: FormData) {
 }
 
 // Helper function to set project session cookie
-async function setProjectSession(projectId: string, storagePathId: string, projectName: string, simtype: string | undefined, userId: string) {
+async function setProjectSession(projectId: string, storagePathId: string, projectName: string, simType: string | undefined, userId: string) {
   // Validate that the storage path ID exists and user has access
   const realPath = await getRealPath(storagePathId)
   if (!realPath) {
@@ -304,7 +304,7 @@ async function setProjectSession(projectId: string, storagePathId: string, proje
     storagePathId,
     realPath,
     projectName,
-    simtype: simtype, // Keep as simtype for database consistency
+    simType: simType, // Keep as simType for consistency
     userId,
     timestamp: Date.now()
   }
@@ -320,11 +320,11 @@ async function setProjectSession(projectId: string, storagePathId: string, proje
 }
 
 // Secure project selection action
-export async function selectProject(projectId: string, storagePathId: string, projectName: string, simtype?: string) {
+export async function selectProject(projectId: string, storagePathId: string, projectName: string, simType?: string) {
   try {
     const { userId } = await getAuthenticatedUser()
     
-    await setProjectSession(projectId, storagePathId, projectName, simtype, userId)
+    await setProjectSession(projectId, storagePathId, projectName, simType, userId)
     
   } catch (error) {
     console.error('Failed to select project:', error)

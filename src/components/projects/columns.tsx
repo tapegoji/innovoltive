@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
 
-import { statuses, getSimtypeClass, getStatusClass } from "@/lib/definitions"
+import { statuses, getSimTypeClass, getStatusClass } from "@/lib/definitions"
 import { Project } from "@/lib/definitions"
 import { DataTableColumnHeader } from "./data-table-column-header"
 import { DataTableRowActions } from "./data-table-row-actions"
@@ -45,7 +45,7 @@ export const columns: ColumnDef<Project>[] = [
 		),
 		cell: ({ row }) => {
 			const name = row.getValue("name") as string
-			const simtype = row.getValue("simtype") as string
+			const simType = row.getValue("simType") as string
 			const isShared = row.original.shared
 			const storagePathId = row.original.storage_path_id
 			const projectId = row.original.id
@@ -58,7 +58,7 @@ export const columns: ColumnDef<Project>[] = [
 				const handleClick = async () => {
 					if (storagePathId && projectId) {
 						try {
-							await selectProject(projectId, storagePathId, name, simtype)
+							await selectProject(projectId, storagePathId, name, simType)
 						} catch (error) {
 							console.error('Failed to select project:', error)
 						}
@@ -89,25 +89,25 @@ export const columns: ColumnDef<Project>[] = [
 		enableHiding: false,
 	},
 	{
-		accessorKey: "simtype",
+		accessorKey: "simType",
 		header: ({ column }) => (
 			<DataTableColumnHeader column={column} title="Type" />
 		),
 		cell: ({ row }) => {
-			const simtypeValue = row.getValue("simtype") as string
+			const simTypeValue = row.getValue("simType") as string
 
-			if (!simtypeValue) {
+			if (!simTypeValue) {
 				return null
 			}
 
 			// Split comma-separated values
-			const simtypeValues = simtypeValue.split(',').map(t => t.trim()).filter(Boolean)
+			const simTypeValues = simTypeValue.split(',').map(t => t.trim()).filter(Boolean)
 
 			return (
 				<div className="flex w-fit items-center gap-1 flex-wrap">
-					{simtypeValues.map(simtype => (
-						<Badge key={simtype} variant="outline" className={getSimtypeClass(simtype)}>
-							{simtype.toUpperCase()}
+					{simTypeValues.map(simType => (
+						<Badge key={simType} variant="outline" className={getSimTypeClass(simType)}>
+							{simType.toUpperCase()}
 						</Badge>
 					))}
 				</div>

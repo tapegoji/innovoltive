@@ -114,7 +114,7 @@ export async function fetchUserProjects(userId: string, userName: string): Promi
       SELECT
         projects.id,
         projects.name,
-        projects.simtype,
+        projects.sim_type as "simType",
         projects.description,
         projects.date_modified,
         projects.size,
@@ -152,11 +152,11 @@ export async function CreateNewProject(
 
     // Insert the project
     const [project] = await sql<ProjectData[]>`
-      INSERT INTO projects (id, name, simtype, description, size, user_id, status, date_modified, storage_path_id)
+      INSERT INTO projects (id, name, sim_type, description, size, user_id, status, date_modified, storage_path_id)
       VALUES (
         ${projectId},
         ${projectData.name},
-        ${projectData.simtype},
+        ${projectData.simType},
         ${projectData.description || ''},
         ${'0 MB'},
         ${userId},
@@ -164,7 +164,7 @@ export async function CreateNewProject(
         ${projectData.date_modified || new Date().toISOString()},
         ${hashedPath}
       )
-      RETURNING id, name, simtype, description, date_modified, size, status, user_id, storage_path_id
+      RETURNING id, name, sim_type as "simType", description, date_modified, size, status, user_id, storage_path_id
     `
 
     // Link the project to the user as owner
@@ -214,7 +214,7 @@ export async function EditProject(
     // Prepare update data with defaults
     const updateData = {
       name: projectData.name ?? currentProject.name,
-      simtype: projectData.simtype ?? currentProject.simtype,
+      simType: projectData.simType ?? currentProject.simType,
       description: projectData.description ?? currentProject.description,
       status: projectData.status ?? currentProject.status,
       date_modified: projectData.date_modified ?? new Date().toISOString()
@@ -224,12 +224,12 @@ export async function EditProject(
       UPDATE projects
       SET
         name = ${updateData.name},
-        simtype = ${updateData.simtype},
+        sim_type = ${updateData.simType},
         description = ${updateData.description},
         status = ${updateData.status},
         date_modified = ${updateData.date_modified}
       WHERE id = ${projectId}
-      RETURNING id, name, simtype, description, date_modified, size, status, user_id, storage_path_id
+      RETURNING id, name, sim_type as "simType", description, date_modified, size, status, user_id, storage_path_id
     `
 
     if (!project) {
@@ -344,7 +344,7 @@ export async function CopyProject(
     }
 
     const [copiedProject] = await sql<ProjectData[]>`
-      INSERT INTO projects (id, name, simtype, description, size, user_id, status, date_modified, storage_path_id)
+      INSERT INTO projects (id, name, sim_type, description, size, user_id, status, date_modified, storage_path_id)
       VALUES (
         ${newProjectId},
         ${newName},
@@ -356,7 +356,7 @@ export async function CopyProject(
         ${new Date().toISOString()},
         ${hashedPath}
       )
-      RETURNING id, name, simtype, description, date_modified, size, status, user_id, storage_path_id
+      RETURNING id, name, sim_type as "simType", description, date_modified, size, status, user_id, storage_path_id
     `
 
     // Link the copied project to the current user as owner

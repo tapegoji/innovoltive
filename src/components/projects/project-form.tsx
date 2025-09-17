@@ -79,8 +79,8 @@ export function ProjectForm({ mode, open, onOpenChange, project, action }: Proje
 
   // Initialize selected type and name when project changes
   useEffect(() => {
-    if (project && project.simtype) {
-      setSelectedType(project.simtype)
+    if (project && project.simType) {
+      setSelectedType(project.simType)
     } else if (mode === 'create') {
       setSelectedType('')
     }
@@ -107,7 +107,7 @@ export function ProjectForm({ mode, open, onOpenChange, project, action }: Proje
       <DialogContent className="w-full sm:max-w-[425px]">
         <form action={action}>
           <input type="hidden" name="clientTime" value={clientTime} />
-          <input type="hidden" name="simtype" value={selectedType} />
+          <input type="hidden" name="simType" value={selectedType} />
           <DialogHeader>
             <DialogTitle>{config.title}</DialogTitle>
             <DialogDescription>
