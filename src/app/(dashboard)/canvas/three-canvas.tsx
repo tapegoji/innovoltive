@@ -27,7 +27,7 @@ export default function ThreeCanvas() {
     >
       {/* <ambientLight intensity={1} /> */}
       {/* <pointLight position={[10, 10, 10]} /> */}
-      {/* <Box /> */}
+      <Box />
       <GizmoHelper alignment="bottom-right" margin={gizmoMargin}>
         <GizmoViewport axisColors={['red', 'green', 'blue']} labelColor="white" scale={gizmoScale} />
       </GizmoHelper>

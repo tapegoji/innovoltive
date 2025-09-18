@@ -9,7 +9,6 @@ import { Plus, Minus } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { FileTree, type FileNode } from '@/components/ui/file-tree';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { DialogTrigger } from '@/components/ui/dialog';
 import { Upload } from 'lucide-react';
 import { UploadDialog } from './upload-dialog';
 

@@ -3,7 +3,6 @@ import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/s
 import { AppSidebar } from "@/components/app-sidebar"
 import { Header } from "@/components/Header"
 import Footer from "@/components/Footer"
-import { SidebarIcon } from "lucide-react"
 
 export default async function DashboardLayout({
   children,
