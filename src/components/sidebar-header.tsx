@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { ChevronsUpDown, PanelLeftIcon, Plus } from "lucide-react"
+import Link from "next/link"
 
 import {
   DropdownMenu,
@@ -39,12 +40,12 @@ export function SideBarHeader({
   }
 
   return (
-    <SidebarMenu className="p-0 h-4"> 
-      <SidebarMenuItem>
-        <div className={open ? "justify-between w-full flex items-center" : "justify-center w-full flex items-center"}>
+    <SidebarMenu className="p-0 flex  h-4"> 
+      <SidebarMenuItem className="p-0">
+        <div className={open ? "justify-between flex" : "justify-center flex"}>
         {open ? (
           <>
-            <div>Dashboard</div>
+            <Link href="/dashboard" className="text-inherit hover:underline">Dashboard</Link>
             <IconX className="size-6" onClick={toggleSidebar} />
           </>
         ) : (
