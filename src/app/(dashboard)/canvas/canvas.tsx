@@ -2,8 +2,6 @@
 
 import { ControlPanel } from '@/components/canvas/control-panel'
 import ThreeCanvas from './three-canvas'
-import { Header } from '@/components/Header'
-import CanvasHeaderIcons from '@/components/canvas/canvas-header-icons'
 import MagneticCanvas from './magnetic-canvas'
 
 interface CanvasProps {
@@ -19,10 +17,7 @@ export default function Canvas({ projectData }: CanvasProps) {
   const showMagnetic = projectData.simType === 'MAG'
 
   return (
-    <div className="w-full h-[calc(100vh-2rem-1px)]">
-      <Header compact className='border-b'>
-        {showThree && <CanvasHeaderIcons />}
-      </Header>
+    <div className="w-ful h-[calc(100vh-2rem-1px)]">
       {showThree && (
         <>
         <ControlPanel projectData={projectData} />

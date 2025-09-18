@@ -1,6 +1,5 @@
 'use client'
 
-import Footer from '@/components/Footer'
 import React, { ReactNode } from 'react'
 
 export default function CanvasLayout({
@@ -11,7 +10,6 @@ export default function CanvasLayout({
   return (
     <div className="w-full h-full">
       {children}
-      <Footer />
     </div>
   )
 }
