@@ -10,7 +10,6 @@ import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarHeader,
-  SidebarInput,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -18,13 +17,13 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import { ProjectsSidebar } from "./projects-sidebar"
-import { DocumentationSidebar } from "./documentation-sidebar"
+import { DocsSidebar } from "./docs-sidebar"
 import { SettingsSidebar } from "./settings-sidebar"
 
 // This is adapted data for nested sidebar
 const projectsData = {
   title: "Projects",
-  url: "/dashboard",
+  url: "/my-projects",
   icon: LayoutDashboard,
   isActive: true,
 };
@@ -125,15 +124,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <div className="text-foreground text-base font-medium">
             {activeItem?.title}
           </div>
-          {activeItem?.title === "Documentation" && (
-            <SidebarInput placeholder="Type to search..." />
-          )}
         </SidebarHeader>
         <SidebarContent>
           <SidebarGroup className="px-0">
             <SidebarGroupContent>
               {activeItem?.title === "Projects" && <ProjectsSidebar />}
-              {activeItem?.title === "Documentation" && <DocumentationSidebar />}
+              {activeItem?.title === "Documentation" && <DocsSidebar />}
               {activeItem?.title === "Settings" && <SettingsSidebar />}
             </SidebarGroupContent>
           </SidebarGroup>

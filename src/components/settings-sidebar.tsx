@@ -15,7 +15,12 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible"
 
-const settingsItems = [
+interface SettingsItem {
+  title: string;
+  url: string;
+}
+
+const settingsItems: SettingsItem[] = [
   {
     title: "General",
     url: "/settings/general",
@@ -37,7 +42,7 @@ const settingsItems = [
 export function SettingsSidebar() {
   return (
     <SidebarMenu>
-      {settingsItems.map((subItem: any) => (
+      {settingsItems.map((subItem) => (
         <Collapsible
           key={subItem.title}
           asChild

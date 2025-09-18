@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Folder, Globe } from "lucide-react"
+import { Folder, Globe, LucideIcon } from "lucide-react"
 import Link from "next/link"
 import {
   SidebarMenu,
@@ -7,7 +7,14 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 
-const projectsItems = [
+interface ProjectItem {
+  title: string;
+  url: string;
+  icon: LucideIcon;
+  isActive: boolean;
+}
+
+const projectsItems: ProjectItem[] = [
   {
     title: "My Projects",
     url: "/my-projects",
@@ -25,7 +32,7 @@ const projectsItems = [
 export function ProjectsSidebar() {
   return (
     <SidebarMenu>
-      {projectsItems.map((subItem: any) => (
+      {projectsItems.map((subItem) => (
         <SidebarMenuItem key={subItem.title}>
           <SidebarMenuButton asChild>
             <Link href={subItem.url}>
