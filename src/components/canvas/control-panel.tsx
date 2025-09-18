@@ -55,7 +55,7 @@ export function ControlPanel({ projectData }: ControlPanelProps) {
     return (
       <button
         onClick={() => setIsVisible(true)}
-        className="fixed top-9 left-1 z-[100] w-10 h-10 bg-sidebar text-sidebar-foreground rounded-full shadow-lg  flex items-center justify-center border border-sidebar-border"
+        className="fixed top-9 left-3rem z-[100] w-10 h-10 bg-sidebar text-sidebar-foreground rounded-full shadow-lg  flex items-center justify-center border border-sidebar-border"
         title="Open Control Panel"
       >
         <IconMenu2 size={25} />

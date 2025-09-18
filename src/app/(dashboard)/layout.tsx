@@ -14,7 +14,7 @@ export default async function DashboardLayout({
   const defaultOpen = cookieStore.get("sidebar_state")?.value === "true"
 
   return (
-    <SidebarProvider defaultOpen={defaultOpen}>
+    <SidebarProvider defaultOpen={defaultOpen} style={{ "--sidebar-width-icon": "3rem" } as React.CSSProperties}>
       <AppSidebar />
       <SidebarInset>
       <main className="w-full">
