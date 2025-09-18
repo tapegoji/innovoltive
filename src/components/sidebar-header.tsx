@@ -1,43 +1,19 @@
 "use client"
 
 import * as React from "react"
-import { ChevronsUpDown, PanelLeftIcon, Plus } from "lucide-react"
+import { PanelLeftIcon } from "lucide-react"
 import Link from "next/link"
 
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import {
   SidebarMenu,
-  SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
-import SidebarTrigger from "./side-bar-trigger"
 import { Button } from "./ui/button"
 import { IconX } from "@tabler/icons-react"
 
-export function SideBarHeader({
-  teams,
-}: {
-  teams: {
-    name: string
-    logo: React.FC<{ className?: string }>
-    plan: string
-  }[]
-}) {
-  const [activeTeam, setActiveTeam] = React.useState(teams[0])
+export function SideBarHeader() {
   const { toggleSidebar, open } = useSidebar()
-
-  if (!activeTeam) {
-    return null
-  }
 
   return (
     <SidebarMenu className="gap-0"> 

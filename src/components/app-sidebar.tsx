@@ -19,22 +19,9 @@ import {
   SidebarRail,
   SidebarSeparator,
 } from "@/components/ui/sidebar"
-import { MdDashboard } from "react-icons/md"
 
 // This is sample data.
 const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-  teams: [
-    {
-      name: "InnoVoltive",
-      logo: MdDashboard,
-      plan: "Enterprise",
-    }
-  ],
   NavPlatForm: [
     {
       title: "Documentation",
@@ -104,7 +91,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader className="h-8 gap-0 p-1"  >
-        <SideBarHeader teams={data.teams} />
+        <SideBarHeader />
       </SidebarHeader>
         <SidebarContent>
         <SidebarSeparator />
