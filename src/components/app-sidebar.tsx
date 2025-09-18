@@ -4,7 +4,6 @@ import * as React from "react"
 import { BookOpen, Settings2, Folder, Globe, LayoutDashboard, Minus, Plus } from "lucide-react"
 import Link from "next/link"
 
-import { NavUser } from "@/components/nav-user"
 import {
   Sidebar,
   SidebarContent,
@@ -30,11 +29,6 @@ import {
 
 // This is adapted data for nested sidebar
 const data = {
-  user: {
-    name: "User",
-    email: "user@example.com",
-    avatar: "/avatars/user.jpg",
-  },
   navMain: [
     {
       title: "Projects",
@@ -178,7 +172,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarGroup>
         </SidebarContent>
         <SidebarFooter>
-          <NavUser user={data.user} />
         </SidebarFooter>
       </Sidebar>
 
