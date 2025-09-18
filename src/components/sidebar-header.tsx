@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { ChevronsUpDown, Plus } from "lucide-react"
+import { ChevronsUpDown, PanelLeftIcon, Plus } from "lucide-react"
 
 import {
   DropdownMenu,
@@ -18,8 +18,11 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
+import SidebarTrigger from "./side-bar-trigger"
+import { Button } from "./ui/button"
+import { IconX } from "@tabler/icons-react"
 
-export function TeamSwitcher({
+export function SideBarHeader({
   teams,
 }: {
   teams: {
@@ -28,17 +31,37 @@ export function TeamSwitcher({
     plan: string
   }[]
 }) {
-  const { isMobile } = useSidebar()
   const [activeTeam, setActiveTeam] = React.useState(teams[0])
+  const { toggleSidebar, open } = useSidebar()
 
   if (!activeTeam) {
     return null
   }
 
   return (
-    <SidebarMenu>
+    <SidebarMenu className="p-0 h-4"> 
       <SidebarMenuItem>
-        <DropdownMenu>
+        <div className={open ? "justify-between w-full flex items-center" : "justify-center w-full flex items-center"}>
+        {open ? (
+          <>
+            <div>Dashboard</div>
+            <IconX className="size-6" onClick={toggleSidebar} />
+          </>
+        ) : (
+          <Button
+            data-sidebar="trigger"
+            data-slot="sidebar-trigger"
+            variant="ghost"
+            size="icon"
+            className="size-4"
+            onClick={toggleSidebar}
+          >
+            <PanelLeftIcon className="size-6" />
+            <span className="sr-only">Toggle Sidebar</span>
+          </Button>
+        )}
+        </div>
+        {/* <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
               size="lg"
@@ -84,7 +107,7 @@ export function TeamSwitcher({
               <div className="text-muted-foreground font-medium">Add team</div>
             </DropdownMenuItem>
           </DropdownMenuContent>
-        </DropdownMenu>
+        </DropdownMenu> */}
       </SidebarMenuItem>
     </SidebarMenu>
   )

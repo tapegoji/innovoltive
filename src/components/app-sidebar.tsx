@@ -10,7 +10,7 @@ import {
 
 import { NavPlatForm } from "@/components/nav-platform"
 import { NavProjects } from "@/components/nav-projects"
-import { TeamSwitcher } from "@/components/team-switcher"
+import { SideBarHeader } from "@/components/sidebar-header"
 import {
   Sidebar,
   SidebarContent,
@@ -104,7 +104,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
+        <SideBarHeader teams={data.teams} />
       </SidebarHeader>
         <SidebarContent>
         <SidebarSeparator />

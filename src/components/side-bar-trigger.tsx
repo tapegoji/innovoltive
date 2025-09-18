@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { PanelLeftIcon } from "lucide-react"
 import { useSidebar } from "./ui/sidebar"
+import { useIsMobile } from "@/hooks/use-mobile"
 
 export default function SidebarTrigger({
   className,
@@ -12,14 +13,17 @@ export default function SidebarTrigger({
   ...props
 }: React.ComponentProps<typeof Button>) {
   const { toggleSidebar } = useSidebar()
+  const isMobile = useIsMobile()
 
   return (
+    <>
+    {isMobile && (
     <Button
       data-sidebar="trigger"
       data-slot="sidebar-trigger"
       variant="ghost"
       size="icon"
-      className={cn("size-7", className)}
+      className={cn("size-6", className)}
       onClick={(event) => {
         onClick?.(event)
         toggleSidebar()
@@ -29,5 +33,7 @@ export default function SidebarTrigger({
       <PanelLeftIcon className="size-6"/>
       <span className="sr-only">Toggle Sidebar</span>
     </Button>
+    )}
+    </>
   )
 }
