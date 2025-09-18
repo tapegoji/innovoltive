@@ -1,8 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { BookOpen, Settings2, Folder, Globe, LayoutDashboard, Minus, Plus } from "lucide-react"
-import Link from "next/link"
+import { BookOpen, Settings2, LayoutDashboard } from "lucide-react"
 
 import {
   Sidebar,
@@ -15,97 +14,41 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
   SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar"
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible"
+import { ProjectsSidebar } from "./projects-sidebar"
+import { DocumentationSidebar } from "./documentation-sidebar"
+import { SettingsSidebar } from "./settings-sidebar"
 
 // This is adapted data for nested sidebar
-const data = {
-  navMain: [
-    {
-      title: "Projects",
-      url: "/dashboard",
-      icon: LayoutDashboard,
-      isActive: true,
-      items: [
-      {
-        title: "My Projects",
-        url: "/my-projects",
-        icon: Folder,
-        isActive: false,
-      },
-      {
-        title: "Public Projects",
-        url: "/public-projects",
-        icon: Globe,
-        isActive: false,
-      },
-      ]
-    },
-      
-    {
-      title: "Documentation",
-      url: "/documentation",
-      icon: BookOpen,
-      isActive: false,
-      items: [
-        {
-          title: "Quick Reference",
-          url: "/documentation/quick-reference",
-        },
-        {
-          title: "Get Started",
-          url: "/documentation/get-started",
-        },
-        {
-          title: "Tutorials",
-          url: "/documentation/tutorials",
-        },
-        {
-          title: "Changelog",
-          url: "/documentation/changelog",
-        },
-      ],
-    },
-    {
-      title: "Settings",
-      url: "/settings",
-      icon: Settings2,
-      isActive: false,
-      items: [
-        {
-          title: "General",
-          url: "/settings/general",
-        },
-        {
-          title: "Team",
-          url: "/settings/team",
-        },
-        {
-          title: "Billing",
-          url: "/settings/billing",
-        },
-        {
-          title: "Limits",
-          url: "/settings/limits",
-        },
-      ],
-    },
-  ],
-}
+const projectsData = {
+  title: "Projects",
+  url: "/dashboard",
+  icon: LayoutDashboard,
+  isActive: true,
+};
+
+const documentationData = {
+  title: "Documentation",
+  url: "/documentation",
+  icon: BookOpen,
+  isActive: false,
+};
+
+const settingsData = {
+  title: "Settings",
+  url: "/settings",
+  icon: Settings2,
+  isActive: false,
+};
+
+const navMain = [projectsData, documentationData, settingsData];
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   // Note: I'm using state to show active item.
   // IRL you should use the url/router.
-  const [activeItem, setActiveItem] = React.useState(data.navMain[0])
+  const [activeItem, setActiveItem] = React.useState(navMain[0])
   const { setOpen, open } = useSidebar()
 
   return (
@@ -142,7 +85,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarGroup>
             <SidebarGroupContent className="px-1.5 md:px-0">
               <SidebarMenu>
-                {data.navMain.map((item) => (
+                {navMain.map((item) => (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton
                       tooltip={{
@@ -189,44 +132,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarContent>
           <SidebarGroup className="px-0">
             <SidebarGroupContent>
-              {activeItem?.items ? (
-                <SidebarMenu>
-                  {activeItem.items.map((subItem: any) => (
-                    <Collapsible
-                      key={subItem.title}
-                      asChild
-                      defaultOpen={false}
-                      className="group/collapsible"
-                    >
-                      <SidebarMenuItem>
-                        <CollapsibleTrigger asChild>
-                          <SidebarMenuButton tooltip={subItem.title}>
-                            {'icon' in subItem && subItem.icon && <subItem.icon />}
-                            <span>{subItem.title}</span>
-                            <Plus className="ml-auto transition-all duration-200 group-data-[state=open]/collapsible:hidden" />
-                            <Minus className="ml-auto transition-all duration-200 group-data-[state=closed]/collapsible:hidden" />
-                          </SidebarMenuButton>
-                        </CollapsibleTrigger>
-                        <CollapsibleContent>
-                          <SidebarMenuSub>
-                            <SidebarMenuSubItem>
-                              <SidebarMenuSubButton asChild>
-                                <Link href={subItem.url}>
-                                  <span>View {subItem.title}</span>
-                                </Link>
-                              </SidebarMenuSubButton>
-                            </SidebarMenuSubItem>
-                          </SidebarMenuSub>
-                        </CollapsibleContent>
-                      </SidebarMenuItem>
-                    </Collapsible>
-                  ))}
-                </SidebarMenu>
-              ) : (
-                <div className="p-4 text-sm text-muted-foreground">
-                  No sub-items for {activeItem?.title}
-                </div>
-              )}
+              {activeItem?.title === "Projects" && <ProjectsSidebar />}
+              {activeItem?.title === "Documentation" && <DocumentationSidebar />}
+              {activeItem?.title === "Settings" && <SettingsSidebar />}
             </SidebarGroupContent>
           </SidebarGroup>
         </SidebarContent>

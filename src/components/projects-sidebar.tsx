@@ -1,0 +1,40 @@
+import * as React from "react"
+import { Folder, Globe } from "lucide-react"
+import Link from "next/link"
+import {
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from "@/components/ui/sidebar"
+
+const projectsItems = [
+  {
+    title: "My Projects",
+    url: "/my-projects",
+    icon: Folder,
+    isActive: false,
+  },
+  {
+    title: "Public Projects",
+    url: "/public-projects",
+    icon: Globe,
+    isActive: false,
+  },
+];
+
+export function ProjectsSidebar() {
+  return (
+    <SidebarMenu>
+      {projectsItems.map((subItem: any) => (
+        <SidebarMenuItem key={subItem.title}>
+          <SidebarMenuButton asChild>
+            <Link href={subItem.url}>
+              {subItem.icon && <subItem.icon />}
+              <span>{subItem.title}</span>
+            </Link>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      ))}
+    </SidebarMenu>
+  );
+}
