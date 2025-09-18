@@ -39,10 +39,9 @@ export function DataTableToolbar<TData>({
 
   return (
     <>
-      <div className="flex items-center gap-4 py-2 overflow-x-auto">
+      <div className="flex items-center py-2 overflow-x-auto">
         {!isPublic && (
           <div className="flex items-center space-x-2 gap-2">
-            <CreateNewProject />
             {selectedRows.length > 0 && (
               <Button
                 variant="destructive"
@@ -132,6 +131,7 @@ export function DataTableToolbar<TData>({
             />
           )}
           <DataTableViewOptions table={table} />
+          {!isPublic && (<CreateNewProject /> )}
           {isFiltered && (
             <Button
               variant="ghost"

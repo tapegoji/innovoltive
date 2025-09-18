@@ -84,15 +84,18 @@ const data = {
     },
   ],
   projects: [
+    
     {
-      name: "My Projects",
+      title: "My Projects",
       url: "/my-projects",
       icon: Folder,
+      items: []
     },
     {
-      name: "Public Projects",
+      title: "Public Projects",
       url: "/public-projects",
       icon: Globe,
+      items: []
     }
   ],
 }
@@ -104,7 +107,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <TeamSwitcher teams={data.teams} />
       </SidebarHeader>
       <SidebarContent>
-        <NavProjects projects={data.projects} />
+        <NavProjects items={data.projects} />
         <NavPlatForm items={data.NavPlatForm} />
       </SidebarContent>
       <SidebarFooter>

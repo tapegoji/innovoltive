@@ -1,6 +1,6 @@
 "use client"
 
-import { ChevronRight, type LucideIcon } from "lucide-react"
+import { type LucideIcon, Minus, Plus } from "lucide-react"
 
 import {
   Collapsible,
@@ -48,7 +48,8 @@ export function NavPlatForm({
                 <SidebarMenuButton tooltip={item.title}>
                   {item.icon && <item.icon />}
                   <span>{item.title}</span>
-                  <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                  <Plus className="ml-auto transition-all duration-200 group-data-[state=open]/collapsible:hidden" />
+                  <Minus className="ml-auto transition-all duration-200 group-data-[state=closed]/collapsible:hidden" />
                 </SidebarMenuButton>
               </CollapsibleTrigger>
               <CollapsibleContent>
