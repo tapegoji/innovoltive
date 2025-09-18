@@ -1,8 +1,9 @@
 import { cookies } from "next/headers"
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
+import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/app-sidebar"
 import { Header } from "@/components/Header"
 import Footer from "@/components/Footer"
+import { SidebarIcon } from "lucide-react"
 
 export default async function DashboardLayout({
   children,
@@ -15,6 +16,7 @@ export default async function DashboardLayout({
   return (
     <SidebarProvider defaultOpen={defaultOpen}>
       <AppSidebar />
+      <SidebarInset>
       <main className="w-full">
         <div className="flex items-center border-b px-2 bg-sidebar">
           <SidebarTrigger />
@@ -25,6 +27,7 @@ export default async function DashboardLayout({
         {children}
       </main>
       <Footer />
+      </SidebarInset>
     </SidebarProvider>
   )
 }
