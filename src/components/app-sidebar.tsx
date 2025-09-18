@@ -18,6 +18,7 @@ import {
   SidebarFooter,
   SidebarHeader,
   SidebarRail,
+  SidebarSeparator,
 } from "@/components/ui/sidebar"
 import { MdDashboard } from "react-icons/md"
 
@@ -106,8 +107,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader>
         <TeamSwitcher teams={data.teams} />
       </SidebarHeader>
-      <SidebarContent>
+        <SidebarContent>
+        <SidebarSeparator />
         <NavProjects items={data.projects} />
+        <SidebarSeparator />
         <NavPlatForm items={data.NavPlatForm} />
       </SidebarContent>
       <SidebarFooter>
