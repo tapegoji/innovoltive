@@ -112,7 +112,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   // Note: I'm using state to show active item.
   // IRL you should use the url/router.
   const [activeItem, setActiveItem] = React.useState(data.navMain[0])
-  const { setOpen } = useSidebar()
+  const { setOpen, open } = useSidebar()
 
   return (
     <Sidebar
@@ -156,8 +156,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                         hidden: false,
                       }}
                       onClick={() => {
-                        setActiveItem(item)
-                        setOpen(true)
+                        if (activeItem?.title === item.title) {
+                          // If clicking the same active item, toggle the sidebar
+                          setOpen(!open)
+                        } else {
+                          // If clicking a different item, set it as active and open sidebar
+                          setActiveItem(item)
+                          setOpen(true)
+                        }
                       }}
                       isActive={activeItem?.title === item.title}
                       className="px-2.5 md:px-2"
@@ -190,9 +196,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarContent>
           <SidebarGroup className="px-0">
             <SidebarGroupContent>
-              {activeItem?.title === "Documentation" ? (
+              {activeItem?.items ? (
                 <SidebarMenu>
-                  {activeItem.items?.map((subItem: any) => (
+                  {activeItem.items.map((subItem: any) => (
                     <Collapsible
                       key={subItem.title}
                       asChild
@@ -223,16 +229,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     </Collapsible>
                   ))}
                 </SidebarMenu>
-              ) : activeItem?.items ? (
-                activeItem.items.map((subItem: any) => (
-                  <a
-                    href={subItem.url}
-                    key={subItem.title}
-                    className="hover:bg-sidebar-accent hover:text-sidebar-accent-foreground flex flex-col items-start gap-2 border-b p-4 text-sm leading-tight whitespace-nowrap last:border-b-0"
-                  >
-                    <span className="font-medium">{subItem.title}</span>
-                  </a>
-                ))
               ) : (
                 <div className="p-4 text-sm text-muted-foreground">
                   No sub-items for {activeItem?.title}
