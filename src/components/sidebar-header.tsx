@@ -40,8 +40,8 @@ export function SideBarHeader({
   }
 
   return (
-    <SidebarMenu className="p-0 flex  h-4"> 
-      <SidebarMenuItem className="p-0">
+    <SidebarMenu className="gap-0"> 
+      <SidebarMenuItem>
         <div className={open ? "justify-between flex" : "justify-center flex"}>
         {open ? (
           <>
@@ -54,7 +54,7 @@ export function SideBarHeader({
             data-slot="sidebar-trigger"
             variant="ghost"
             size="icon"
-            className="size-4"
+            className="size-6"
             onClick={toggleSidebar}
           >
             <PanelLeftIcon className="size-6" />

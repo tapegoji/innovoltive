@@ -103,7 +103,7 @@ const data = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
-      <SidebarHeader>
+      <SidebarHeader className="h-8 gap-0 p-1"  >
         <SideBarHeader teams={data.teams} />
       </SidebarHeader>
         <SidebarContent>
