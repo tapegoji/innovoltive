@@ -1,7 +1,14 @@
 import { cookies } from "next/headers"
-import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/app-sidebar"
-import { Header } from "@/components/Header"
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
 import Footer from "@/components/Footer"
 
 export default async function DashboardLayout({
@@ -13,19 +20,26 @@ export default async function DashboardLayout({
   const defaultOpen = cookieStore.get("sidebar_state")?.value === "true"
 
   return (
-    <SidebarProvider defaultOpen={defaultOpen} style={{ "--sidebar-width-icon": "3rem" } as React.CSSProperties}>
+    <SidebarProvider defaultOpen={defaultOpen} style={{ "--sidebar-width": "350px" } as React.CSSProperties}>
       <AppSidebar />
       <SidebarInset>
-      <main className="w-full">
-        <div className="flex items-center border-b px-2 bg-sidebar">
-          <SidebarTrigger />
-          <div className="flex-1">
-            <Header compact/>
-          </div>
-        </div>
-        {children}
-      </main>
-      <Footer />
+        <header className="bg-background sticky top-0 flex shrink-0 items-center gap-2 border-b p-4">
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem className="hidden md:block">
+                <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator className="hidden md:block" />
+              <BreadcrumbItem>
+                <BreadcrumbPage>Overview</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+        </header>
+        <main className="flex flex-1 flex-col gap-4 p-4">
+          {children}
+        </main>
+        <Footer />
       </SidebarInset>
     </SidebarProvider>
   )

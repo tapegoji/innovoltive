@@ -13,6 +13,7 @@ import {
 
 export function NavProjects({
   items,
+  onItemClick,
 }: {
   items: {
     title: string
@@ -24,6 +25,7 @@ export function NavProjects({
       url: string
     }[]
   }[]
+  onItemClick?: (item: any) => void
 }) {
   return (
     <SidebarGroup>
@@ -31,7 +33,7 @@ export function NavProjects({
       <SidebarMenu>
         {items.map((item) => (
           <SidebarMenuItem key={item.title}>
-            <SidebarMenuButton asChild>
+            <SidebarMenuButton asChild onClick={() => onItemClick?.(item)}>
               <Link href={item.url}>
                 {item.icon && <item.icon />}
                 <span>{item.title}</span>

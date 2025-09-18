@@ -21,6 +21,7 @@ import {
 
 export function NavPlatForm({
   items,
+  onItemClick,
 }: {
   items: {
     title: string
@@ -33,6 +34,7 @@ export function NavPlatForm({
       icon?: LucideIcon
     }[]
   }[]
+  onItemClick?: (item: any) => void
 }) {
   return (
     <SidebarGroup>
@@ -47,7 +49,7 @@ export function NavPlatForm({
           >
             <SidebarMenuItem>
               <CollapsibleTrigger asChild>
-                <SidebarMenuButton tooltip={item.title}>
+                <SidebarMenuButton tooltip={item.title} onClick={() => onItemClick?.(item)}>
                   {item.icon && <item.icon />}
                   <span>{item.title}</span>
                   <Plus className="ml-auto transition-all duration-200 group-data-[state=open]/collapsible:hidden" />
