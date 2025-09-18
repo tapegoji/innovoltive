@@ -1,5 +1,6 @@
 import { cookies } from "next/headers"
-import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
+import SidebarTrigger from "@/components/side-bar-trigger"
 import { AppSidebar } from "@/components/app-sidebar"
 import { Header } from "@/components/Header"
 import Footer from "@/components/Footer"
